@@ -333,7 +333,6 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval
         // Calculate size svg should be.
         // Calcule size tree should be including margin.
         tree.size([newHeight, viewerWidth]);
-        console.log("New height: " + newHeight);
 
         // Pass heirarchy to tree
         tree(root);

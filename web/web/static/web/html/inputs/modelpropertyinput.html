@@ -1,0 +1,41 @@
+<div class="hxRow" ng-form="modelPropForm">
+  <div class="hxCol hxSpan-2">
+    <label>Model</label>
+  </div>
+  <div class="hxCol hxSpan-4">
+    <select
+      class="hxTextCtrl"
+      name="model"
+      ng-model="$ctrl.value.model"
+      ng-required="true"
+      ng-change="$ctrl.modelChange()">
+      <option ng-repeat="model in $ctrl.modelChoices">{{ model }}</option>
+    </select>
+  </div>
+  <div class="hxCol hxSpan-2">
+    <label>Property</label>
+  </div>
+  <div class="hxCol hxSpan-4">
+    <select
+      class="hxTextCtrl"
+      name="prop"
+      ng-model="$ctrl.value.prop"
+      ng-required="true"
+      ng-change="$ctrl.change()">
+      <option ng-repeat="property in $ctrl.propertyChoices">{{ property }}</option>
+    </select>
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="modelPropForm.$invalid">
+    <div ng-if="modelPropForm.model.$error.required"><hx-error>Please select a model.</hx-error></div>
+    <div ng-if="modelPropForm.prop.$error.required"><hx-error>Please select a property.</hx-error></div>
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="$ctrl.serverErrors">
+    <div
+      ng-if="$ctrl.serverErrors.model"
+      ng-repeat="e in $ctrl.serverErrors.model"><hx-error>Model: {{ e }}</hx-error></div>
+    <div
+      ng-if="$ctrl.serverErrors.prop"
+      ng-repeat="e in $ctrl.serverErrors.prop"><hx-error>Property: {{ e }}</hx-error></div>
+    </div>
+  </div>
+</div>

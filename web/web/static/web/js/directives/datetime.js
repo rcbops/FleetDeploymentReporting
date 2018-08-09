@@ -6,10 +6,25 @@ angular.module('cloudSnitch').directive('dateTime', function() {
     return {
         require: 'ngModel',
         link: function(scope, elm, attrs, ctrl) {
-            ctrl.$validators.dateTime = function(modelValue, viewValue) {
-                return moment(viewValue, format).isValid();
+            function timeValidator(ngModelValue) {
+                var m = moment(ngModelValue, format, true);
+                ctrl.$setValidity('dateTime', m.isValid());
+                return ngModelValue;
             };
+            ctrl.$parsers.push(timeValidator);
         }
     }
 });
 
+angular.module('cloudSnitch').directive('dateTimeForceVal', function() {
+    var format = 'YYYY-MM-DD HH:mm:ss';
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            scope.$watch(attrs['ngModel'], function (v) {
+                ctrl.$setViewValue(null);
+                ctrl.$setViewValue(v);
+            });
+        }
+    }
+});

@@ -1,7 +1,7 @@
 import logging
 
 from cloud_snitch.models import registry
-from .query import Query
+from neo4jdriver.query import Query
 
 logger = logging.getLogger(__name__)
 

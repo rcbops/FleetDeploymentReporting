@@ -24,4 +24,10 @@ angular.module('cloudSnitch').controller('MainController', ['$scope', 'typesServ
         'STARTS WITH',
         'ENDS WITH'
     ];
+
+    $scope.changeSubApp = function(newApp) {
+        $scope.subApp = newApp;
+    };
+
+    $scope.subApp = 'browse';
 }]);

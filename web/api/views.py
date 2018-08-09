@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import list_route
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from neo4jdriver.query import Query
 
 from .decorators import cls_cached_result
 
@@ -21,7 +22,6 @@ from .serializers import PropertySerializer
 from .serializers import SearchSerializer
 from .serializers import TimesChangedSerializer
 
-from .query import Query
 from .query import TimesQuery
 
 from .tasks import objectdiff

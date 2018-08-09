@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     {% if cloud_snitch_web_raxauth_enabled or cloud_snitch_testenv %}'raxauth',{% endif %}
     'web.apps.WebConfig',
     'common.apps.CommonConfig',
-    'api.apps.ApiConfig'
+    'api.apps.ApiConfig',
+    'reports.apps.ReportsConfig'
 ]
 
 MIDDLEWARE = [

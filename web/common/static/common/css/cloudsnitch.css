@@ -41,13 +41,18 @@ body.hxHorizontal {
   height : 1.5rem;
 }*/
 
-.panesContainer {
+.panesContainer, .reportingContainer {
   display: flex;
   overflow: hidden;
   position: relative;
   width: 100%;
   backface-visibility: hidden;
   will-change: overflow;
+}
+
+.reportingContainer {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 pane {
@@ -242,6 +247,25 @@ div.diffNodeDetail hx-panel {
 .diffRight {
     background-color: #C8E6C9;
     color: #1B5E20;
+}
+
+
+.busyContainer {
+  background-color: rgba(0,0,0,0.3);
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.busyContainer .hxBox-md {
+  border: 3px solid #0c7c84;
+  background: white;
+  border-radius: 10px;
 }
 
 .diffBusy {

@@ -96,6 +96,9 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
     service.path = function(label) {
         var p = [];
         var path = service.paths[label];
+        if (!angular.isDefined(path)) {
+            return [];
+        }
         for (var i = 0; i < path.length; i++) {
             p.push(path[i]);
         }

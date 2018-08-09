@@ -1,0 +1,58 @@
+<div class="hxCol hxSpan-12">
+  <div ng-if="$ctrl.label" class="hxRow">
+    <div class="hxCol hxSpan-12"><h5>{{ $ctrl.label }}</h5></div>
+  </div>
+
+  <div ng-if="$ctrl.help_text" class="hxRow">
+    <div class="hxCol hxSpan-12">{{ $ctrl.help_text }}</div>
+  </div>
+
+  <div ng-repeat="value in $ctrl.values track by $index" ng-switch="$ctrl.options.component" class="hxRow">
+    <time-input
+      ng-switch-when="Time"
+      options="$ctrl.options"
+      on-change="$ctrl.update($index, change)"
+      all="$ctrl.all"
+      server-errors="$ctrl.serverErrors[$index]"
+      value="$ctrl.values[$index]"
+      class="hxCol hxSpan-11"></time-input>
+
+    <model-input
+      ng-switch-when="Model"
+      options="$ctrl.options"
+      on-change="$ctrl.update($index, change)"
+      all="$ctrl.all"
+      server-errors="$ctrl.serverErrors[$index]"
+      value="$ctrl.values[$index]"
+      class="hxCol hxSpan-11"></model-input>
+
+    <model-property-input
+      ng-switch-when="ModelProperty"
+      options="$ctrl.options"
+      on-change="$ctrl.update($index, change)"
+      all="$ctrl.all"
+      server-errors="$ctrl.serverErrors[$index]"
+      value="$ctrl.values[$index]"
+      class="hxCol hxSpan-11"></model-property-input>
+
+    <select-input
+      ng-switch-when="Select"
+      options="$ctrl.options"
+      on-change="$ctrl.update($index, change)"
+      all="$ctrl.all"
+      server-errors="$ctrl.serverErrors[$index]"
+      value="$ctrl.values[$index]"
+      class="hxCol hxSpan-11"></select-input>
+
+    <div class="hxCol hxSpan-1" ng-if="$ctrl.canRemove()">
+      <button type="button" class="hxBtn" ng-click="$ctrl.remove($index)"><hx-icon type="minus"</hx-icon></button>
+    </div>
+
+  </div>
+
+  <div ng-if="$ctrl.canAdd()" class="hxRow">
+    <div class="hxCol hxSpan-12">
+      <button class="hxBtn" type="button" ng-click="$ctrl.add()"><hx-icon type="plus"></hx-icon></button>
+    </div>
+  </div>
+</div>

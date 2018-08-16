@@ -1,6 +1,6 @@
 import mock
 
-from django.test import TestCase
+from django.test import tag, TestCase
 
 from api.query import Query
 from api.query import TimesQuery
@@ -72,12 +72,14 @@ class TestQuery(TestCase):
     ORDER BY environment.account_number_name ASC
     """
 
+    @tag('unit')
     def test_match_root_label(self):
         """Test match clause targeted at a root level model."""
         q = Query('Environment')
         expected = "MATCH (environment:Environment)"
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_match_with_state(self):
         """Test match clause including a model with state."""
         q = Query('Host')
@@ -87,18 +89,21 @@ class TestQuery(TestCase):
         )
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_return_root_label(self):
         """Test return clause targeted at a root level model."""
         q = Query('Environment')
         expected = "RETURN environment"
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_return_with_state(self):
         """Test return clause that should include state."""
         q = Query('Host')
         expected = 'RETURN environment, host, host_state'
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     @mock.patch('api.query.utils.milliseconds_now', return_value=10)
     def test_default_time(self, m_now):
         """Test that default time parameter."""
@@ -108,18 +113,21 @@ class TestQuery(TestCase):
         q.time(None)
         self.assertEquals(q.params['time'], 10)
 
+    @tag('unit')
     def test_provided_time(self):
         """Test that providing a time changes the query params."""
         q = Query('Environment')
         q.time(3)
         self.assertEquals(q.params['time'], 3)
 
+    @tag('unit')
     def test_orderby_default(self):
         """Test default orderby clause."""
         q = Query('Environment')
         expected = "ORDER BY environment.account_number_name ASC"
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_orderby_no_label(self):
         """Test a single nondefault orderby"""
         q = Query('Environment')
@@ -127,18 +135,21 @@ class TestQuery(TestCase):
         expected = "ORDER BY environment.account_number DESC"
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_orderby_invalid_property(self):
         """Test that orderby raises InvalidPropertyError"""
         q = Query('Environment')
         with self.assertRaises(InvalidPropertyError):
             q.orderby('invalidproperty', 'ASC')
 
+    @tag('unit')
     def test_orderby_invalid_label(self):
         """Test that orderby raises InvalidLabelError"""
         q = Query('Environment')
         with self.assertRaises(InvalidLabelError):
             q.orderby('aproperty', 'DESC', label='invalidlabel')
 
+    @tag('unit')
     def test_orderby_multiple(self):
         """Test multiple orderby statements."""
         q = Query('Environment')
@@ -150,6 +161,7 @@ class TestQuery(TestCase):
         )
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_orderby_state_property(self):
         """Test orderby on a state property."""
         q = Query('Host')
@@ -157,11 +169,13 @@ class TestQuery(TestCase):
         expected = 'ORDER BY host_state.kernel DESC'
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_limit_none(self):
         """Test query where no limit has been set."""
         q = Query('Environment')
         self.assertFalse('LIMIT' in str(q))
 
+    @tag('unit')
     def test_limit(self):
         """Test query where a limit as been set."""
         q = Query('Environment')
@@ -169,11 +183,13 @@ class TestQuery(TestCase):
         q.limit(10)
         self.assertTrue('LIMIT 10' in str(q))
 
+    @tag('unit')
     def test_skip_none(self):
         """Test query where no skip has been set."""
         q = Query('Environment')
         self.assertFalse('SKIP' in str(q))
 
+    @tag('unit')
     def test_skip(self):
         """Test query where skip has been set."""
         q = Query('Environment')
@@ -181,6 +197,7 @@ class TestQuery(TestCase):
         q.skip(10)
         self.assertTrue('SKIP 10' in str(q))
 
+    @tag('unit')
     def test_filter_without_label(self):
         """Test filtering using default label."""
         q = Query('Host')
@@ -189,6 +206,7 @@ class TestQuery(TestCase):
         self.assertTrue(expected in str(q))
         self.assertEquals(q.params['filterval0'], 'somehostname')
 
+    @tag('unit')
     def test_filter_with_label(self):
         """Test filtering with a non default label."""
         q = Query('Host')
@@ -196,18 +214,21 @@ class TestQuery(TestCase):
         expected = 'WHERE environment.account_number = $filterval0'
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_filter_invalid_label(self):
         """Test filtering with invalid label."""
         q = Query('Host')
         with self.assertRaises(InvalidLabelError):
             q.filter('someprop', 'someop', 'someval', label='InvalidLabel')
 
+    @tag('unit')
     def test_filter_invalid_prop(self):
         """Test filtering with invalid property."""
         q = Query('Host')
         with self.assertRaises(InvalidPropertyError):
             q.filter('someinvalidprop', 'someop', 'someval')
 
+    @tag('unit')
     def test_multiple_filters(self):
         """Tests more than one filters."""
         q = Query('Host')
@@ -219,6 +240,7 @@ class TestQuery(TestCase):
         )
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     def test_rel_filters(self):
         """Test adding time filters on relationships."""
         q = Query('Virtualenv')
@@ -228,6 +250,7 @@ class TestQuery(TestCase):
         )
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     @mock.patch('api.query.get_connection')
     def test_count(self, m_connection):
         """Tests counting number of results."""
@@ -238,6 +261,7 @@ class TestQuery(TestCase):
         q = Query('Environment')
         self.assertEquals(q.count(), 13)
 
+    @tag('unit')
     @mock.patch('api.query.Query.fetch')
     def test_page_defaults(self, m_fetch):
         """Test default arguments to page() method."""
@@ -249,6 +273,7 @@ class TestQuery(TestCase):
         expected = 'LIMIT 100'
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     @mock.patch('api.query.get_connection')
     def test_page_with_page(self, m_fetch):
         """Test providing page with a page and a size."""
@@ -259,6 +284,7 @@ class TestQuery(TestCase):
         expected = "LIMIT 500"
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     @mock.patch('api.query.get_connection')
     def test_page_with_index(self, m_fetch):
         """Test providing page an index and a size."""
@@ -269,6 +295,7 @@ class TestQuery(TestCase):
         expected = "LIMIT 500"
         self.assertTrue(expected in str(q))
 
+    @tag('unit')
     @mock.patch('api.query.get_connection')
     def test_page_with_negative_index(self, m_fetch):
         """Test providing page with a negative index and a size."""
@@ -282,6 +309,7 @@ class TestQuery(TestCase):
 
 class TestTimesQuery(TestCase):
 
+    @tag('unit')
     def test_query_str_and_params(self):
         label = 'Environment'
         id_ = 'someid'
@@ -297,6 +325,7 @@ class TestTimesQuery(TestCase):
         self.assertEquals(str(q), expected)
         self.assertEquals(q.params['identity'], id_)
 
+    @tag('unit')
     @mock.patch('api.query.get_connection')
     def test_fetch(self, m_connection):
         data = [[{'t': 1}, {'t': 2}, {'t': 3}]]

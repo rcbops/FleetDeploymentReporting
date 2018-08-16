@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware', # Normal db auth
+    'django.contrib.auth.middleware.AuthenticationMiddleware', #  Normal db auth
     # 'raxauth.middleware.AuthenticationMiddleware', # Auth from rackspace
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -210,7 +210,7 @@ LOGGING = {
 }
 
 # LOGIN_URL = '/raxauth/login/' # RAX AUTH
-LOGIN_URL = '/web/login/' # DB AUTH
+LOGIN_URL = '/web/login/' #  DB AUTH
 
 
 LOGIN_REDIRECT_URL = '/web/'
@@ -218,9 +218,9 @@ LOGIN_REDIRECT_URL = '/web/'
 # AUTH_USER_MODEL = 'raxauth.RaxAuthUser' # RAX AUTH
 # AUTHENTICATION_BACKENDS = [ # RAX AUTH
 #    'raxauth.backend.RaxAuthBackend' # RAX AUTH
-#] # RAX AUTH
+# ] # RAX AUTH
 
-#RAXAUTH_AUTH_URL = 'https://someurl.com' # RAX AUTH
+# RAXAUTH_AUTH_URL = 'https://someurl.com' # RAX AUTH
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -230,4 +230,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     )
 }
-

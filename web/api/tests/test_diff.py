@@ -1,10 +1,11 @@
-from django.test import TestCase
+from django.test import tag, TestCase
 
 from api.diff import Node
 
 
 class TestNode(TestCase):
 
+    @tag('unit')
     def test_dirty(self):
         """Test the node.dirty property."""
         n = Node('someid', 'somelabel')
@@ -23,6 +24,7 @@ class TestNode(TestCase):
         n.rel_changed = True
         self.assertTrue(n.dirty)
 
+    @tag('unit')
     def test_cleaned_props(self):
         """Test that samevalue properties are moved to both props."""
         n = Node('someid', 'somelabel')
@@ -54,6 +56,7 @@ class TestNode(TestCase):
             'bothprop': 'bothval'
         })
 
+    @tag('unit')
     def test_cleaned_descendents(self):
         """Test that rel_changed is marked."""
         n = Node('someid', 'somelabel')
@@ -78,18 +81,21 @@ class TestNode(TestCase):
         n.clean()
         self.assertFalse(n.rel_changed)
 
+    @tag('unit')
     def test_add_property_left(self):
         """Test adding property from the left."""
         n = Node('someid', 'somelabel')
         n.add_property('prop', 'val', 'left')
         self.assertDictEqual(n.left_props, {'prop': 'val'})
 
+    @tag('unit')
     def test_add_property_right(self):
         """Test adding property from the right."""
         n = Node('someid', 'somelabel')
         n.add_property('prop', 'val', 'right')
         self.assertDictEqual(n.right_props, {'prop': 'val'})
 
+    @tag('unit')
     def test_update_left(self):
         """Test updating from the left."""
         n = Node('someid', 'somelabel')
@@ -97,6 +103,7 @@ class TestNode(TestCase):
         n.update(d, 'left')
         self.assertDictEqual(d, n.left_props)
 
+    @tag('unit')
     def test_update_right(self):
         """Test updating from the right."""
         n = Node('someid', 'somelabel')

@@ -1,0 +1,2 @@
+- import_playbook: collect.yml
+- import_playbook: sync.yml

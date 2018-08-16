@@ -62,14 +62,14 @@ class InterfaceParser:
         self.directives = []
 
         content=[]
-        self.source_files=self.getSources()
+        self.source_files = self.get_sources()
         for source_file in self.source_files:
-            fd=open(source_file)
+            fd = open(source_file)
             for line in fd.read().splitlines():
-                line=line.strip()
+                line = line.strip()
                 content.append(line)
             fd.close()
-        self.iterator=iter(content)
+        self.iterator = iter(content)
         self.parse()
 
     def parse(self):
@@ -93,12 +93,12 @@ class InterfaceParser:
             self.directives.append([directive])
         return
 
-    def getSources(self):
-        source_files=[ NETWORK_INTERFACE_FILENAME ]
+    def get_sources(self):
+        source_files = [ NETWORK_INTERFACE_FILENAME ]
         for line in open(NETWORK_INTERFACE_FILENAME).read().splitlines():
-            line=line.strip()
+            line = line.strip()
             if line.startswith("source"):
-                source_path=line.split(" ")[1]
+                source_path = line.split(" ")[1]
                 if path.isfile(source_path):
                     source_files.append(source_path)
                 else:
@@ -112,7 +112,7 @@ class InterfaceParser:
                             source_files.append(join(dirname,f))
         return source_files
 
-    def getInterfaces(self):
+    def get_interfaces(self):
         interfaces=[]
         for directive in self.directives:
             if directive[0].startswith("iface"):
@@ -124,8 +124,8 @@ class InterfaceParser:
                     for sub in directive[1]:
                         for key in CONFIGURED_PARAMS:
                             if sub.startswith(key):
-                                val=sub.split(key)[1]
-                                interfacekwargs[device][key]=val.strip()
+                                val = sub.split(key)[1]
+                                interfacekwargs[device][key] = val.strip()
                     interfaces.append(interfacekwargs)
         return interfaces
 
@@ -145,7 +145,7 @@ def run_module():
     )
 
     parser=InterfaceParser()
-    for interface in parser.getInterfaces():
+    for interface in parser.get_interfaces():
         for key,value in interface.iteritems():
             result['payload'][key] = {}
             for k, v in value.iteritems():

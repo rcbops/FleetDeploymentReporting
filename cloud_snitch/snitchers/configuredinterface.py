@@ -54,7 +54,7 @@ class ConfiguredInterfaceSnitcher(BaseSnitcher):
                 if '-' in key:
                     # neo4j properties don't allow -
                     # dns-nameservers, offline-sg
-                    key=key.replace('-','_')
+                    key = key.replace('-','_')
                 interfacekwargs[key] = val
             
             interface = ConfiguredInterfaceEntity(**interfacekwargs)

@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_results',
     'neo4jdriver',
-    {% if cloud_snitch_web_raxauth_enabled %}'raxauth',{% endif %}
+    {% if cloud_snitch_web_raxauth_enabled or cloud_snitch_testenv %}'raxauth',{% endif %}
     'web.apps.WebConfig',
     'common.apps.CommonConfig',
     'api.apps.ApiConfig'
@@ -230,6 +230,8 @@ AUTHENTICATION_BACKENDS = [
     'raxauth.backend.RaxAuthBackend'
 ]
 RAXAUTH_AUTH_URL = '{{ cloud_snitch_web_raxauth_auth_url }}'
+{% elif cloud_snitch_testenv %}
+RAXAUTH_AUTH_URL = 'https://someurl.com'
 {% endif %}
 
 REST_FRAMEWORK = {

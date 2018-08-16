@@ -1,0 +1,10 @@
+---
+neo4j_data_dump_file: /opt/neo4j_dump
+
+cloudsnitch_test_pip_pkgs:
+  mock: 2.0.0
+
+cloud_snitch_testenv: True
+
+cloud_snitch_web_venv: /opt/venvs/cloudsnitch
+cloud_snitch_web_repo_dir: /opt/web/cloud_snitch

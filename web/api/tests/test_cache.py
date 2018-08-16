@@ -3,7 +3,7 @@ import time
 import logging
 
 from django.core.cache.backends.locmem import LocMemCache
-from django.test import TestCase
+from django.test import tag, TestCase
 
 from api.cache import cache_key
 from api import decorators
@@ -21,19 +21,22 @@ class TestCacheKey(TestCase):
     args = (1, 2, 3)
     kwargs = {'key1': 'val1', 'key2': 'val2', 'key3': 'val3'}
 
+    @tag('unit')
     def test_default(self):
         key = cache_key(self.args, self.kwargs)
-        expected = b'LSgxLCAyLCAzKS1bKCdrZXkxJywgJ3ZhbDEnKSwgKCdrZXkyJywgJ3ZhbDInKSwgKCdrZXkzJywgJ3ZhbDMnKV0=' # noqa E501
+        expected = b'LSgxLCAyLCAzKS1bKCdrZXkxJywgJ3ZhbDEnKSwgKCdrZXkyJywgJ3ZhbDInKSwgKCdrZXkzJywgJ3ZhbDMnKV0='  # noqa E501
         self.assertEquals(key, expected)
 
+    @tag('unit')
     def test_prefix(self):
         key = cache_key(self.args, self.kwargs, prefix='test_prefix_123')
-        expected = b'dGVzdF9wcmVmaXhfMTIzLSgxLCAyLCAzKS1bKCdrZXkxJywgJ3ZhbDEnKSwgKCdrZXkyJywgJ3ZhbDInKSwgKCdrZXkzJywgJ3ZhbDMnKV0=' # noqa E501
+        expected = b'dGVzdF9wcmVmaXhfMTIzLSgxLCAyLCAzKS1bKCdrZXkxJywgJ3ZhbDEnKSwgKCdrZXkyJywgJ3ZhbDInKSwgKCdrZXkzJywgJ3ZhbDMnKV0='  # noqa E501
         self.assertEquals(key, expected)
 
+    @tag('unit')
     def test_non_zero_index(self):
         key = cache_key(self.args, self.kwargs, index=1)
-        expected = b'LSgyLCAzKS1bKCdrZXkxJywgJ3ZhbDEnKSwgKCdrZXkyJywgJ3ZhbDInKSwgKCdrZXkzJywgJ3ZhbDMnKV0=' # noqa E501
+        expected = b'LSgyLCAzKS1bKCdrZXkxJywgJ3ZhbDEnKSwgKCdrZXkyJywgJ3ZhbDInKSwgKCdrZXkzJywgJ3ZhbDMnKV0='  # noqa E501
         self.assertEquals(key, expected)
 
 
@@ -49,6 +52,7 @@ class BaseCacheCase(TestCase):
 
 
 class TestCachedResult(BaseCacheCase):
+    @tag('unit')
     def test_default(self):
         @cached_result()
         def test_func():
@@ -57,6 +61,7 @@ class TestCachedResult(BaseCacheCase):
         v2 = test_func()
         self.assertEquals(v1, v2)
 
+    @tag('unit')
     def test_with_prefix(self):
         @cached_result(prefix='test_func')
         def test_func():
@@ -65,6 +70,7 @@ class TestCachedResult(BaseCacheCase):
         v2 = test_func()
         self.assertEquals(v1, v2)
 
+    @tag('unit')
     def test_timeout(self):
         @cached_result(timeout=1)
         def test_func():
@@ -76,6 +82,7 @@ class TestCachedResult(BaseCacheCase):
 
 
 class TestClsCachedResult(BaseCacheCase):
+    @tag('unit')
     def test_default(self):
         class SillyTest:
             @cls_cached_result()
@@ -86,6 +93,7 @@ class TestClsCachedResult(BaseCacheCase):
         v2 = obj.test_func('arg1', 'arg2')
         self.assertEquals(v1, v2)
 
+    @tag('unit')
     def test_with_prefix(self):
         class SillyTest:
             @cls_cached_result(prefix='test_func')
@@ -96,6 +104,7 @@ class TestClsCachedResult(BaseCacheCase):
         v2 = obj.test_func('arg1', 'arg2')
         self.assertEquals(v1, v2)
 
+    @tag('unit')
     def test_timeout(self):
         class SillyTest:
             @cls_cached_result(timeout=1)

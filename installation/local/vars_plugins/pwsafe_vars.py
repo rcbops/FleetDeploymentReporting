@@ -16,9 +16,13 @@ DOCUMENTATION = '''
     short_description: In charge of loading pwsafe vars
     description:
         - Slurps in variables from password safe
-        - Uses environment variables SSO_USERNAME and SSO_PASSWORD and PWSAFE_PROJECT for login credentials
-        - Uses the credential's "prerequisites" field to map to variable names within ansible.
-        - Credentials within the project are turned into variables of pwsafe_<<prerequisites>>_username and pwsafe_<<prerequisites>>_password
+        - Uses environment variables SSO_USERNAME and SSO_PASSWORD
+          and PWSAFE_PROJECT for login credentials
+        - Uses the credential's "prerequisites" field to map to variable
+          names within ansible.
+        - Credentials within the project are turned into variables of
+          pwsafe_<<prerequisites>>_username and
+          pwsafe_<<prerequisites>>_password
     notes:
         - Not sure if this works
 '''
@@ -53,7 +57,6 @@ class VarsModule(BaseVarsPlugin):
             msg = ("Please export env vars: "
                    "SSO_USERNAME, SSO_PASSWORD, and PWSAFE_PROJECT.")
             raise Exception(msg)
-
 
         pwsafe_client = PasswordSafeComp(sso_username, sso_password).client
         creds = pwsafe_client.get_creds(pwsafe_project).json()

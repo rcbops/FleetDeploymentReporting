@@ -2,6 +2,7 @@ import logging
 import mock
 
 from django.contrib.auth.models import User
+from django.test import tag
 
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -32,10 +33,12 @@ class BaseApiTestCase(APITestCase):
 
 class TestModelViewSetList(BaseApiTestCase):
 
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.get('/api/models/')
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_with_auth(self):
         self.client.login(**self.credentials)
         resp = self.client.get('/api/models/')
@@ -46,15 +49,18 @@ class TestModelViewSetList(BaseApiTestCase):
 
 class TestModelViewSetRetrieve(BaseApiTestCase):
 
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.get('/api/models/Environment/')
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_not_found(self):
         self.client.login(**self.credentials)
         resp = self.client.get('/api/models/SomeRandomModel/')
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     def test_200(self):
         self.client.login(**self.credentials)
         resp = self.client.get('/api/models/Environment/')
@@ -64,10 +70,12 @@ class TestModelViewSetRetrieve(BaseApiTestCase):
 
 
 class TestPathViewSetList(BaseApiTestCase):
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.get('/api/paths/')
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_with_auth(self):
         self.client.login(**self.credentials)
         resp = self.client.get('/api/paths/')
@@ -80,10 +88,12 @@ class TestPathViewSetList(BaseApiTestCase):
 
 
 class TestPropertyViewSetList(BaseApiTestCase):
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.get('/api/properties/')
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_with_auth(self):
         self.client.login(**self.credentials)
         resp = self.client.get('/api/properties/')
@@ -109,16 +119,19 @@ class TestObjectViewSetTimes(BaseApiTestCase):
             'time': 10
         }
 
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.post('/api/objects/times/', self.body)
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', return_value=None)
     def test_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post('/api/objects/times/', self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', return_value=fake_fetch_result)
     @mock.patch('api.query.TimesQuery.fetch', return_value=[1, 2, 3])
     def test_resp(self, m_fetch, m_times):
@@ -128,6 +141,7 @@ class TestObjectViewSetTimes(BaseApiTestCase):
         self.assertDictEqual(self.body, data['data'])
         self.assertListEqual([1, 2, 3, 10], data['times'])
 
+    @tag('integration')
     def test_invalid(self):
         self.client.login(**self.credentials)
         resp = self.client.post('/api/objects/times/', {})
@@ -144,15 +158,18 @@ class TestObjectViewSetSearch(BaseApiTestCase):
             'page': 1
         }
 
+    @tag('integration')
     def test_no_auth(self):
         resp = self.client.post('/api/objects/search/', self.body)
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_invalid_req(self):
         self.client.login(**self.credentials)
         resp = self.client.post('/api/objects/search/', {})
         self.assertEquals(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @tag('integration')
     @mock.patch('api.query.Query.count', return_value=5)
     @mock.patch('api.query.Query.page', return_value='testpage')
     def test_resp(self, m_page, m_count):
@@ -208,27 +225,32 @@ class TestObjectDiffViewSetNode(BaseApiTestCase):
             'node_identity': 'someid'
         }
 
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.post(self.baseurl, {})
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_invalid_req(self):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, {})
         self.assertEquals(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', return_value=[])
     def test_left_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[], [1]])
     def test_right_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', side_effect=JobRunningError())
     def test_job_running(self, m_diff, m_fetch):
@@ -236,6 +258,7 @@ class TestObjectDiffViewSetNode(BaseApiTestCase):
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_202_ACCEPTED)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch(
         'api.views.objectdiff',
@@ -246,6 +269,7 @@ class TestObjectDiffViewSetNode(BaseApiTestCase):
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', side_effect=JobError())
     def test_job_error(self, m_diff, m_fetch):
@@ -256,6 +280,7 @@ class TestObjectDiffViewSetNode(BaseApiTestCase):
             status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch(
         'api.views.objectdiff',
@@ -287,27 +312,32 @@ class TestObjectDiffViewSetNodes(BaseApiTestCase):
             'limit': 10
         }
 
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.post(self.baseurl, {})
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_invalid_req(self):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, {})
         self.assertEquals(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', return_value=[])
     def test_left_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[], [1]])
     def test_right_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', side_effect=JobRunningError())
     def test_job_running(self, m_diff, m_fetch):
@@ -315,6 +345,7 @@ class TestObjectDiffViewSetNodes(BaseApiTestCase):
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_202_ACCEPTED)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', side_effect=JobError())
     def test_job_error(self, m_diff, m_fetch):
@@ -325,6 +356,7 @@ class TestObjectDiffViewSetNodes(BaseApiTestCase):
             status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', return_value=FakeDiffResult())
     def test_nodes(self, m_diff, m_fetch):
@@ -351,27 +383,32 @@ class TestObjectDiffViewSetStructure(BaseApiTestCase):
             'right_time': 2
         }
 
+    @tag('integration')
     def test_without_auth(self):
         resp = self.client.post(self.baseurl, {})
         self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    @tag('integration')
     def test_invalid_req(self):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, {})
         self.assertEquals(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', return_value=[])
     def test_left_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[], [1]])
     def test_right_not_found(self, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', side_effect=JobRunningError())
     def test_job_running(self, m_diff, m_fetch):
@@ -379,6 +416,7 @@ class TestObjectDiffViewSetStructure(BaseApiTestCase):
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_202_ACCEPTED)
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', side_effect=JobError())
     def test_job_error(self, m_diff, m_fetch):
@@ -389,6 +427,7 @@ class TestObjectDiffViewSetStructure(BaseApiTestCase):
             status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+    @tag('integration')
     @mock.patch('api.query.Query.fetch', side_effect=[[1], [1]])
     @mock.patch('api.views.objectdiff', return_value=FakeDiffResult())
     def test_frame(self, m_diff, m_fetch):

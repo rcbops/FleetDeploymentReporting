@@ -214,5 +214,5 @@ class RaxAuthUser(AbstractBaseUser):
         :returns: HMAC of the token id.
         :rtype: str
         """
-        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash" # noqa E501
+        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"  # noqa E501
         return salted_hmac(key_salt, self.token_id).hexdigest()

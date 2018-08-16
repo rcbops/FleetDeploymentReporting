@@ -1,0 +1,45 @@
+---
+- hosts: web
+  roles:
+    - testenv_install
+  tags:
+    - testenv
+
+- hosts: web
+  vars:
+    cloud_snitch_testenv: True
+  roles:
+    - web_install
+  tags:
+    - web
+
+- hosts: neo4j
+  vars:
+    crypt_name: neo4jcryptvol
+    crypt_backing_device: "{{ neo4j_crypt_backing_device }}"
+    crypt_mount_point: "{{ neo4j_home }}"
+    crypt_disk_password: "{{ pwsafe_neo4j_disk_password }}"
+    neo4j_data_dump_file: "/opt/neo4j_dump"
+  tasks:
+    - include_role:
+        name: crypt
+      when: neo4j_crypt_enabled
+  tags:
+    - crypt
+
+- hosts: neo4j
+  roles:
+    - java_install
+  tags:
+    - java
+
+- hosts: neo4j
+  roles:
+    - neo4j_install
+  tags:
+    - neo4j
+
+- hosts: cloud_snitch_sync
+  roles:
+    - sync_install
+

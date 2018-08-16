@@ -1,0 +1,19 @@
+---
+- name: Neo4j - Remove current graph.db directory
+  file:
+    path: "{{ neo4j_home }}/data/databases/graph.db"
+    state: absent
+
+- name: Neo4j - Load database from dump file
+  command: neo4j-admin load --from={{ neo4j_data_dump_file }}
+  notify:
+    - Restart Neo4j
+
+- name: Neo4j - Set graph.db directory/file permissions
+  file:
+    path: "{{ neo4j_home }}/data/databases/graph.db"
+    owner: "{{ neo4j_user }}"
+    group: "{{ neo4j_group }}"
+    recurse: True
+  notify:
+    - Restart Neo4j

@@ -101,3 +101,5 @@ cloud_snitch_web_celery_concurrency: 2
 cloud_snitch_web_celery_pid_file: /var/run/celery/%n.pid
 cloud_snitch_web_celery_log_file: "{{ cloud_snitch_web_log_dir }}/%n%I.log"
 cloud_snitch_web_celery_log_level: INFO
+
+cloud_snitch_testenv: False

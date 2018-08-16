@@ -1,6 +1,6 @@
 import logging
 
-from django.test import TestCase
+from django.test import tag, TestCase
 
 from api.serializers import DiffNodeSerializer
 from api.serializers import DiffNodesSerializer
@@ -17,12 +17,14 @@ logging.getLogger('api').setLevel(logging.ERROR)
 
 class TestModelSerializer(TestCase):
 
+    @tag('unit')
     def test_serialize_single(self):
         test_obj = {'somekey': 'someval'}
         s = ModelSerializer(test_obj)
         data = s.data
         self.assertTrue(data is test_obj)
 
+    @tag('unit')
     def test_serialize_many(self):
         test_objs = [
             {'somekey1': 'someval1'},
@@ -35,6 +37,7 @@ class TestModelSerializer(TestCase):
 
 class TestPropertySerializer(TestCase):
 
+    @tag('unit')
     def test_serialize_single(self):
         props = ['prop1', 'prop2', 'prop3']
         data = PropertySerializer(props).data
@@ -68,37 +71,46 @@ class TestFilterSerializer(SerializerCase):
             'value': 'test_val'
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_property_too_long(self):
         self.data['prop'] = 't' * 300
         self.assertInvalid()
 
+    @tag('unit')
     def test_property_missing(self):
         del self.data['prop']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_operator(self):
         self.data['operator'] = 'abc'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_operator(self):
         del self.data['operator']
         self.assertInvalid()
 
+    @tag('unit')
     def test_value_too_long(self):
         self.data['value'] = 't' * 257
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_value(self):
         del self.data['value']
         self.assertInvalid()
@@ -115,29 +127,36 @@ class TestOrderSerializer(SerializerCase):
             'direction': 'asc'
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_prop(self):
         self.data['prop'] = '    a      b '
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_prop(self):
         del self.data['prop']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_direction(self):
         self.data['direction'] = 'dasc'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_direction(self):
         del self.data['direction']
         self.assertInvalid()
@@ -168,48 +187,59 @@ class TestSearchSerializer(SerializerCase):
             'index': 15
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_negative_time(self):
         self.data['time'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_time(self):
         """Test time not provided. Should be valid."""
         del self.data['time']
         self.assertValid()
 
+    @tag('unit')
     def test_identity_too_long(self):
         self.data['identity'] = 't' * 257
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_identity(self):
         """Test identity not provided. Should be valid."""
         del self.data['identity']
         self.assertValid()
 
+    @tag('unit')
     def test_missing_filters(self):
         """Test without filters. Should be valid."""
         del self.data['filters']
         self.assertValid()
 
+    @tag('unit')
     def test_nonlist_filters(self):
         self.data['filters'] = 'afilter'
         self.assertInvalid()
 
+    @tag('unit')
     def test_emptylist_filters(self):
         self.data['filters'] = []
         self.assertValid()
 
+    @tag('unit')
     def test_filters_with_invalid_prop(self):
         self.data['filters'] = [{
             'model': 'Environment',
@@ -219,18 +249,22 @@ class TestSearchSerializer(SerializerCase):
         }]
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_orders(self):
         del self.data['orders']
         self.assertValid()
 
+    @tag('unit')
     def test_emptylist_orders(self):
         self.data['orders'] = []
         self.assertValid()
 
+    @tag('unit')
     def test_nonlist_orders(self):
         self.data['orders'] = 'anorder'
         self.assertInvalid()
 
+    @tag('unit')
     def test_orders_with_invalid_prop(self):
         self.data['orders'] = [{
             'model': 'Environment',
@@ -239,24 +273,29 @@ class TestSearchSerializer(SerializerCase):
         }]
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_page(self):
         del self.data['page']
         self.assertValid()
         self.assertEquals(self.serializer.validated_data['page'], 1)
 
+    @tag('unit')
     def test_invalid_page(self):
         self.data['page'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_pagesize(self):
         del self.data['pagesize']
         self.assertValid()
         self.assertEquals(self.serializer.validated_data['pagesize'], 500)
 
+    @tag('unit')
     def test_missing_index(self):
         del self.data['index']
         self.assertValid()
 
+    @tag('unit')
     def test_invalid_index(self):
         self.data['index'] = -1
         self.assertInvalid()
@@ -273,29 +312,36 @@ class TestTimesChangedSerializer(SerializerCase):
             'time': 1
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_identity(self):
         del self.data['identity']
         self.assertInvalid()
 
+    @tag('unit')
     def test_identity_too_long(self):
         self.data['identity'] = 't' * 257
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_time(self):
         del self.data['time']
         self.assertValid()
 
+    @tag('unit')
     def test_invalid_time(self):
         self.data['time'] = -1
         self.assertInvalid()
@@ -313,37 +359,46 @@ class TestDiffSerializer(SerializerCase):
             'right_time': 20
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_identity(self):
         del self.data['identity']
         self.assertInvalid()
 
+    @tag('unit')
     def test_identity_too_long(self):
         self.data['identity'] = 't' * 257
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_left_time(self):
         del self.data['left_time']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_left_time(self):
         self.data['left_time'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_right_time(self):
         del self.data['right_time']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_right_time(self):
         self.data['right_time'] = -1
         self.assertInvalid()
@@ -363,45 +418,56 @@ class TestDiffNodesSerializer(SerializerCase):
             'limit': 5
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_identity(self):
         del self.data['identity']
         self.assertInvalid()
 
+    @tag('unit')
     def test_identity_too_long(self):
         self.data['identity'] = 't' * 257
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_left_time(self):
         del self.data['left_time']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_left_time(self):
         self.data['left_time'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_right_time(self):
         del self.data['right_time']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_right_time(self):
         self.data['right_time'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_offset(self):
         del self.data['offset']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_offset(self):
         self.data['offset'] = -1
         self.assertInvalid()
@@ -409,10 +475,12 @@ class TestDiffNodesSerializer(SerializerCase):
         self.data['offset'] = 'somenonnumber'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_limit(self):
         del self.data['limit']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_limit(self):
         self.data['limit'] = -1
         self.assertInvalid()
@@ -435,53 +503,66 @@ class TestDiffNodeSerializer(SerializerCase):
             'node_identity': 'someid'
         }
 
+    @tag('unit')
     def test_valid(self):
         self.assertValid()
 
+    @tag('unit')
     def test_missing_model(self):
         del self.data['model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_model(self):
         self.data['model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_identity(self):
         del self.data['identity']
         self.assertInvalid()
 
+    @tag('unit')
     def test_identity_too_long(self):
         self.data['identity'] = 't' * 257
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_left_time(self):
         del self.data['left_time']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_left_time(self):
         self.data['left_time'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_right_time(self):
         del self.data['right_time']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_right_time(self):
         self.data['right_time'] = -1
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_node_model(self):
         del self.data['node_model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_invalid_node_model(self):
         self.data['node_model'] = 'somerandommodel'
         self.assertInvalid()
 
+    @tag('unit')
     def test_missing_node_identity(self):
         del self.data['node_model']
         self.assertInvalid()
 
+    @tag('unit')
     def test_node_identity_too_long(self):
         self.data['node_identity'] = 't' * 257
         self.assertInvalid()

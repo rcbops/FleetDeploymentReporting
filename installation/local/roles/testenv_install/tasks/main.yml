@@ -1,0 +1,15 @@
+---
+- name: Pip packages
+  pip:
+    name: "{{ item.key }}"
+    version: "{{ item.value }}"
+    virtualenv: "{{ cloud_snitch_web_venv }}"
+  with_dict: "{{ cloudsnitch_test_pip_pkgs }}"
+
+- name: Install cloud snitch
+  shell: |
+    source {{ cloud_snitch_web_venv }}/bin/activate
+    python setup.py install
+  args:
+    chdir: "{{ cloud_snitch_web_repo_dir }}"
+    executable: /bin/bash

@@ -48,7 +48,14 @@
   notify:
     - Restart Neo4j
 
+- include: db_load.yml
+  when: neo4j_data_dump_file is defined
+  tags:
+    - db_load
+
 - name: Neo4j - Service
   service:
     name: "{{ neo4j_service_name }}"
     state: started
+
+

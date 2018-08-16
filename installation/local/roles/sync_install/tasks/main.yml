@@ -1,4 +1,8 @@
 ---
+- name: Make sure git installed
+  apt:
+    name: git
+
 - name: Create Directories
   file:
     state: directory

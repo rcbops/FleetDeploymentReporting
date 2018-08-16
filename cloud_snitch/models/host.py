@@ -212,5 +212,6 @@ class HostEntity(VersionedEntity):
         'interfaces': ('HAS_INTERFACE', InterfaceEntity),
         'mounts': ('HAS_MOUNT', MountEntity),
         'devices': ('HAS_DEVICE', DeviceEntity),
-        'configuredinterfaces': ('HAS_CONFIGURED_INTERFACE', ConfiguredInterfaceEntity)
+        'configuredinterfaces': ('HAS_CONFIGURED_INTERFACE',
+                                 ConfiguredInterfaceEntity)
     }

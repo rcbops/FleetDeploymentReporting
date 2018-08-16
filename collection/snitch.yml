@@ -30,7 +30,7 @@
 - hosts: all
   tasks:
     - name: Collect values from interface configurations
-      action: configuredinterface_snitch
+      configuredinterface_snitch:
       tags:
         - config
 

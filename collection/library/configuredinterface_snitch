@@ -1,12 +1,8 @@
 #!/usr/bin/python
 
-import glob
-import hashlib
 from os import listdir
 from os import path
 from os.path import isfile, join
-import re
-import StringIO
 
 
 DOCUMENTATION = '''
@@ -19,7 +15,7 @@ version_added: "2.1.6"
 
 description:
     - "Pulls network interface files from a host"
-    - "Parses the files and returns a dict of key and values for configured keys."
+    - "Parses the files and returns a dict of configured key and values."
 
 extends_documentation_fragment:
     - azure
@@ -53,7 +49,7 @@ CONFIGURED_PARAMS = [
 ]
 
 
-NETWORK_INTERFACE_FILENAME="/etc/network/interfaces"
+NETWORK_INTERFACE_FILENAME = "/etc/network/interfaces"
 
 
 class InterfaceParser:
@@ -61,7 +57,7 @@ class InterfaceParser:
     def __init__(self):
         self.directives = []
 
-        content=[]
+        content = []
         self.source_files = self.get_sources()
         for source_file in self.source_files:
             fd = open(source_file)
@@ -75,10 +71,10 @@ class InterfaceParser:
     def parse(self):
         for directive in self.iterator:
             while directive.startswith("iface"):
-                sup=None
-                subs=[]
+                sup = None
+                subs = []
                 for sub in self.iterator:
-                    if sub.startswith(("auto","iface","source")):
+                    if sub.startswith(("auto", "iface", "source")):
                         sup = sub
                         break
                     else:
@@ -94,7 +90,7 @@ class InterfaceParser:
         return
 
     def get_sources(self):
-        source_files = [ NETWORK_INTERFACE_FILENAME ]
+        source_files = [NETWORK_INTERFACE_FILENAME]
         for line in open(NETWORK_INTERFACE_FILENAME).read().splitlines():
             line = line.strip()
             if line.startswith("source"):
@@ -102,21 +98,21 @@ class InterfaceParser:
                 if path.isfile(source_path):
                     source_files.append(source_path)
                 else:
-                    dirname=path.dirname(source_path)
-                    #basename=path.basename(path)
-                    ext=path.splitext(source_path)[1]
+                    dirname = path.dirname(source_path)
+                    # basename=path.basename(path)
+                    ext = path.splitext(source_path)[1]
                     for f in listdir(dirname):
                         if isfile(join(dirname, f)) and ext and ext in f:
-                            source_files.append(join(dirname,f))
+                            source_files.append(join(dirname, f))
                         elif isfile(join(dirname, f)) and not ext:
-                            source_files.append(join(dirname,f))
+                            source_files.append(join(dirname, f))
         return source_files
 
     def get_interfaces(self):
-        interfaces=[]
+        interfaces = []
         for directive in self.directives:
             if directive[0].startswith("iface"):
-                device=directive[0].split(" ")[1]
+                device = directive[0].split(" ")[1]
                 interfacekwargs = {
                     device: {}
                 }
@@ -144,9 +140,9 @@ def run_module():
         supports_check_mode=True
     )
 
-    parser=InterfaceParser()
+    parser = InterfaceParser()
     for interface in parser.get_interfaces():
-        for key,value in interface.iteritems():
+        for key, value in interface.iteritems():
             result['payload'][key] = {}
             for k, v in value.iteritems():
                 result['payload'][key][k] = v

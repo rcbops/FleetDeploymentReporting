@@ -47,8 +47,8 @@ pipeline {
                          string(credentialsId: 'RAX_USERNAME', variable: 'RS_USERNAME'),
                          string(credentialsId: 'RAX_API_KEY', variable: 'RS_API_KEY'),]) {
           sh 'git branch; git show'
-          //sh 'export RS_REGION_NAME=DFW; rack files object download --container cloud-snitch-test-data --name james-newton-aio > neo4j_dump'
-          //sh 'vagrant up --provider=rackspace'
+          sh 'export RS_REGION_NAME=DFW; rack files object download --container cloud-snitch-test-data --name james-newton-aio > neo4j_dump'
+          sh 'vagrant up --provider=rackspace'
         }
       }
     }

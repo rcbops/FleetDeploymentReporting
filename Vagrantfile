@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
      cd /vagrant/installation/local
      if [ #{ENV['RUN_TEST']} == true ]; then
        ansible-playbook testenv_install.yml
-       cd /vagrant/web
+       cd /opt/web/cloud_snitch/web
        python manage.py test
      elif [ #{ENV['RUN_REAL']} == true ]; then
        ansible-playbook web_install.yml

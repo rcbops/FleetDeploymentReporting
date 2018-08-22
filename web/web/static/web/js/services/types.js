@@ -11,6 +11,7 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
     service.glanceViews = {
         AptPackage: ['name', 'version'],
         Configfile: ['path'],
+        ConfiguredInterface: ['device'],
         Device: ['name'],
         Environment: ['account_number', 'name'],
         GitRemote: ['name'],
@@ -30,6 +31,7 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
     service.diffLabelView = {
         AptPackage: 'name',
         ConfigFile: 'name',
+        ConfiguredInterface: 'device',
         Device: 'name',
         Environment: 'name',
         GitRemote: 'name',

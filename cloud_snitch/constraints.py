@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 _models = [
     models.AptPackageEntity,
     models.ConfigfileEntity,
+    models.ConfiguredInterfaceEntity,
     models.DeviceEntity,
     models.EnvironmentEntity,
     models.EnvironmentLockEntity,

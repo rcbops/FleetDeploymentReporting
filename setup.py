@@ -14,6 +14,7 @@ entry_points = """
     GitUrl=cloud_snitch.models:GitUrlEntity
     Host=cloud_snitch.models:HostEntity
     Interface=cloud_snitch.models:InterfaceEntity
+    ConfiguredInterface=cloud_snitch.models:ConfiguredInterfaceEntity
     Mount=cloud_snitch.models:MountEntity
     NameServer=cloud_snitch.models:NameServerEntity
     Partition=cloud_snitch.models:PartitionEntity

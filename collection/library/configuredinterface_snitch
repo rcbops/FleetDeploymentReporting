@@ -1,0 +1,157 @@
+#!/usr/bin/python
+
+from os import listdir
+from os import path
+from os.path import isfile, join
+
+
+DOCUMENTATION = '''
+---
+module: configuredinterface_snitch
+
+short_description: Gathers configured values from network interface files.
+
+version_added: "2.1.6"
+
+description:
+    - "Pulls network interface files from a host"
+    - "Parses the files and returns a dict of configured key and values."
+
+extends_documentation_fragment:
+    - azure
+
+author:
+    - Sudarshan Acharya
+'''
+
+RETURN = '''
+payload:
+    description: |
+       Dict of configured keys and their values.
+    type: dict
+doctype:
+    description: Type of document. Will always be 'configuredinterface'
+    type: str
+'''
+
+
+CONFIGURED_PARAMS = [
+    "mtu",
+    "offload-sg",
+    "bridge_waitport",
+    "bridge_fd",
+    "bridge_ports",
+    "bridge_stp",
+    "address",
+    "netmask",
+    "dns-nameservers",
+    "gateway"
+]
+
+
+NETWORK_INTERFACE_FILENAME = "/etc/network/interfaces"
+
+
+class InterfaceParser:
+
+    def __init__(self):
+        self.directives = []
+
+        content = []
+        self.source_files = self.get_sources()
+        for source_file in self.source_files:
+            fd = open(source_file)
+            for line in fd.read().splitlines():
+                line = line.strip()
+                content.append(line)
+            fd.close()
+        self.iterator = iter(content)
+        self.parse()
+
+    def parse(self):
+        for directive in self.iterator:
+            while directive.startswith("iface"):
+                sup = None
+                subs = []
+                for sub in self.iterator:
+                    if sub.startswith(("auto", "iface", "source")):
+                        sup = sub
+                        break
+                    else:
+                        subs.append(sub)
+                if subs:
+                    self.directives.append([directive, subs])
+                else:
+                    self.directives.append([directive])
+                if not sup:
+                    return
+                directive = sup
+            self.directives.append([directive])
+        return
+
+    def get_sources(self):
+        source_files = [NETWORK_INTERFACE_FILENAME]
+        for line in open(NETWORK_INTERFACE_FILENAME).read().splitlines():
+            line = line.strip()
+            if line.startswith("source"):
+                source_path = line.split(" ")[1]
+                if path.isfile(source_path):
+                    source_files.append(source_path)
+                else:
+                    dirname = path.dirname(source_path)
+                    # basename=path.basename(path)
+                    ext = path.splitext(source_path)[1]
+                    for f in listdir(dirname):
+                        if isfile(join(dirname, f)) and ext and ext in f:
+                            source_files.append(join(dirname, f))
+                        elif isfile(join(dirname, f)) and not ext:
+                            source_files.append(join(dirname, f))
+        return source_files
+
+    def get_interfaces(self):
+        interfaces = []
+        for directive in self.directives:
+            if directive[0].startswith("iface"):
+                device = directive[0].split(" ")[1]
+                interfacekwargs = {
+                    device: {}
+                }
+                if len(directive) > 1:
+                    for sub in directive[1]:
+                        for key in CONFIGURED_PARAMS:
+                            if sub.startswith(key):
+                                val = sub.split(key)[1]
+                                interfacekwargs[device][key] = val.strip()
+                    interfaces.append(interfacekwargs)
+        return interfaces
+
+
+def run_module():
+    module_args = dict()
+
+    result = dict(
+        changed=False,
+        payload={},
+        doctype='configuredinterface'
+    )
+
+    module = AnsibleModule(
+        argument_spec=module_args,
+        supports_check_mode=True
+    )
+
+    parser = InterfaceParser()
+    for interface in parser.get_interfaces():
+        for key, value in interface.iteritems():
+            result['payload'][key] = {}
+            for k, v in value.iteritems():
+                result['payload'][key][k] = v
+    module.exit_json(**result)
+
+
+def main():
+    run_module()
+
+from ansible.module_utils.basic import *
+
+main()

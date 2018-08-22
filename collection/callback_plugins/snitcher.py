@@ -124,7 +124,8 @@ TARGET_DOCTYPES = [
     'pip_list',
     'file_dict',
     'gitrepos',
-    'uservars'
+    'uservars',
+    'configuredinterface'
 ]
 
 DOCTYPE_HANDLERS = {
@@ -133,7 +134,8 @@ DOCTYPE_HANDLERS = {
     'pip_list': FileHandler,
     'gitrepos': GitFileHandler,
     'uservars': UservarsHandler,
-    'file_dict': FileHandler
+    'file_dict': FileHandler,
+    'configuredinterface': FileHandler
 }
 
 

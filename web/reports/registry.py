@@ -4,6 +4,7 @@ from rest_framework.serializers import Serializer
 from .cinder_volume_driver import CinderVolumeDriverReport
 from .generic import GenericReport
 from .git import GitReport
+from .mtu import MTUReport
 
 
 class Registry:
@@ -14,7 +15,8 @@ class Registry:
         self.reports = [
             CinderVolumeDriverReport,
             GenericReport,
-            GitReport
+            GitReport,
+            MTUReport,
         ]
         # @TODO - Code to find reports from plugins.
 

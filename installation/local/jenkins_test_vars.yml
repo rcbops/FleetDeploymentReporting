@@ -1,0 +1,4 @@
+---
+cloud_snitch_web_repo_dir: "{{ inventory_dir }}"
+cloud_snitch_web_venv: "{{ inventory_dir }}/jenkenv"
+cloud_snitch_testenv: True

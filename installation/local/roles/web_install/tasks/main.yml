@@ -6,10 +6,14 @@
 - name: Install python-pip
   apt:
     name: python-pip
+  #tags:
+  #  - minimal_config
 
 - name: Install virtualenv
   pip:
     name: virtualenv
+  tags:
+    - minimal_config
 
 - name: Create cloudsnitch virtualenv
   command: "virtualenv {{ cloud_snitch_web_venv }} -p python3.5"
@@ -22,6 +26,8 @@
     version: "{{ item.value }}"
     virtualenv: "{{ cloud_snitch_web_venv }}"
   with_dict: "{{ cloud_snitch_web_pip_pkgs }}"
+  tags:
+    - minimal_config
 
 - name: Pip install cloud snitch repo
   pip:
@@ -68,6 +74,8 @@
     chdir: "{{ cloud_snitch_web_repo_dir }}"
     executable: /bin/bash
   when: cloud_snitch_testenv
+  tags:
+    - minimal_config
 
 - name: Cloud Snitch Web - Settings
   template:
@@ -75,6 +83,7 @@
     dest: "{{ cloud_snitch_web_app_dir }}/settings.py"
   tags:
     - config
+    - minimal_config
   notify:
     - Restart Apache2
     - Restart Celery Worker
@@ -90,6 +99,7 @@
     dest: "{{ cloud_snitch_web_app_dir }}/urls.py"
   tags:
     - config
+    - minimal_config
   notify:
     - Restart Apache2
 

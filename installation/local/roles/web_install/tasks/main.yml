@@ -6,8 +6,6 @@
 - name: Install python-pip
   apt:
     name: python-pip
-  #tags:
-  #  - minimal_config
 
 - name: Install virtualenv
   pip:

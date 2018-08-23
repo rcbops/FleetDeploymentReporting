@@ -2,3 +2,5 @@
 cloud_snitch_web_repo_dir: "{{ inventory_dir }}"
 cloud_snitch_web_venv: "{{ inventory_dir }}/jenkenv"
 cloud_snitch_testenv: True
+cloud_snitch_web_session_engine: "django.contrib.sessions.backends.file"
+cloud_snitch_web_cache_backend: "django.core.cache.backends.dummy.DummyCache" 

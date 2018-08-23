@@ -4,6 +4,8 @@ from collections import OrderedDict
 from django.test import tag
 from rest_framework import status
 
+from reports.views import ReportViewSet
+
 from .base import APITestCase
 
 
@@ -20,6 +22,10 @@ class FakeReport:
         d['keya'] = 'value1'
         d['keyb'] = 'value2'
         return [d]
+
+    def columns(self):
+        """Return dummy data columns."""
+        return ['keya', 'keyb']
 
 
 class TestReportsViewSet(APITestCase):
@@ -97,3 +103,16 @@ class TestReportsViewSet(APITestCase):
         result = resp.json()
         self.assertEquals(result[0]['keya'], 'value1')
         self.assertEquals(result[0]['keyb'], 'value2')
+
+    def test_get_renderer_context(self):
+        """Test that get_renderer_context can detect columns."""
+        v = ReportViewSet()
+
+        v.columns = None
+        ctx = v.get_renderer_context()
+        self.assertTrue(ctx.get('header') is None)
+
+        v.columns = ['a', 'b', 'c']
+        ctx = v.get_renderer_context()
+        for i, name in enumerate(v.columns):
+            self.assertEquals(name, ctx['header'][i])

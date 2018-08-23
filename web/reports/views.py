@@ -48,6 +48,17 @@ class ReportViewSet(viewsets.ViewSet):
         # This will raise a validationerror if report parameters are invalid
         report = report_class(request.data)
 
+        # Save columns for renderer context
+        self.columns = report.columns()
+
         # Run report and serialize the result
         s = ReportDataSerializer(report.run())
         return Response(s.data)
+
+    def get_renderer_context(self):
+        """Add column ordering to renderer context for csvs."""
+        context = super().get_renderer_context()
+        columns = getattr(self, 'columns', None)
+        if columns is not None:
+            context['header'] = columns
+        return context

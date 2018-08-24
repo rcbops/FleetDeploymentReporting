@@ -45,7 +45,7 @@ class Connection:
 
     def close(self):
         """Close the driver if not closed."""
-        if self.driver is not None:
+        if hasattr(self, 'driver') and self.driver is not None:
             self.driver.close()
             self.driver = None
 

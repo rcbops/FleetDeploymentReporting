@@ -1,0 +1,25 @@
+<div class="hxRow" ng-form="timeForm">
+  <div class="hxCol hxSpan-2">
+    <label>{{ $ctrl.label }}</label>
+  </div>
+  <div class="hxCol hxSpan-10">
+    <input
+      class="hxTextCtrl"
+      type="text"
+      name="{{ $ctrl.name }}"
+      ng-model="$ctrl.valueSTR"
+      ng-required="$ctrl.required"
+      ng-change="$ctrl.change()"
+      date-time
+      date-time-force-val
+      datetime-picker date-format="yyyy-MM-dd HH:mm:ss"
+      close-on-select="true" />
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="timeForm.$invalid">
+    <div ng-if="timeForm[$ctrl.name].$error.required"><hx-error>Please select a time.</hx-error></div>
+    <div ng-if="timeForm[$ctrl.name].$error.dateTime"><hx-error>Time must be in 'YYYY-MM-DD HH:mm:ss' format.</hx-error></div>
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="$ctrl.serverErrors">
+    <div ng-repeat="e in $ctrl.serverErrors"><hx-error>{{ e }}</hx-error></div>
+  </div>
+</div>

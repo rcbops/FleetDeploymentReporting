@@ -1,9 +1,10 @@
+from rest_framework.routers import DefaultRouter
+
 from .views import ModelViewSet
 from .views import ObjectDiffViewSet
 from .views import PathViewSet
 from .views import PropertyViewSet
 from .views import ObjectViewSet
-from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'models', ModelViewSet, base_name='models')

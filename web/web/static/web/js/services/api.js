@@ -42,6 +42,8 @@ angular.module('cloudSnitch').factory('authInterceptor', ['$q', '$window', funct
                     logout();
                 }
             }
+
+            return $q.reject(rejection);
         }
     }
 }]);
@@ -67,7 +69,7 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
     function makeHeaders() {
         var headers = {
             'Content-Type': 'application/json',
-            'Accept-Type': 'application/json',
+            'Accept': 'application/json',
             'X-CSRFToken': csrfService.getCookie()
         }
         return headers;
@@ -85,6 +87,63 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
             // Error
             typesDeferred.reject(resp);
             return typesDeferred.promise;
+        });
+    };
+
+    service.reports = function() {
+        var defer = $q.defer();
+        return $http({
+            method: 'GET',
+            url: '/api/reports/'
+        }).then(function(resp) {
+            // Success
+            defer.resolve(resp.data);
+            return defer.promise;
+        }, function(resp) {
+            // Error
+            defer.reject(resp);
+            return defer.promise;
+        });
+    };
+
+    service.runReport = function(report_name, type, parameters) {
+        var defer = $q.defer();
+
+        // Set accept type for content negotiation
+        var headers = makeHeaders();
+        var req = angular.copy(parameters);
+        req.report_name = report_name;
+        var responseType;
+
+        switch (type) {
+            case 'csv':
+                headers['Accept'] = 'text/csv';
+                responseType = 'blob';
+                break;
+            case 'json':
+                headers['Accept'] = 'application/json';
+                responseType = 'blob';
+                break;
+            case 'web':
+            default:
+                headers['Accept'] = 'application/json';
+                responseType = 'json';
+                break;
+        }
+
+        return $http({
+            method: 'POST',
+            url: '/api/reports/run/',
+            headers: headers,
+            data: req,
+            responseType: responseType
+        }).then(function(resp) {
+            defer.resolve(resp.data);
+            return defer.promise;
+        }, function(resp) {
+            // Error
+            defer.reject(resp);
+            return defer.promise;
         });
     };
 

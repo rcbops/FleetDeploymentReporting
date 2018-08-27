@@ -19,4 +19,3 @@ example:
 Current modules:
  - pkg_snitch
  - pip_snitch(coming soon)
-

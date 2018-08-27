@@ -1,0 +1,22 @@
+<div class="hxRow" ng-model="modelForm">
+  <div class="hxCol hxSpan-2">
+    <label>Model</label>
+  </div>
+  <div class="hxCol hxSpan-10">
+    <select
+      class="hxTextCtrl"
+      name="model"
+      ng-model="$ctrl.value"
+      ng-required="true"
+      ng-change="$ctrl.change()">
+      <option value="">Select a model</option>
+      <option ng-repeat="model in $ctrl.modelChoices">{{ model }}</option>
+    </select>
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="modelForm.$invalid">
+    <div ng-if="modelForm[$ctrl.name].$error.required"><hx-error>Please select a time.</hx-error></div>
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="$ctrl.serverErrors">
+    <div ng-repeat="e in $ctrl.serverErrors"><hx-error>{{ e }}</hx-error></div>
+  </div>
+</div>

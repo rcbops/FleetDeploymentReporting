@@ -18,7 +18,17 @@
     <div class="hxSpan-3 hxBox-xs">
       <div>
         <label>Time</label>
-        <input class="hxTextCtrl" type="text" name="time" ng-model="paneObj.search.time" ng-required="false" datetime-picker date-format="yyyy-MM-dd HH:mm:ss" close-on-select="true" date-time />
+        <input
+          class="hxTextCtrl"
+          type="text"
+          name="time"
+          ng-model="paneObj.search.time"
+          ng-required="false"
+          datetime-picker
+          date-format="yyyy-MM-dd HH:mm:ss"
+          close-on-select="true"
+          date-time-force-val
+          date-time />
       </div>
       <div ng-if="searchForm.time.$invalid">
         <div ng-if="searchForm.time.$error.dateTime">

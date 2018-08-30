@@ -88,3 +88,13 @@ class MaxRetriesExceededError(Exception):
     def __init__(self):
         msg = 'Maximum number of retries has been reached.'
         super(MaxRetriesExceededError, self).__init__(msg)
+
+
+class EnvironmentNotFoundError(Exception):
+    """Error for environment not found."""
+    def __init__(self, account_number, name):
+        msg = (
+            'Unable to locate environment with account number '
+            '\'{}\' and name \'{}\'.'
+        ).format(account_number, name)
+        super(EnvironmentNotFoundError, self).__init__(msg)

@@ -2,6 +2,8 @@ import logging
 
 from pkg_resources import iter_entry_points
 
+from cloud_snitch.models.base import SharedVersionedEntity
+
 logger = logging.getLogger(__name__)
 
 _REGISTRY = None
@@ -176,6 +178,19 @@ class Registry:
         if klass is None:
             return None
         return sorted(klass.static_properties)
+
+    def is_shared(self, model):
+        """Return whether or not the model is shared.
+
+        :param model: Model name
+        :type model: str
+        :returns: True for shared, False otherwise
+        :rtype: bool
+        """
+        klass = self.models.get(model)
+        if issubclass(klass, SharedVersionedEntity):
+            return True
+        return False
 
     def children(self, model):
         """Return the children of a model

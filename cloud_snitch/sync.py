@@ -133,7 +133,9 @@ def sync_paths(paths):
             # Try to acquire environment lock.
             # @TODO - Implement wait until timeout loop.
             try:
-                with lock_environment(driver, run):
+                account_number = run.environment_account_number
+                name = run.environment_name
+                with lock_environment(driver, account_number, name):
                     sync_run(driver, run)
             except EnvironmentLockedError as e:
                 logger.error(e)

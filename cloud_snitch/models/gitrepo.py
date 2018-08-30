@@ -1,5 +1,6 @@
 import logging
 
+from .base import SharedVersionedEntity
 from .base import VersionedEntity
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ class GitUntrackedFileEntity(VersionedEntity):
     identity_property = 'path'
 
 
-class GitUrlEntity(VersionedEntity):
+class GitUrlEntity(SharedVersionedEntity):
     """Models a git repo url."""
 
     label = 'GitUrl'

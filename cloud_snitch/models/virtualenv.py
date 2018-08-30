@@ -1,11 +1,12 @@
 import logging
 
+from .base import SharedVersionedEntity
 from .base import VersionedEntity
 
 logger = logging.getLogger(__name__)
 
 
-class PythonPackageEntity(VersionedEntity):
+class PythonPackageEntity(SharedVersionedEntity):
     """Model pythonpackage nodes in the graph."""
 
     label = 'PythonPackage'

@@ -1,5 +1,6 @@
 import logging
 
+from .base import SharedVersionedEntity
 from .base import VersionedEntity
 from .apt import AptPackageEntity
 from .configfile import ConfigfileEntity
@@ -8,7 +9,7 @@ from .virtualenv import VirtualenvEntity
 logger = logging.getLogger(__name__)
 
 
-class NameServerEntity(VersionedEntity):
+class NameServerEntity(SharedVersionedEntity):
     """Model a name server node in the graph."""
 
     label = 'NameServer'

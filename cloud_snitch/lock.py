@@ -74,7 +74,7 @@ class EnvironmentLock:
 
 
 @contextlib.contextmanager
-def lock_environment(driver, run):
+def lock_environment(driver, account_number, name):
     """Lock an environment
 
     Prevents multiple sync instances from updating a single environment
@@ -82,16 +82,18 @@ def lock_environment(driver, run):
 
     :param driver: Driver instance
     :type driver: neo4j.v1.GraphDatabase.driver
-    :param run: Collection run data structure.
-    :type run: cloud_snitch.run.Run
+    :param account_number: Account number of environment to lock
+    :type account_number: str
+    :param name: Name of environment to lock
+    :type name: str
     :yields: The environment lock object
     :ytype: Environment
     """
     # Start the lock object
     lock = EnvironmentLock(
         driver,
-        run.environment_account_number,
-        run.environment_name
+        account_number,
+        name
     )
     try:
         # Obtain the lock

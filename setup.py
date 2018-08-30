@@ -26,6 +26,7 @@ entry_points = """
     cloud-snitch-fake=cloud_snitch.fake:main
     cloud-snitch-constraints=cloud_snitch.constraints:main
     cloud-snitch-clean=cloud_snitch.clean:main
+    cloud-snitch-remove=cloud_snitch.remove:main
 """
 
 setup(

@@ -476,3 +476,12 @@ class VersionedEntity(object):
                 children[rel_name] = childklass.todict(children=children)
             d['children'] = children
         return d
+
+
+class SharedVersionedEntity(VersionedEntity):
+    """Simple class to indicate an entity is shared.
+
+    This important when cleaning/pruning data.  Shared entities
+    should only be detached and not deleted.
+    """
+    pass

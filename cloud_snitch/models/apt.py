@@ -1,11 +1,11 @@
 import logging
 
-from .base import VersionedEntity
+from .base import SharedVersionedEntity
 
 logger = logging.getLogger(__name__)
 
 
-class AptPackageEntity(VersionedEntity):
+class AptPackageEntity(SharedVersionedEntity):
     """Model apt package nodes in the graph."""
 
     label = 'AptPackage'

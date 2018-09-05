@@ -8,13 +8,26 @@
   <div class="hxRow">
     <div class="hxCol hxSpan-6">
       <h4>Select a Report</h4>
-      <select class="hxTextCtrl" ng-model="controls.reportName">
+
+      <!-- Only show select box if not rendered -->
+      <select ng-hide="rendered" class="hxTextCtrl" ng-model="controls.reportName">
         <option value="">Select...</option>
         <option ng-repeat="report in reports" value="{{report.name}}">{{ report.name }}</option>
       </select>
+
+      <!-- Display text if report is rendered. -->
+      <p ng-show="rendered">{{ controls.report.name }}</p>
     </div>
+
     <div class="hxCol hxSpan-12" ng-if="serverErrors.report_name">
         <div ng-repeat="e in serverErrors.report_name"><hx-error>{{ e }}</hx-error></div>
+    </div>
+  </div>
+
+  <div ng-if="controls.report" class="hxRow">
+    <div class="hxCol hxSpan-6">
+      <h4>Description:</h4>
+      <p>{{ controls.report.description }}</p>
     </div>
   </div>
 
@@ -41,13 +54,6 @@
 
   <div ng-if="controls.report" ng-hide="rendered" class="hxRow">
     <div class="hxCol hxSpan-6">
-
-      <div class="hxRow">
-        <div class="hxCol hxSpan-12">
-          <h4>Description:</h4>
-          <p>{{ controls.report.description }}</p>
-        </div>
-      </div>
 
       <div class="hxRow">
         <div class="hxCol hxSpan-12"><h4>Report parameters:</h4></div>

@@ -5,7 +5,8 @@
     enabled: yes
     state: restarted
     daemon_reload: "{{ (ansible_service_mgr == 'systemd') | ternary ('yes', omit) }}"
-  when: not cloud_snitch_testenv
+  tags:
+    - service_restart
 
 - name: Restart Celery Worker
   service:
@@ -13,4 +14,5 @@
     enabled: yes
     state: restarted
     daemon_reload: "{{ (ansible_service_mgr == 'systemd') | ternary ('yes', omit) }}"
-  when: not cloud_snitch_testenv
+  tags:
+    - service_restart

@@ -1,7 +1,7 @@
 /**
  * The details controller covers displaying object details.
  */
-angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, cloudSnitchApi, typesService, timeService) {
+angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, $log, cloudSnitchApi, typesService, timeService) {
 
     $scope.f = undefined;
     $scope.obj = {};
@@ -55,7 +55,15 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
                 $scope.busy = false;
             }
         }, function(resp) {
-            // @TODO - Error handling
+            $log.log("In promise failure updateTimes");
+            $scope.$broadcast("notification:api",
+                              {
+                                 function: "updateTimes",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "times",
+                                 type: "ERROR"
+                              });
             $scope.busy = false;
         });
     };
@@ -76,6 +84,15 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
         ).then(function(result) {
             $scope.objectBusy = false;
         }, function(resp) {
+            $log.error("In promise failure updateObject");
+            $scope.$broadcast("notification:api",
+                              {
+                                 function: "updateObject",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "searchAll",
+                                 type: "ERROR"
+                              });
             $scope.objectBusy = false;
         });
     };
@@ -106,6 +123,15 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
             $scope.children[childRef].busy = false;
         }, function(resp) {
             // @TODO - error handling
+            $log.error("In promise failure searchChildren");
+            $scope.$broadcast("notification:api",
+                              {
+                                 function: "searchChildren",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "searchAll",
+                                 type: "ERROR"
+                              });
             $scope.children[childRef].busy = false;
         });
     };

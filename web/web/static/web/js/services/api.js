@@ -258,6 +258,7 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
         return $http({
             method: 'POST',
             url: '/api/objects/search/',
+            //url: '/api/objects/dan/',
             data: req,
             headers: makeHeaders(),
             }).then(function(resp) {
@@ -309,69 +310,8 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
             return $http({
                 method: 'POST',
                 headers: makeHeaders(),
-                url: '/api/objects/search/',
-                data: req
-            }).then(function(resp) {
-                sink(resp.data);
-                if (req.page * req.pagesize >= resp.data.count) {
-                    defer.resolve({});
-                    return defer.promise
-                }
-                else {
-                    return more(page + 1);
-                }
-            }, function(resp) {
-                // @TODO - handle errors
-                defer.reject(resp);
-                return defer.promise;
-            });
-        }
-
-        return more(1);
-    };
-
-
-
-    service.searchAll = function(model, identity, time, filters, sink) {
-
-        var defer = $q.defer();
-        var req = {
-            model: model,
-            page: 1,
-            pagesize: 500
-        };
-
-        if (identity !== undefined && identity != "") {
-            req.identity = identity;
-        }
-
-        if (time !== undefined) {
-            // Convert string time to timestamp
-            time = convertTime(time);
-            if (time > 0) {
-                req.time = time;
-            }
-        }
-
-        if (filters !== undefined) {
-            var apiFilters = [];
-            angular.forEach(filters, function(item) {
-                apiFilters.push({
-                    model: item.model,
-                    prop: item.property,
-                    operator: item.operator,
-                    value: item.value
-                });
-            });
-            req.filters = apiFilters;
-        }
-
-        function more(page) {
-            req.page = page
-            return $http({
-                method: 'POST',
-                headers: makeHeaders(),
-                url: '/api/objects/search/',
+                //url: '/api/objects/search/',
+                url: '/api/objects/dan/',
                 data: req
             }).then(function(resp) {
                 sink(resp.data);

@@ -1,7 +1,7 @@
 /**
  * The details controller covers displaying object details.
  */
-angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval', '$window', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, $interval, $window, cloudSnitchApi, typesService, timeService) {
+angular.module('cloudSnitch').controller('DiffController', ['$scope', '$log', '$interval', '$window', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, $log, $interval, $window, cloudSnitchApi, typesService, timeService) {
 
     var frame = undefined;
     var nodeMap = undefined;
@@ -493,6 +493,15 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval
         }, function(resp) {
             stopPollingNodes();
             $scope.state = 'error';
+            $log.log("In promise failure getNodes");
+            $scope.$broadcast("notification:api",
+                              {
+                                 function: "getNodes",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "diffNodes",
+                                 type: "ERROR"
+                              });
         });
     }
 
@@ -615,6 +624,15 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval
         }, function(resp) {
             stopPolling();
             $scope.state = 'error'
+            $log.log("In promise failure getStructure");
+            $scope.$broadcast("notification:api",
+                              {
+                                 function: "getStructure",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "diffStructure",
+                                 type: "ERROR"
+                              });
         });
     }
 

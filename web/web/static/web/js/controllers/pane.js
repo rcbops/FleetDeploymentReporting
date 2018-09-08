@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').controller('ResultsController', ['$scope', 'cloudSnitchApi', 'typesService', function($scope, cloudSnitchApi, typesService) {
+angular.module('cloudSnitch').controller('ResultsController', ['$scope', '$log', 'cloudSnitchApi', 'typesService', function($scope, $log, cloudSnitchApi, typesService) {
 
     function dataPath() {
         var path = $scope.frame().path;
@@ -102,7 +102,15 @@ angular.module('cloudSnitch').controller('ResultsController', ['$scope', 'cloudS
             $scope.count = data.count;
             $scope.busy = false;
         }, function(resp) {
-            console.log("error searching page.");
+            $log.log("In promise failure searchPage");
+            $scope.$broadcast("notification:api",
+                              {
+                                 function: "searchPage",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "searchSome",
+                                 type: "ERROR"
+                              });
             $scope.busy = false;
         });
     };

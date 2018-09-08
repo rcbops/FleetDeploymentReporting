@@ -1,0 +1,12 @@
+<div ng-repeat="(subject, alert) in alerts" id='hxAlert'>
+    <span id='hxIconWrapper'>
+        <hx-icon id='hxIcon' type='info-circle'></hx-icon>
+    </span>
+    <span id='hxContent'>
+        <span id='hxStatus'>{{ alert.notification }}:</span>
+        {{ subject }} Response: {{alert.status}} {{ alert.message }}
+    </span>
+    <button id='hxDismiss' type='button' ng-click="removeAlert(subject)">
+        <hx-icon type='times'></hx-icon>
+    </button>
+</div>

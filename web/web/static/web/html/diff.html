@@ -12,6 +12,8 @@
     </div>
   </hx-panelhead>
   <hx-panelbody>
+    <hx-alert ng-controller="AlertController" type="error" my-subject="diffNodes"></hx-alert>
+    <hx-alert ng-controller="AlertController" type="error" my-subject="diffStructure"></hx-alert>
     <div ng-if="state != 'done'" class="diffBusy">
       <h2><hx-busy ng-if="state != 'empty' && state != 'error'"></hx-busy>&nbsp;&nbsp;{{ humanState() }}.</h2>
     </div>

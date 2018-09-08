@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', function(cloudSnitchApi) {
+angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cloudSnitchApi', function($rootScope, $log, cloudSnitchApi) {
 
     var service = {};
     service.types = [];
@@ -74,6 +74,15 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
             service.pathsLoading = false;
         }, function(error) {
             // @TODO - Do something with errors.
+            $log.log("In promise failure updatePaths");
+            $rootScope.$broadcast("notification:api",
+                              {
+                                 function: "updatePaths",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "paths",
+                                 type: "ERROR"
+                              });
             service.paths = {};
         });
     }
@@ -89,6 +98,15 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
             }
         }, function(error) {
             // @TODO - Do something with error
+            $log.log("In promise failure updateTypes");
+            $rootScope.$broadcast("notification:api",
+                              {
+                                 function: "updateTypes",
+                                 message: resp.statusText,
+                                 status: resp.status,
+                                 subject: "types",
+                                 type: "ERROR"
+                              });
             service.types = [];
         });
     }

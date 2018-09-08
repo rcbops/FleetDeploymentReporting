@@ -1,5 +1,6 @@
 <div ng-controller="ResultsController">
   <h2>Search Results <hx-busy ng-if="busy"></hx-busy></h2>
+  <hx-alert type="error" target="'searchpage_' + paneObj.paneId"></hx-alert>
   <pagedtable
     thing="paneObj.search.type"
     records="rows"

@@ -9,6 +9,29 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
     $scope.children = {};
     $scope.busy = false;
     $scope.objectBusy = false;
+    $scope.properties = [];
+
+    /**
+     * Sorted list of non identity and non created_at properties.
+     */
+    function objKeys() {
+        var index;
+        var keys = Object.keys($scope.obj).sort();
+
+        // Remove identity key
+        var identity_property = typesService.identityProperty($scope.f.type);
+        index = keys.indexOf(identity_property);
+        if (index > -1) {
+            keys.splice(index, 1);
+        }
+
+        // Remove created_at key
+        index = keys.indexOf("created_at");
+        if (index > -1) {
+            keys.splice(index, 1);
+        }
+        return keys;
+    }
 
     $scope.loadChildren = function() {
         var modelChildren = typesService.typeMap[$scope.f.type].children;
@@ -71,6 +94,7 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
                 if (data.records.length > 0) {
                     $scope.f.record = data.records[0];
                     $scope.obj = $scope.f.record[$scope.f.type];
+                    $scope.properties = objKeys();
                 }
             }
         ).then(function(result) {

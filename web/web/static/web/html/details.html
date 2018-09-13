@@ -25,11 +25,22 @@
   <div>
     <table class="hxTable hxHoverable hxTable--condensed">
       <tbody>
-        <tr ng-repeat="(key, value) in obj">
+        <tr ng-if="identity">
+          <td>identity</td>
+          <td>{{ identity }}</td>
+        </tr>
+        <tr ng-if="obj.created_at">
+          <td>discovered on</td>
+          <td>{{ obj.created_at }}</td>
+        </tr>
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr ng-repeat="key in properties">
             <td>{{ key }}</td>
             <td>
-                <pre class="configContents" ng-if="f.type == 'Configfile' && key == 'contents'"><code>{{ value }}</code></pre>
-                <span ng-if="!(f.type == 'Configfile' && key == 'contents')">{{ value }}</span>
+                <pre class="configContents" ng-if="f.type == 'Configfile' && key == 'contents'"><code>{{ obj[key] }}</code></pre>
+                <span ng-if="!(f.type == 'Configfile' && key == 'contents')">{{ obj[key] }}</span>
             </td>
         </tr>
       </tbody>

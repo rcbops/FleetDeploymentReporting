@@ -1,7 +1,9 @@
 import mock
+import sys
 import unittest
 
 from argparse import ArgumentError
+from io import StringIO
 
 from cloud_snitch.exc import EnvironmentNotFoundError
 from cloud_snitch.remove import confirm
@@ -13,6 +15,15 @@ from cloud_snitch.remove import prune
 
 class TestArgParser(unittest.TestCase):
     """Test the argument parser."""
+
+    def setUp(self):
+        self.old_stream = sys.stderr
+        self.stream = StringIO()
+        sys.stderr = self.stream
+
+    def tearDown(self):
+        sys.stderr = self.old_stream
+        self.stream.close()
 
     def test_missing_positionals(self):
         """Test with 0 args."""

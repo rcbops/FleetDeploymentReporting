@@ -31,7 +31,7 @@
         </tr>
         <tr ng-if="obj.created_at">
           <td>discovered on</td>
-          <td>{{ obj.created_at }}</td>
+          <td>{{ obj.created_at | localtime }}</td>
         </tr>
         <tr>
           <td colspan="2">&nbsp;</td>

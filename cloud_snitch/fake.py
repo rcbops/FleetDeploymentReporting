@@ -8,12 +8,14 @@ import os
 import pytz
 
 from cloud_snitch import settings
-from cloud_snitch.runs import Run
+from cloud_snitch.cli_common import base_parser
 from cloud_snitch.exc import RunInvalidError
+from cloud_snitch.runs import Run
+
 
 logger = logging.getLogger(__name__)
 
-parser = argparse.ArgumentParser(
+parser = base_parser(
     description="Create fake data sets from a real data set."
 )
 parser.add_argument(

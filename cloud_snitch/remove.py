@@ -4,6 +4,7 @@ import logging
 import pprint
 
 from cloud_snitch import settings
+from cloud_snitch.cli_common import base_parser
 from cloud_snitch.lock import lock_environment
 from cloud_snitch.models import EnvironmentEntity
 from cloud_snitch.models import registry
@@ -12,9 +13,7 @@ from neo4j.v1 import GraphDatabase
 
 logger = logging.getLogger(__name__)
 
-parser = argparse.ArgumentParser(
-    description="Remove customer data."
-)
+parser = base_parser(description="Remove environment data.")
 
 parser.add_argument(
     'account_number',

@@ -24,6 +24,7 @@ from cloud_snitch.snitchers.configuredinterface import \
 
 from cloud_snitch import runs
 from cloud_snitch import utils
+from cloud_snitch.cli_common import base_parser
 from cloud_snitch.driver import DriverContext
 from cloud_snitch.exc import EnvironmentLockedError
 from cloud_snitch.exc import RunInvalidStatusError
@@ -35,7 +36,7 @@ from cloud_snitch.lock import lock_environment
 logger = logging.getLogger(__name__)
 
 
-parser = argparse.ArgumentParser(
+parser = base_parser(
     description="Ingest collected snitch data to neo4j."
 )
 parser.add_argument(
@@ -192,7 +193,7 @@ def main():
                 logger.exception(
                     'An exception occurred while processing group.'
                 )
-    logger.info("Finished in {} seconds".format(time.time() - start))
+    logger.info("Finished in {:.3f} seconds".format(time.time() - start))
 
 
 if __name__ == '__main__':

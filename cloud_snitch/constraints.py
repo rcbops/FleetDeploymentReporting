@@ -1,8 +1,10 @@
 import logging
 
-from cloud_snitch import settings
 from neo4j.v1 import GraphDatabase
+
 from cloud_snitch import models
+from cloud_snitch import settings
+from cloud_snitch.cli_common import base_parser
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,10 @@ _models = [
 
 
 def main():
+    parser = base_parser(
+        description="Set up neo4j constraints for cloud snitch entities."
+    )
+    args = parser.parse_args()
     driver = GraphDatabase.driver(
         settings.NEO4J_URI,
         auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)

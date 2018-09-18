@@ -1,7 +1,7 @@
 /**
  * The details controller covers displaying object details.
  */
-angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, $log, cloudSnitchApi, typesService, timeService) {
+angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log', 'cloudSnitchApi', 'typesService', 'timeService', 'messagingService', function($scope, $log, cloudSnitchApi, typesService, timeService, messagingService) {
 
     $scope.f = undefined;
     $scope.obj = {};
@@ -55,15 +55,10 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
                 $scope.busy = false;
             }
         }, function(resp) {
-            $log.log("In promise failure updateTimes");
-            $scope.$broadcast("notification:api",
-                              {
-                                 function: "updateTimes",
-                                 message: resp.statusText,
-                                 status: resp.status,
-                                 subject: "times",
-                                 type: "ERROR"
-                              });
+            $log.error("In promise failure updateTimes");
+            messagingService.error("details_"+$scope.paneObj.paneIndex,
+                                   "API ERROR",
+                                   resp.status+" "+resp.statusText);
             $scope.busy = false;
         });
     };
@@ -85,14 +80,9 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
             $scope.objectBusy = false;
         }, function(resp) {
             $log.error("In promise failure updateObject");
-            $scope.$broadcast("notification:api",
-                              {
-                                 function: "updateObject",
-                                 message: resp.statusText,
-                                 status: resp.status,
-                                 subject: "searchAll",
-                                 type: "ERROR"
-                              });
+            messagingService.error("details_"+$scope.paneObj.paneIndex,
+                                   "API ERROR",
+                                   resp.status+" "+resp.statusText);
             $scope.objectBusy = false;
         });
     };
@@ -122,16 +112,10 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
         ).then(function(result) {
             $scope.children[childRef].busy = false;
         }, function(resp) {
-            // @TODO - error handling
             $log.error("In promise failure searchChildren");
-            $scope.$broadcast("notification:api",
-                              {
-                                 function: "searchChildren",
-                                 message: resp.statusText,
-                                 status: resp.status,
-                                 subject: "searchAll",
-                                 type: "ERROR"
-                              });
+            messagingService.error("details_"+$scope.paneObj.paneIndex,
+                                   "API ERROR",
+                                   resp.status+" "+resp.statusText);
             $scope.children[childRef].busy = false;
         });
     };

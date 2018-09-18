@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cloudSnitchApi', function($rootScope, $log, cloudSnitchApi) {
+angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cloudSnitchApi', 'messagingService', function($rootScope, $log, cloudSnitchApi, messagingService) {
 
     var service = {};
     service.types = [];
@@ -72,17 +72,11 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         cloudSnitchApi.paths().then(function(result) {
             service.paths = result;
             service.pathsLoading = false;
-        }, function(error) {
-            // @TODO - Do something with errors.
-            $log.log("In promise failure updatePaths");
-            $rootScope.$broadcast("notification:api",
-                              {
-                                 function: "updatePaths",
-                                 message: resp.statusText,
-                                 status: resp.status,
-                                 subject: "paths",
-                                 type: "ERROR"
-                              });
+        }, function(resp) {
+            $log.error("In promise failure updatePaths");
+            messagingService.error("master_alert",
+                                   "API ERROR",
+                                   resp.status+" "+resp.statusText);
             service.paths = {};
         });
     }
@@ -96,17 +90,11 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
             for (var i = 0; i < service.types.length; i++) {
                 service.typeMap[service.types[i].label] = service.types[i];
             }
-        }, function(error) {
-            // @TODO - Do something with error
-            $log.log("In promise failure updateTypes");
-            $rootScope.$broadcast("notification:api",
-                              {
-                                 function: "updateTypes",
-                                 message: resp.statusText,
-                                 status: resp.status,
-                                 subject: "types",
-                                 type: "ERROR"
-                              });
+        }, function(resp) {
+            $log.error("In promise failure updateTypes");
+            messagingService.error("master_alert",
+                                   "API ERROR",
+                                   resp.status+" "+resp.statusText);
             service.types = [];
         });
     }

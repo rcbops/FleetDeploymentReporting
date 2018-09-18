@@ -20,8 +20,7 @@
         </optgroup>
       </select>
     </div>
-    <hx-alert ng-controller="AlertController" type="error" my-subject="updateObject"></hx-alert>
-    <hx-alert ng-controller="AlertController" type="error" my-subject="searchAll"></hx-alert>
+    <hx-alert type="error" target="'details_' + paneObj.paneIndex"></hx-alert>
 
   </div>
   <div>

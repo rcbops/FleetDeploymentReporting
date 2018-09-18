@@ -25,7 +25,8 @@ angular.module('cloudSnitch').controller('PanesController', ['$scope', 'timeServ
             },
             loading: false,
             stack: [{ state: 'search' }],
-            deleted: false
+            deleted: false,
+            paneIndex: $scope.numPanes
         });
 
         $scope.numPanes++;

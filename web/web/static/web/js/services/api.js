@@ -258,7 +258,6 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
         return $http({
             method: 'POST',
             url: '/api/objects/search/',
-            //url: '/api/objects/dan/',
             data: req,
             headers: makeHeaders(),
             }).then(function(resp) {
@@ -310,8 +309,7 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
             return $http({
                 method: 'POST',
                 headers: makeHeaders(),
-                //url: '/api/objects/search/',
-                url: '/api/objects/dan/',
+                url: '/api/objects/search/',
                 data: req
             }).then(function(resp) {
                 sink(resp.data);

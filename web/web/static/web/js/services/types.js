@@ -48,26 +48,53 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         Virtualenv: 'path'
     };
 
+    var strOperators = [
+        '=',
+        '<',
+        '<=',
+        '>',
+        '>=',
+        '<>',
+        'CONTAINS',
+        'STARTS WITH',
+        'ENDS WITH'
+    ];
+
+    var numericOperators = [
+        '=',
+        '<',
+        '<=',
+        '>',
+        '>=',
+        '<>'
+    ];
+
+    var boolOperators = [
+        '=',
+        '<>'
+    ];
+
     service.glanceProperties = function(label) {
         return service.glanceViews[label];
     };
 
+    /**
+     * Update properties for types.
+     */
     service.updateProperties = function() {
         service.properties = {};
-        for (var i = 0; i < service.types.length; i++) {
-            var props = [];
-            var t = service.types[i];
-            props.push(t.identity);
-            for (var j = 0; j < t.static_properties.length; j++) {
-                props.push(t.static_properties[j]);
-            }
-            for (var j = 0; j < t.state_properties.length; j++) {
-                props.push(t.state_properties[j]);
-            }
-            service.properties[t.label] = props;
-        }
+        angular.forEach(service.typeMap, function(type, label) {
+            service.properties[label] = [];
+            angular.forEach(type.properties, function(prop_obj, prop_name) {
+                service.properties[label].push(prop_name);
+            });
+            service.properties[label].sort();
+        });
     };
 
+    /**
+     * Update paths for types.
+     */
     service.updatePaths = function() {
         cloudSnitchApi.paths().then(function(result) {
             service.paths = result;
@@ -80,15 +107,26 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         });
     }
 
+    /**
+     * Update types.
+     */
     service.updateTypes = function() {
         service.typeMap = {};
         cloudSnitchApi.types().then(function(result) {
+            // Save the result
             service.types = result;
-            service.updateProperties();
-            service.typesLoading = false;
+
+            // Map the result
             for (var i = 0; i < service.types.length; i++) {
                 service.typeMap[service.types[i].label] = service.types[i];
             }
+
+            // Update properties.
+            service.updateProperties();
+
+            // Stop loading indicator.
+            service.typesLoading = false;
+
         }, function(resp) {
             messagingService.error("master_alert",
                                    "API ERROR",
@@ -97,6 +135,9 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         });
     }
 
+    /**
+     * Get path for a label.
+     */
     service.path = function(label) {
         var p = [];
         var path = service.paths[label];
@@ -110,6 +151,9 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         return p;
     };
 
+    /**
+     * Get identity property for a label.
+     */
     service.identityProperty = function(label) {
         var prop = undefined;
         var type = service.typeMap[label];
@@ -117,6 +161,53 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
             prop = type.identity;
         }
         return prop;
+    };
+
+    /**
+     * Get operators for a label and property.
+     */
+    service.operators = function(label, property) {
+        var type;
+
+        try {
+            type = service.typeMap[label].properties[property].type;
+        } catch (error) {
+            return [];
+        }
+
+        switch(type) {
+            case 'bool':
+                return boolOperators;
+                break;
+            case 'int':
+            case 'float':
+                return numericOperators;
+                break;
+            default:
+                return strOperators;
+        }
+    };
+
+    /**
+     * Get the type of a property
+     */
+    service.propertyType = function(label, property) {
+        var type;
+        try {
+            type = service.typeMap[label].properties[property].type;
+        } catch (error) {
+            type = "str";
+        }
+        return type;
+    };
+
+    /**
+     * Determine if a property is a number property
+     */
+    service.isNumber = function(label, property) {
+        var type = service.propertyType(lable, property);
+        if (type === 'int' || type === 'float') { return true; }
+        return false;
     };
 
     service.update = function() {

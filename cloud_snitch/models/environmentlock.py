@@ -1,12 +1,15 @@
 import logging
 
+from .base import versioned_properties
 from .base import VersionedEntity
+from .base import VersionedProperty
 from cloud_snitch import utils
 from cloud_snitch.exc import EnvironmentLockedError
 
 logger = logging.getLogger(__name__)
 
 
+@versioned_properties
 class EnvironmentLockEntity(VersionedEntity):
     """Model an environment lock in the graph.
 
@@ -16,17 +19,14 @@ class EnvironmentLockEntity(VersionedEntity):
 
     label = 'EnvironmentLock'
     state_label = 'EnvironmentLockState'
-    identity_property = 'account_number_name'
-    static_properties = [
-        'account_number',
-        'name',
-        'locked'
-    ]
-    concat_properties = {
-        'account_number_name': [
-            'account_number',
-            'name'
-        ]
+    properties = {
+        'account_number_name': VersionedProperty(
+            is_identity=True,
+            concat_properties=['account_number', 'name']
+        ),
+        'account_number': VersionedProperty(is_static=True),
+        'name': VersionedProperty(is_static=True),
+        'locked': VersionedProperty(is_static=True, type=int)
     }
 
     @classmethod

@@ -17,6 +17,7 @@ from .exceptions import JobRunningError
 from .serializers import DiffSerializer
 from .serializers import DiffNodeSerializer
 from .serializers import DiffNodesSerializer
+from .serializers import GenericSerializer
 from .serializers import ModelSerializer
 from .serializers import PropertySerializer
 from .serializers import SearchSerializer
@@ -34,13 +35,14 @@ class ModelViewSet(viewsets.ViewSet):
 
     def list(self, request):
         """Get a list of models."""
-        models = registry.modeldicts()
+        models = registry.models.values()
+        models = sorted(models, key=lambda x: x.label)
         serializer = ModelSerializer(models, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """Get a specific model."""
-        model = registry.modeldict(pk)
+        model = registry.models.get(pk)
         if model is None:
             raise Http404
         serializer = ModelSerializer(model)
@@ -55,7 +57,7 @@ class PathViewSet(viewsets.ViewSet):
         paths = {}
         for label, model in registry.models.items():
             paths[label] = [l for l, _ in registry.path(label)]
-        serializer = ModelSerializer(paths)
+        serializer = GenericSerializer(paths)
         return Response(serializer.data)
 
 
@@ -128,7 +130,7 @@ class ObjectViewSet(viewsets.ViewSet):
         if created_at not in times:
             times.append(created_at)
 
-        results = ModelSerializer({
+        results = GenericSerializer({
             'data': vd,
             'times': times
         })
@@ -165,7 +167,7 @@ class ObjectViewSet(viewsets.ViewSet):
             index=vd.get('index')
         )
 
-        serializer = ModelSerializer({
+        serializer = GenericSerializer({
             'query': str(query),
             'data': vd,
             'params': query.params,
@@ -281,7 +283,7 @@ class ObjectDiffViewSet(viewsets.ViewSet):
         if node is None:
             raise Http404()
 
-        results = ModelSerializer({
+        results = GenericSerializer({
             'node': node,
             'nodecount': diff.diffdict['nodecount'],
             'data': data
@@ -309,7 +311,7 @@ class ObjectDiffViewSet(viewsets.ViewSet):
         except JobError:
             return self._job_error_response()
 
-        results = ModelSerializer({
+        results = GenericSerializer({
             'nodes': diff.getnodes(data['offset'], data['limit']),
             'nodecount': diff.diffdict['nodecount'],
             'data': data
@@ -338,7 +340,7 @@ class ObjectDiffViewSet(viewsets.ViewSet):
             return self._job_error_response()
 
         # Return the response
-        results = ModelSerializer({
+        results = GenericSerializer({
             'frame': diff.frame(),
             'nodemap': diff.diffdict['nodemap'],
             'nodecount': diff.diffdict['nodecount'],

@@ -209,6 +209,18 @@ class TestQuery(TestCase):
         self.assertEquals(q.params['filterval0'], 'somehostname')
 
     @tag('unit')
+    @mock.patch('neo4jdriver.query.prep_val')
+    def test_filter_calls_prep_val(self, m_prep):
+        q = Query('Host')
+        q.filter('processor_cores', '=', '42')
+        m_prep.assert_called_once_with(
+            'Host',
+            'processor_cores',
+            '42',
+            raise_for_error=False
+        )
+
+    @tag('unit')
     def test_filter_with_label(self):
         """Test filtering with a non default label."""
         q = Query('Host')

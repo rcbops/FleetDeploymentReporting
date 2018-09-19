@@ -1,7 +1,9 @@
 import logging
 
 from cloud_snitch.models import registry
+from cloud_snitch.models.utils import prep_val
 from cloud_snitch import utils
+
 from collections import OrderedDict
 
 from .exceptions import InvalidLabelError
@@ -136,6 +138,9 @@ class Query:
         if prop not in registry.properties(label):
             raise InvalidPropertyError(prop, label)
 
+        # Attempt a conversion for more accurate results.
+        prepped = prep_val(label, prop, value, raise_for_error=False)
+
         if prop in registry.state_properties(label):
             label = '{}_state'.format(label)
 
@@ -147,7 +152,7 @@ class Query:
         )
         self.filter_wheres.append(condition)
 
-        self.params['filterval{}'.format(self.filter_count)] = value
+        self.params['filterval{}'.format(self.filter_count)] = prepped
         self.filter_count += 1
         return self
 

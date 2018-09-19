@@ -86,13 +86,23 @@
         <div class="hxSpan-2 hxBox-xs">
           <div>
             <select class="hxTextCtrl" name="operator" ng-model="filter.operator" ng-required="true">
-              <option ng-repeat="operator in operators" value="{{operator}}">{{operator}}</option>
+              <option ng-repeat="operator in typesService.operators(filter.model, filter.property)" value="{{operator}}">{{operator}}</option>
             </select>
           </div>
         </div>
         <div class="hxSpan-3 hxBox-xs">
-          <div>
-            <input class="hxTextCtrl" name="filterValue" ng-model="filter.value" ng-required="true" ng-maxlength="256" />
+          <div ng-switch="typesService.propertyType(filter.model, filter.property)">
+            <!-- Boolean filter value -->
+            <select ng-switch-when="bool" class="hxTextCtrl" name="filterValue" ng-model="filter.value" ng-required="true">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+
+            <!-- Numeric filter value -->
+            <input ng-switch-when="int|float" ng-switch-when-separator="|" type="number" class="hxTextCtrl" name="filterValue" ng-model="filter.value" ng-required="true" ng-maxlength="16" />
+
+            <!-- all others -->
+            <input ng-switch-default class="hxTextCtrl" name="filterValue" ng-model="filter.value" ng-required="true" ng-maxlength="256" />
           </div>
           <div ng-if="f.filterValue.$invalid">
             <div ng-if="f.filterValue.$error.required">

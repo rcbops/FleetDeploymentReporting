@@ -73,10 +73,9 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
             service.paths = result;
             service.pathsLoading = false;
         }, function(resp) {
-            $log.error("In promise failure updatePaths");
             messagingService.error("master_alert",
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
             service.paths = {};
         });
     }
@@ -91,10 +90,9 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
                 service.typeMap[service.types[i].label] = service.types[i];
             }
         }, function(resp) {
-            $log.error("In promise failure updateTypes");
             messagingService.error("master_alert",
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
             service.types = [];
         });
     }

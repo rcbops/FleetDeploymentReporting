@@ -493,10 +493,9 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$log', '$
         }, function(resp) {
             stopPollingNodes();
             $scope.state = 'error';
-            $log.error("In promise failure getNodes");
             messagingService.error("diff",
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
         });
     }
 
@@ -619,10 +618,9 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$log', '$
         }, function(resp) {
             stopPolling();
             $scope.state = 'error'
-            $log.error("In promise failure getStructure");
             messagingService.error("diff",
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
         });
     }
 

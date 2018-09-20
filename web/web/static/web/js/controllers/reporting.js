@@ -106,10 +106,9 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
         }, function(resp) {
             $scope.serverErrors = resp.data;
             $scope.busy = false;
-            $log.error("In promise failure submitReport");
             messagingService.error("reporting",
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
         });
     };
 

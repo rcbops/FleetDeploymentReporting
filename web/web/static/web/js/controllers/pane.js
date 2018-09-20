@@ -102,10 +102,9 @@ angular.module('cloudSnitch').controller('ResultsController', ['$scope', '$log',
             $scope.count = data.count;
             $scope.busy = false;
         }, function(resp) {
-            $log.error("In promise failure searchPage");
-            messagingService.error("searchpage_"+$scope.paneObj.paneIndex,
+            messagingService.error("searchpage_" + $scope.paneObj.paneIndex,
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
             $scope.busy = false;
         });
     };

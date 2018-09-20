@@ -22,10 +22,9 @@ angular.module('cloudSnitch').factory('reportsService', ['$rootScope', '$log', '
             }
             $rootScope.$broadcast('reports:update');
         }, function(resp) {
-            $log.error("In promise failure updateReports");
             messagingService.error("master_alert",
                                    "API ERROR",
-                                   resp.status+" "+resp.statusText);
+                                   resp.status + " " + resp.statusText);
             service.reports = [];
         });
     }

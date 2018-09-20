@@ -1,5 +1,4 @@
-<div ng-repeat="(level, alerts) in $ctrl.alerts" >
-<div ng-repeat="(subject, alert) in alerts" id='hxAlert' type="{{level}}">
+<div ng-repeat="alert in $ctrl.alerts track by $index" id='hxAlert' type="{{alert.level | lowercase}}">
     <span id='hxIconWrapper'>
         <hx-icon id='hxIcon' type='info-circle'></hx-icon>
     </span>
@@ -7,8 +6,7 @@
         <span id='hxStatus'>{{alert.subject}}:</span>
         {{alert.msg}}
     </span>
-    <button id='hxDismiss' type='button' ng-click="$ctrl.removeAlert(level, subject)">
+    <button id='hxDismiss' type='button' ng-click="$ctrl.removeAlert($index)">
         <hx-icon type='times'></hx-icon>
     </button>
-</div>
 </div>

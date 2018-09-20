@@ -2,15 +2,11 @@ function AlertsController($scope, $filter, $log) {
     var self = this;
 
     self.$onInit = function() {
-        self.alerts = {
-          'error': {},
-          'warning': {},
-          'success': {}
-        };
+        self.alerts = [];
     };
 
-    self.removeAlert = function(level, index) {
-        delete self.alerts[level][index];
+    self.removeAlert = function(index) {
+        self.alerts.splice(index, 1)
         if (self.alerts.length == 0) {
             self.onNoAlerts({});
         }
@@ -18,8 +14,7 @@ function AlertsController($scope, $filter, $log) {
 
     $scope.$on('notify', function(notification, args) {
         if (args.target == self.target) {
-            level = $filter('lowercase')(args.level);
-            self.alerts[level][args.subject] = args;
+            self.alerts.push(args);
             if (self.alerts.length == 1) {
                 self.onHasAlerts({});
             }

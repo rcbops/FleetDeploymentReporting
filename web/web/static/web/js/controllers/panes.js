@@ -26,7 +26,7 @@ angular.module('cloudSnitch').controller('PanesController', ['$scope', 'timeServ
             loading: false,
             stack: [{ state: 'search' }],
             deleted: false,
-            paneIndex: $scope.numPanes
+            paneId: timeService.str(timeService.now())
         });
 
         $scope.numPanes++;
@@ -49,7 +49,9 @@ angular.module('cloudSnitch').controller('PanesController', ['$scope', 'timeServ
      */
     $scope.copyPane = function(srcPane) {
         if ($scope.panes.length < $scope.maxPanes) {
-            $scope.panes.push(angular.copy(srcPane));
+            newPane = angular.copy(srcPane);
+            newPane.paneId = timeService.str(timeService.now());
+            $scope.panes.push(newPane);
             $scope.numPanes++;
         }
     };

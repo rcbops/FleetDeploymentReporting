@@ -55,7 +55,7 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
                 $scope.busy = false;
             }
         }, function(resp) {
-            messagingService.error("details_" + $scope.paneObj.paneIndex,
+            messagingService.error("details_" + $scope.paneObj.paneId,
                                    "API ERROR",
                                    resp.status + " " + resp.statusText);
             $scope.busy = false;
@@ -78,7 +78,7 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
         ).then(function(result) {
             $scope.objectBusy = false;
         }, function(resp) {
-            messagingService.error("details_" + $scope.paneObj.paneIndex,
+            messagingService.error("details_" + $scope.paneObj.paneId,
                                    "API ERROR",
                                    resp.status + " " + resp.statusText);
             $scope.objectBusy = false;
@@ -110,7 +110,7 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
         ).then(function(result) {
             $scope.children[childRef].busy = false;
         }, function(resp) {
-            messagingService.error("details_" + $scope.paneObj.paneIndex,
+            messagingService.error("details_" + $scope.paneObj.paneId,
                                    "API ERROR",
                                    resp.status + " " + resp.statusText);
             $scope.children[childRef].busy = false;

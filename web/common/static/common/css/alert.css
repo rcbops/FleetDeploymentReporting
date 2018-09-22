@@ -9,7 +9,7 @@
 }
 #hxAlert #hxIconWrapper {
   flex-shrink: 0;
-  padding: 1rem;
+  padding: 1.1rem;
 }
 #hxAlert #hxContent {
   flex-grow: 1;
@@ -19,8 +19,19 @@
 #hxAlert #hxDismiss {
   flex-shrink: 0;
   height: 3rem;
-  padding: 1rem;
+  padding: 1.25rem;
   width: 3rem;
+}
+
+#hxAlert #hxStatus {
+  float: left;
+  font-weight: 500;
+  margin-right: 0.25rem;
+  text-transform: uppercase;
+}
+
+#hxDismiss > hx-icon {
+  color: white;
 }
 
 hx-alert {
@@ -58,6 +69,9 @@ hx-alert[type="warning"] {
   background-color: #bbdefb;
   color: #000000;
 }
+#hxAlert[type="info"] > hx-icon {
+  color: black;
+}
 #hxAlert[type="error"] {
   background-color: #d32f2f;
   color: #ffffff;
@@ -70,3 +84,8 @@ hx-alert[type="warning"] {
   background-color: #ffeb3b;
   color: #000000;
 }
+
+#hxAlert[type="warning"] > #hxDismiss > hx-icon {
+  color: black;
+}
+

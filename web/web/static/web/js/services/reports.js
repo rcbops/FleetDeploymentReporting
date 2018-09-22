@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('reportsService', ['$rootScope', 'cloudSnitchApi', function($rootScope, cloudSnitchApi) {
+angular.module('cloudSnitch').factory('reportsService', ['$rootScope', '$log', 'cloudSnitchApi', 'messagingService', function($rootScope, $log, cloudSnitchApi, messagingService) {
 
     var service = {};
 
@@ -21,8 +21,10 @@ angular.module('cloudSnitch').factory('reportsService', ['$rootScope', 'cloudSni
                 service.reportsMap[service.reports[i].name] = service.reports[i];
             }
             $rootScope.$broadcast('reports:update');
-        }, function(error) {
-            // @TODO - Do something with error
+        }, function(resp) {
+            messagingService.error("master_alert",
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
             service.reports = [];
         });
     }

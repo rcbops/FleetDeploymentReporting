@@ -1,7 +1,7 @@
 /**
  * Main controller. Holds various app wide things.
  */
-angular.module('cloudSnitch').controller('ReportingController', ['$scope', 'reportsService', 'cloudSnitchApi', function($scope, reportsService, cloudSnitchApi) {
+angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log', 'reportsService', 'cloudSnitchApi', 'messagingService', function($scope, $log, reportsService, cloudSnitchApi, messagingService) {
     $scope.reports = reportsService.reports;
     $scope.serverErrors = null;
     $scope.rendered = false;
@@ -106,6 +106,9 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', 'repo
         }, function(resp) {
             $scope.serverErrors = resp.data;
             $scope.busy = false;
+            messagingService.error("reporting",
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
         });
     };
 

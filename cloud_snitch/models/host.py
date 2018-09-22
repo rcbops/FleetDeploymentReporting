@@ -127,6 +127,37 @@ class InterfaceEntity(VersionedEntity):
     }
 
 
+class ConfiguredInterfaceEntity(VersionedEntity):
+    """Model a ConfiguredInterface in the graph."""
+
+    label = 'ConfiguredInterface'
+    state_label = 'ConfiguredInterfaceState'
+    identity_property = 'device_host'
+
+    static_properties = [
+        'device',
+        'host'
+    ]
+    state_properties = [
+        'mtu',
+        'offload_sg',
+        'bridge_waitport',
+        'bridge_fd',
+        'bridge_ports',
+        'bridge_stp',
+        'address',
+        'netmask',
+        'dns_nameservers',
+        'gateway'
+    ]
+    concat_properties = {
+        'device_host': [
+            'device',
+            'host'
+        ]
+    }
+
+
 class HostEntity(VersionedEntity):
     """Model host nodes in the graph."""
 
@@ -180,5 +211,6 @@ class HostEntity(VersionedEntity):
         'nameservers': ('HAS_NAMESERVER', NameServerEntity),
         'interfaces': ('HAS_INTERFACE', InterfaceEntity),
         'mounts': ('HAS_MOUNT', MountEntity),
-        'devices': ('HAS_DEVICE', DeviceEntity)
+        'devices': ('HAS_DEVICE', DeviceEntity),
+        'configuredinterfaces': ('HAS_CONFIGURED_INTERFACE', ConfiguredInterfaceEntity)
     }

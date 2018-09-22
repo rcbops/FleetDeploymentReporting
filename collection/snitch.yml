@@ -27,6 +27,13 @@
       tags:
         - config
 
+- hosts: all
+  tasks:
+    - name: Collect values from interface configurations
+      action: configuredinterface_snitch
+      tags:
+        - config
+
 - hosts: localhost
   tasks:
     - name: Get repo information

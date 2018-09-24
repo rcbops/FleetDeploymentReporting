@@ -1,7 +1,7 @@
 /**
  * The details controller covers displaying object details.
  */
-angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, cloudSnitchApi, typesService, timeService) {
+angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log', 'cloudSnitchApi', 'typesService', 'timeService', 'messagingService', function($scope, $log, cloudSnitchApi, typesService, timeService, messagingService) {
 
     $scope.f = undefined;
     $scope.obj = {};
@@ -78,7 +78,9 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
                 $scope.busy = false;
             }
         }, function(resp) {
-            // @TODO - Error handling
+            messagingService.error("details_" + $scope.paneObj.paneId,
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
             $scope.busy = false;
         });
     };
@@ -100,6 +102,9 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
         ).then(function(result) {
             $scope.objectBusy = false;
         }, function(resp) {
+            messagingService.error("details_" + $scope.paneObj.paneId,
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
             $scope.objectBusy = false;
         });
     };
@@ -129,7 +134,9 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', 'cloudS
         ).then(function(result) {
             $scope.children[childRef].busy = false;
         }, function(resp) {
-            // @TODO - error handling
+            messagingService.error("details_" + $scope.paneObj.paneId,
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
             $scope.children[childRef].busy = false;
         });
     };

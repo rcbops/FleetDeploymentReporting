@@ -1,7 +1,7 @@
 /**
  * The details controller covers displaying object details.
  */
-angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval', '$window', 'cloudSnitchApi', 'typesService', 'timeService', function($scope, $interval, $window, cloudSnitchApi, typesService, timeService) {
+angular.module('cloudSnitch').controller('DiffController', ['$scope', '$log', '$interval', '$window', 'cloudSnitchApi', 'typesService', 'timeService', 'messagingService', function($scope, $log, $interval, $window, cloudSnitchApi, typesService, timeService, messagingService) {
 
     var frame = undefined;
     var nodeMap = undefined;
@@ -493,6 +493,9 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval
         }, function(resp) {
             stopPollingNodes();
             $scope.state = 'error';
+            messagingService.error("diff",
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
         });
     }
 
@@ -615,6 +618,9 @@ angular.module('cloudSnitch').controller('DiffController', ['$scope', '$interval
         }, function(resp) {
             stopPolling();
             $scope.state = 'error'
+            messagingService.error("diff",
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
         });
     }
 

@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', function(cloudSnitchApi) {
+angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cloudSnitchApi', 'messagingService', function($rootScope, $log, cloudSnitchApi, messagingService) {
 
     var service = {};
     service.types = [];
@@ -72,8 +72,10 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
         cloudSnitchApi.paths().then(function(result) {
             service.paths = result;
             service.pathsLoading = false;
-        }, function(error) {
-            // @TODO - Do something with errors.
+        }, function(resp) {
+            messagingService.error("master_alert",
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
             service.paths = {};
         });
     }
@@ -87,8 +89,10 @@ angular.module('cloudSnitch').factory('typesService', ['cloudSnitchApi', functio
             for (var i = 0; i < service.types.length; i++) {
                 service.typeMap[service.types[i].label] = service.types[i];
             }
-        }, function(error) {
-            // @TODO - Do something with error
+        }, function(resp) {
+            messagingService.error("master_alert",
+                                   "API ERROR",
+                                   resp.status + " " + resp.statusText);
             service.types = [];
         });
     }

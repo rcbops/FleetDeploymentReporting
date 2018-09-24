@@ -1,14 +1,20 @@
-def postActions(buildStatus) {
+def postActions(buildStatus, deleteEnv, mergeToMaster) {
     def status
+    deleteEnv = deleteEnv.toBoolean()
+    mergeToMaster = mergeToMaster.toBoolean()
 
     switch (buildStatus) {
         case 'SUCCESS':
-            sh 'vagrant destroy -f'
-            sh 'git checkout -b working_dev_branch'
-            sh 'git checkout master'
-            sh 'git merge working_dev_branch'
-            sh 'git push origin master'
-            status = 'is now green'
+            if (deleteEnv) {
+              sh 'vagrant destroy -f'
+            }
+            if (mergeToMaster) {
+              sh 'git checkout -b working_dev_branch'
+              sh 'git checkout master'
+              sh 'git merge working_dev_branch'
+              sh 'git push origin master'
+              status = 'is now green'
+            }
             break
 
         case 'UNSTABLE':
@@ -26,9 +32,13 @@ pipeline {
 
   agent { label 'master' }
 
-  environment {
-    RUN_TEST = true
-    RUN_REMOTE = false
+  parameters { 
+    booleanParam(name: 'RUN_TEST', defaultValue: true, description: '')
+    booleanParam(name: 'RUN_REMOTE', defaultValue: false, description: '')
+    booleanParam(name: 'DELETE_ENV', defaultValue: true, description: '')
+    booleanParam(name: 'MERGE_TO_MASTER', defaultValue: false, description: '')
+
+    string(name: 'HOST_NAME', defaultValue: 'jenkins_snitch_test', description: '') 
   }
 
   stages {
@@ -60,7 +70,7 @@ pipeline {
                          string(credentialsId: 'RAX_API_KEY', variable: 'RAX_API_KEY'),
                          string(credentialsId: 'RAX_REG', variable: 'RAX_REG')]) {
 
-        postActions(currentBuild.currentResult)
+        postActions(currentBuild.currentResult, env.DELETE_ENV, env.MERGE_TO_MASTER)
       }
     }
   }

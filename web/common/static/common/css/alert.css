@@ -37,8 +37,6 @@
 hx-alert {
   display: block;
   width: 100%;
-}
-hx-alert {
   background-color: #d8d8d8;
   color: #000000;
   font-weight: 300;
@@ -46,6 +44,12 @@ hx-alert {
 }
 hx-alert:not(:last-child) {
   margin-bottom: 1rem;
+}
+
+hx-alert[target="master_alert"] {
+  position: absolute;
+  right: 1rem;
+  top: 2rem;
 }
 
 hx-alert[type="info"] {

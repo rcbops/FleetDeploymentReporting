@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
     rs.rackspace_region = ENV['RAX_REG']
     rs.flavor           = /2 GB General Purpose v1/
     rs.image            = /Ubuntu 16.04/
-    rs.server_name      = "jenkins_snitch_test_" + ENV['BUILD_NUMBER']
+    rs.server_name      = ENV['HOST_NAME'] + ENV['BUILD_NUMBER']
     rs.public_key_path  = "~/.ssh/id_rsa.pub"
   end
 
@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
        ansible-playbook testenv_install.yml
        cd /opt/web/cloud_snitch/web
        python manage.py test
-     elif [ #{ENV['RUN_REAL']} == true ]; then
+     elif [ #{ENV['RUN_REMOTE']} == true ]; then
        ansible-playbook web_install.yml
        ansible-playbook neo4j_install.yml
        ansible-playbook sync_install.yml

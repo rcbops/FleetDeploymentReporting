@@ -37,6 +37,10 @@ body.hxHorizontal {
   grid-template-rows: 3.5em 1fr;
 }
 
+body.hxHorizontal > #stage > #content {
+  position: relative;
+}
+
 /*body > #head {
   height : 1.5rem;
 }*/

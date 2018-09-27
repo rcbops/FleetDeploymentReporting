@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
      echo "Install Packages"
      sudo apt-get update
-     sudo apt-get install -y python-pip python3.5
+     sudo apt-get install -y python-pip python3.5 python3.5-dev:
      sudo pip install virtualenv
 
      echo "Update Keys"

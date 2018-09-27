@@ -67,6 +67,7 @@ pane {
   border-right: 1px solid #0c7c84;
   width: 800px;
   height: 100%;
+  position: relative;
 }
 
 /*

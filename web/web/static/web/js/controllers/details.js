@@ -50,7 +50,6 @@ angular.module('cloudSnitch').controller('DetailsController', ['$scope', '$log',
 
     $scope.isBusy = function() {
         var busy = false;
-
         if ($scope.busy) { busy = true; }
         if ($scope.objectBusy) { busy = true; }
         angular.forEach($scope.children, function(childObj, childRef) {

@@ -1,13 +1,10 @@
 <div ng-controller="DetailsController">
+  <bigbusy busy="isBusy()" text="'Loading...'"></bigbusy>
   <div class="hxRow">
 
     <div class="hxCol hxSpan-9 left">
       <span class="hxHeading-5">{{ type }}</span>
-      <h2>
-        <span class="hxHeading-5">{{ type }}</span>
-        {{ identity }}
-        <hx-busy ng-if="isBusy()"></hx-busy>
-      </h2>
+      <h2><span class="hxHeading-5">{{ type }}</span>{{ identity }}</h2>
     </div>
 
     <div class="hxSpan-3 right">

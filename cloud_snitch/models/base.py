@@ -3,6 +3,8 @@ import logging
 import pprint
 from cloud_snitch import utils
 from cloud_snitch.decorators import transient_retry
+
+from cloud_snitch.exc import EntityDefinitionError
 from cloud_snitch.exc import PropertyAlreadyExistsError
 
 logger = logging.getLogger(__name__)
@@ -146,6 +148,102 @@ class VersionedEdgeSet(object):
         """
         with session.begin_transaction() as tx:
             self._update(tx, edges, time_in_ms)
+
+
+class VersionedProperty(object):
+    """Convenience class to keep track of properties in a model."""
+    def __init__(
+        self,
+        type=str,
+        concat_properties=None,
+        is_static=False,
+        is_state=False,
+        is_identity=False
+    ):
+        """Init the property.
+
+        A property should be only one of is_static, is_state, or is_identity
+
+        :param type: Expected type of value for this property.
+        :type type: Class
+        :param concat_fields: List of fields that this property is composed of
+        :type concast_fields: list
+        :param is_static: Is this property a static property
+        :type is_static: bool
+        :param is_state: Is this property a state property
+        :type is_state: bool
+        :param is_identity: Is this property an identity property
+        :type is_identity: bool
+        """
+        self.type = type
+        self.concat_properties = concat_properties
+        self.is_concat = bool(concat_properties)
+        self.is_static = is_static
+        self.is_state = is_state
+        self.is_identity = is_identity
+
+    def is_valid(self):
+        """Validate that the property is one of state, static, or identity"""
+        tests = [self.is_static, self.is_state, self.is_identity]
+        positives = [t for t in tests if t]
+        return (len(positives) == 1)
+
+
+def versioned_properties(klass):
+    """Convenience method for extracting information from properties dict.
+
+    :param klass: Versioned entity class
+    :type klass: class
+    :returns: Decorated class
+    :rtype: class
+    """
+    identity_property = None
+    static_properties = []
+    state_properties = []
+    concat_properties = {}
+
+    for prop_name, prop in klass.properties.items():
+        # Ensure each property is valid
+        # (one of is_static, is_state, or is_identity
+        if not prop.is_valid():
+            raise EntityDefinitionError(
+                "Invalid property {} on versioned entity {}"
+                .format(prop_name, klass.__name__)
+            )
+
+        # Ensure there are not more than one identity properties
+        if prop.is_identity:
+            if identity_property is not None:
+                raise EntityDefinitionError(
+                    "Versioned entity {} must have only one identity property."
+                    .format(klass.__name__)
+                )
+            identity_property = prop_name
+
+        # Collect state properties
+        if prop.is_state:
+            state_properties.append(prop_name)
+
+        # Collect static properties
+        if prop.is_static:
+            static_properties.append(prop_name)
+
+        # Collect concat properties
+        if prop.is_concat:
+            concat_properties[prop_name] = prop.concat_properties
+
+    # Ensure there is one identity property.
+    if identity_property is None:
+        raise EntityDefinitionError(
+            "Versioned entity {} must have an identity property."
+            .format(klass.__name__)
+        )
+
+    klass.identity_property = identity_property
+    klass.static_properties = static_properties
+    klass.state_properties = state_properties
+    klass.concat_properties = concat_properties
+    return klass
 
 
 class VersionedEntity(object):

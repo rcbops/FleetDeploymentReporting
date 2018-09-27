@@ -1,7 +1,9 @@
 import logging
 
+from .base import versioned_properties
 from .base import SharedVersionedEntity
 from .base import VersionedEntity
+from .base import VersionedProperty
 from .apt import AptPackageEntity
 from .configfile import ConfigfileEntity
 from .virtualenv import VirtualenvEntity
@@ -9,202 +11,167 @@ from .virtualenv import VirtualenvEntity
 logger = logging.getLogger(__name__)
 
 
+@versioned_properties
 class NameServerEntity(SharedVersionedEntity):
     """Model a name server node in the graph."""
-
     label = 'NameServer'
     state_label = 'NameServerState'
-    identity_property = 'ip'
+    properties = {
+        'ip': VersionedProperty(is_identity=True)
+    }
 
 
+@versioned_properties
 class PartitionEntity(VersionedEntity):
     """Model a partition on a device in the graph."""
 
     label = 'Partition'
     state_label = 'PartitionState'
-    identity_property = 'name_device'
-
-    static_properties = [
-        'name',
-        'device'
-    ]
-
-    state_properties = [
-        'size',
-        'start'
-    ]
-
-    concat_properties = {
-        'name_device': [
-            'name',
-            'device'
-        ]
+    properties = {
+        'name_device': VersionedProperty(
+            is_identity=True,
+            concat_properties=['name', 'device']
+        ),
+        'name': VersionedProperty(is_static=True),
+        'device': VersionedProperty(is_static=True),
+        'size': VersionedProperty(is_state=True),
+        'start': VersionedProperty(is_state=True)
     }
 
 
+@versioned_properties
 class DeviceEntity(VersionedEntity):
     """Model a device node in the graph."""
 
     label = 'Device'
     state_label = 'DeviceState'
-    identity_property = 'name_host'
-
-    static_properties = [
-        'name',
-        'host',
-    ]
-
-    state_properties = [
-        'removable',
-        'rotational',
-        'size'
-    ]
-
-    concat_properties = {
-        'name_host': [
-            'name',
-            'host'
-        ]
+    properties = {
+        'name_host': VersionedProperty(
+            is_identity=True,
+            concat_properties=['name', 'host']
+        ),
+        'name': VersionedProperty(is_static=True),
+        'host': VersionedProperty(is_static=True),
+        'removable': VersionedProperty(is_state=True),
+        'rotational': VersionedProperty(is_state=True),
+        'size': VersionedProperty(is_state=True)
     }
-
     children = {
         'partitions': ('HAS_PARTITION', PartitionEntity)
     }
 
 
+@versioned_properties
 class MountEntity(VersionedEntity):
     """Model a mount node in the graph."""
 
     label = 'Mount'
     state_label = 'MountState'
-    identity_property = 'mount_host'
-
-    static_properties = [
-        'mount',
-        'host',
-    ]
-
-    state_properties = [
-        'device',
-        'size_total',
-        'fstype'
-    ]
-
-    concat_properties = {
-        'mount_host': [
-            'mount',
-            'host'
-        ]
+    properties = {
+        'mount_host': VersionedProperty(
+            is_identity=True,
+            concat_properties=['mount', 'host']
+        ),
+        'mount': VersionedProperty(is_static=True),
+        'host': VersionedProperty(is_static=True),
+        'device': VersionedProperty(is_state=True),
+        'size_total': VersionedProperty(is_state=True),
+        'fstype': VersionedProperty(is_state=True)
     }
 
 
+@versioned_properties
 class InterfaceEntity(VersionedEntity):
     """Model interface nodes in the graph."""
 
     label = 'Interface'
     state_label = 'InterfaceState'
-    identity_property = 'device_host'
-
-    static_properties = [
-        'device',
-        'host'
-    ]
-
-    state_properties = [
-        'active',
-        'ipv4_address',
-        'ipv6_address',
-        'macaddress',
-        'mtu',
-        'promisc',
-        'type'
-    ]
-
-    concat_properties = {
-        'device_host': [
-            'device',
-            'host'
-        ]
+    properties = {
+        'device_host': VersionedProperty(
+            is_identity=True,
+            concat_properties=['device', 'host']
+        ),
+        'device': VersionedProperty(is_static=True),
+        'host': VersionedProperty(is_static=True),
+        'active': VersionedProperty(is_state=True),
+        'ipv4_address': VersionedProperty(is_state=True),
+        'ipv6_address': VersionedProperty(is_state=True),
+        'macaddress': VersionedProperty(is_state=True),
+        'mtu': VersionedProperty(is_state=True, type=int),
+        'promisc': VersionedProperty(is_state=True),
+        'type': VersionedProperty(is_state=True)
     }
 
 
+@versioned_properties
 class ConfiguredInterfaceEntity(VersionedEntity):
     """Model a ConfiguredInterface in the graph."""
 
     label = 'ConfiguredInterface'
     state_label = 'ConfiguredInterfaceState'
-    identity_property = 'device_host'
-
-    static_properties = [
-        'device',
-        'host'
-    ]
-    state_properties = [
-        'mtu',
-        'offload_sg',
-        'bridge_waitport',
-        'bridge_fd',
-        'bridge_ports',
-        'bridge_stp',
-        'address',
-        'netmask',
-        'dns_nameservers',
-        'gateway'
-    ]
-    concat_properties = {
-        'device_host': [
-            'device',
-            'host'
-        ]
+    properties = {
+        'device_host': VersionedProperty(
+            is_identity=True,
+            concat_properties=['device', 'host']
+        ),
+        'device': VersionedProperty(is_static=True),
+        'host': VersionedProperty(is_static=True),
+        'mtu': VersionedProperty(is_state=True, type=int),
+        'offload_sg': VersionedProperty(is_state=True),
+        'bridge_waitport': VersionedProperty(is_state=True),
+        'bridge_fd': VersionedProperty(is_state=True),
+        'bridge_ports': VersionedProperty(is_state=True),
+        'bridge_stp': VersionedProperty(is_state=True),
+        'address': VersionedProperty(is_state=True),
+        'netmask': VersionedProperty(is_state=True),
+        'dns_nameservers': VersionedProperty(is_state=True),
+        'gateway': VersionedProperty(is_state=True)
     }
 
 
+@versioned_properties
 class HostEntity(VersionedEntity):
     """Model host nodes in the graph."""
 
     label = 'Host'
     state_label = 'HostState'
-    identity_property = 'hostname_environment'
 
-    static_properties = [
-        'hostname',
-        'environment'
-    ]
+    properties = {
+        'hostname_environment': VersionedProperty(
+            is_identity=True,
+            concat_properties=['hostname', 'environment']
+        ),
+        'hostname': VersionedProperty(is_static=True),
+        'environment': VersionedProperty(is_static=True),
 
-    concat_properties = {
-        'hostname_environment': [
-            'hostname',
-            'environment'
-        ]
+        'architecture': VersionedProperty(is_state=True),
+        'bios_date': VersionedProperty(is_state=True),
+        'bios_version': VersionedProperty(is_state=True),
+        'default_ipv4_address': VersionedProperty(is_state=True),
+        'default_ipv6_address': VersionedProperty(is_state=True),
+        'kernel': VersionedProperty(is_state=True),
+        'memtotal_mb': VersionedProperty(is_state=True, type=int),
+        'lsb_codename': VersionedProperty(is_state=True),
+        'lsb_description': VersionedProperty(is_state=True),
+        'lsb_id': VersionedProperty(is_state=True),
+        'lsb_major_release': VersionedProperty(is_state=True),
+        'lsb_release': VersionedProperty(is_state=True),
+        'fqdn': VersionedProperty(is_state=True),
+        'pkg_mgr': VersionedProperty(is_state=True),
+        'processor_cores': VersionedProperty(is_state=True, type=int),
+        'processor_count': VersionedProperty(is_state=True, type=int),
+        'processor_threads_per_core': VersionedProperty(
+            is_state=True,
+            type=int
+        ),
+        'processor_vcpus': VersionedProperty(is_state=True, type=int),
+        'python_executable': VersionedProperty(is_state=True),
+        'python_version': VersionedProperty(is_state=True),
+        'python_type': VersionedProperty(is_state=True),
+        'service_mgr': VersionedProperty(is_state=True),
+        'selinux': VersionedProperty(is_state=True, type=bool),
+        'ansible_version_full': VersionedProperty(is_state=True)
     }
-
-    state_properties = [
-        'architecture',
-        'bios_date',
-        'bios_version',
-        'default_ipv4_address',
-        'default_ipv6_address',
-        'kernel',
-        'memtotal_mb',
-        'lsb_codename',
-        'lsb_description',
-        'lsb_id',
-        'lsb_major_release',
-        'lsb_release',
-        'fqdn',
-        'pkg_mgr',
-        'processor_cores',
-        'processor_count',
-        'processor_threads_per_core',
-        'processor_vcpus',
-        'python_executable',
-        'python_version',
-        'python_type',
-        'service_mgr',
-        'selinux',
-        'ansible_version_full'
-    ]
-
     children = {
         'aptpackages': ('HAS_APT_PACKAGE', AptPackageEntity),
         'virtualenvs': ('HAS_VIRTUALENV', VirtualenvEntity),

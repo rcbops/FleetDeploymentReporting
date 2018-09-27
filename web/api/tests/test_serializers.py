@@ -1,4 +1,5 @@
 import logging
+import mock
 
 from django.test import tag, TestCase
 
@@ -6,21 +7,92 @@ from api.serializers import DiffNodeSerializer
 from api.serializers import DiffNodesSerializer
 from api.serializers import DiffSerializer
 from api.serializers import FilterSerializer
+from api.serializers import GenericSerializer
 from api.serializers import ModelSerializer
 from api.serializers import OrderSerializer
 from api.serializers import PropertySerializer
 from api.serializers import SearchSerializer
 from api.serializers import TimesChangedSerializer
 
+from cloud_snitch.models.base import VersionedEntity
+from cloud_snitch.models.base import VersionedProperty
+from cloud_snitch.models.base import versioned_properties
+
 logging.getLogger('api').setLevel(logging.ERROR)
+
+
+@versioned_properties
+class TestChildEntity(VersionedEntity):
+    """Simple child entity for testing the model serializer."""
+    label = "TestChildEntity"
+    state_label = 'TestChildEntityState'
+    properties = {
+        'identity': VersionedProperty(is_identity=True, type=str)
+    }
+
+
+@versioned_properties
+class TestEntity(VersionedEntity):
+    """Simple entity for testing the model serializer."""
+    label = 'TestEntity'
+    state_label = 'TestEntityState'
+    properties = {
+        'identity': VersionedProperty(is_identity=True, type=str),
+        'static1': VersionedProperty(is_static=True, type=int),
+        'state1': VersionedProperty(is_state=True, type=float)
+    }
+    children = {
+        'children': ('HAS_CHILD', TestChildEntity)
+    }
 
 
 class TestModelSerializer(TestCase):
 
     @tag('unit')
+    @mock.patch('api.serializers.registry.properties')
+    def test_serialize_single(self, m_properties):
+        m_properties.return_value = ['identity', 'state1', 'static1']
+
+        s = ModelSerializer(TestEntity)
+
+        self.assertEqual(s.data['label'], 'TestEntity')
+        self.assertEqual(s.data['state_label'], 'TestEntityState')
+
+        # Test properties
+        expected_properties = {
+            'identity': {'type': 'str'},
+            'static1': {'type': 'int'},
+            'state1': {'type': 'float'}
+        }
+        for prop_name, prop_dict in expected_properties.items():
+            self.assertEqual(
+                s.data['properties'][prop_name]['type'],
+                prop_dict['type']
+            )
+
+        # Test relationships.
+        expected_children = {
+            'children': {
+                'rel_name': 'HAS_CHILD', 'label': 'TestChildEntity'
+            }
+        }
+        for name, child_dict in expected_children.items():
+            self.assertEqual(
+                s.data['children'][name]['rel_name'],
+                child_dict['rel_name']
+            )
+            self.assertEqual(
+                s.data['children'][name]['label'],
+                child_dict['label']
+            )
+
+
+class TestGenericSerializer(TestCase):
+
+    @tag('unit')
     def test_serialize_single(self):
         test_obj = {'somekey': 'someval'}
-        s = ModelSerializer(test_obj)
+        s = GenericSerializer(test_obj)
         data = s.data
         self.assertTrue(data is test_obj)
 
@@ -30,7 +102,7 @@ class TestModelSerializer(TestCase):
             {'somekey1': 'someval1'},
             {'somekey2': 'someval2'}
         ]
-        data = ModelSerializer(test_objs, many=True).data
+        data = GenericSerializer(test_objs, many=True).data
         for i, obj in enumerate(test_objs):
             self.assertTrue(obj is data[i])
 

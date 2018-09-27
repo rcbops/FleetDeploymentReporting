@@ -28,7 +28,41 @@ _operators = [
 
 
 class ModelSerializer(BaseSerializer):
-    """Debug serializer for dicts"""
+    """Serializer for Models."""
+    def to_representation(self, model):
+        """Get dict repr
+
+        :param model: VersionedEntity to represent
+        :type model: class
+        :returns: Dict representation
+        :rtype: dict
+        """
+        # Assemble list of properties.
+        properties = {}
+        for prop in registry.properties(model.label):
+            properties[prop] = {
+                'type': model.properties.get(prop).type.__name__
+            }
+
+        # Assemble child relationships
+        children = {}
+        for name, childtuple in model.children.items():
+            children[name] = {
+                'rel_name': childtuple[0],
+                'label': childtuple[1].label
+            }
+
+        return {
+            'label': model.label,
+            'state_label': model.state_label,
+            'properties': properties,
+            'identity': model.identity_property,
+            'children': children
+        }
+
+
+class GenericSerializer(BaseSerializer):
+    """Generic serializer for dicts"""
     def to_representation(self, obj):
         """Get dict repr
 

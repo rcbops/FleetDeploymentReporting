@@ -1,6 +1,8 @@
 import logging
 
+from .base import versioned_properties
 from .base import VersionedEntity
+from .base import VersionedProperty
 from .host import HostEntity
 from .gitrepo import GitRepoEntity
 from .uservar import UservarEntity
@@ -8,21 +10,19 @@ from .uservar import UservarEntity
 logger = logging.getLogger(__name__)
 
 
+@versioned_properties
 class EnvironmentEntity(VersionedEntity):
     """Model environment nodes in the graph."""
 
     label = 'Environment'
     state_label = 'EnvironmentState'
-    identity_property = 'account_number_name'
-    static_properties = [
-        'account_number',
-        'name',
-    ]
-    concat_properties = {
-        'account_number_name': [
-            'account_number',
-            'name'
-        ]
+    properties = {
+        'account_number_name': VersionedProperty(
+            is_identity=True,
+            concat_properties=['account_number', 'name']
+        ),
+        'account_number': VersionedProperty(is_static=True),
+        'name': VersionedProperty(is_static=True)
     }
 
     children = {

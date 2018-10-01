@@ -1,0 +1,56 @@
+<hx-panel>
+  <panetopctrl
+    backable="$ctrl.frames.length > 1"
+    cloneable="$ctrl.cloneable"
+    diffable="$ctrl.diffable"
+    on-clone="$ctrl.clone()"
+    on-close="$ctrl.close()"
+    on-diff="$ctrl.diff()"
+    on-back="$ctrl.back()"></panetopctrl>
+  <hx-panelbody>
+    <nav class="hxBreadcrumb">
+      <a ng-repeat-start="frame in $ctrl.frames" ng-click="$ctrl.jump($index)">
+        <span ng-if="frame.state == 'search'">Search</span>
+        <span ng-if="frame.state == 'results'">Results</span>
+        <span ng-if="frame.state == 'details'">{{ $ctrl.identity($index) | truncate }}</span>
+      </a>
+      <hx-icon ng-if="!$last" type="angle-right" class="delimiter" ng-repeat-end></hx-icon>
+    </nav>
+    <div ng-repeat="frame in $ctrl.frames">
+      <div ng-switch="frame.state">
+        <search-frame
+          filters="frame.filters"
+          focused="$last"
+          time="frame.time"
+          type="frame.type"
+          ng-show="$last"
+          ng-switch-when="search"
+          on-search="$ctrl.results(type, time, filters)"
+          on-sync-frame="$ctrl.syncFrame(data)"></search-frame>
+        <results-frame
+          fields="frame.fields"
+          filters="frame.filters"
+          focused="$last"
+          page="frame.page"
+          page-size="frame.pageSize"
+          sort-direction="frame.sortDirection"
+          sort-field-index="frame.sortFieldIndex"
+          time="frame.time"
+          type="frame.type"
+          ng-show="$last"
+          ng-switch-when="results"
+          on-details="$ctrl.details(record, time, type)"
+          on-sync-frame="$ctrl.syncFrame(data)"></results-frame>
+        <details-frame
+          focused="$last"
+          record="frame.record"
+          time="frame.time"
+          type="frame.type"
+          ng-show="$last"
+          ng-switch-when="details"
+          on-details="$ctrl.details(record, time, type)"
+          on-sync-frame="$ctrl.syncFrame(data)"></details-frame>
+      </div>
+    </div>
+  </hx-panelbody>
+</hx-panel>

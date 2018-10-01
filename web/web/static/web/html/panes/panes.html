@@ -1,0 +1,24 @@
+<div class="panesContainer">
+  <pane
+    ng-repeat="pane in $ctrl.panes"
+    index="$index"
+    frames="pane.frames"
+    cloneable="$ctrl.cloneable()"
+    diffable="$ctrl.diffable()"
+    on-clone="$ctrl.clone(frames)"
+    on-close="$ctrl.close(index)"
+    on-diff="$ctrl.showDiff()"
+    on-pane-change="$ctrl.paneChange($index, frame)"></pane>
+  <div class="addpane" ng-click="$ctrl.add()" ng-if="$ctrl.panes.length < $ctrl.maxPanes">
+    <div class="addpane-wrapper-outer">
+      <div class="addpane-wrapper-inner">
+        <div class="addpane-rotate hxPrimary">
+          <hx-icon type="plus"></hx-icon> NEW PANE
+        </div><!-- rotate -->
+      </div><!-- inner -->
+    </div><!-- outer -->
+  </div><!-- addpane -->
+  <div ng-if="$ctrl.diff != undefined" class="diffContainer">
+    <diff-view diff="$ctrl.diff" on-close="$ctrl.closeDiff()"></diff-view>
+  </div>
+</div>

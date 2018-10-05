@@ -75,7 +75,7 @@ cloud_snitch_web_service_name: apache2
 cloud_snitch_web_static_root: "{{ cloud_snitch_web_project_dir }}/static"
 
 cloud_snitch_web_pip_pkgs:
-  django: 2.0.2
+  django: 2.0.8
   djangorestframework: 3.8.2
   djangorestframework-csv: 2.1.0
   neo4j-driver: 1.5.3

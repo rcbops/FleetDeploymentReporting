@@ -1,5 +1,4 @@
 """Quick module for generating fake data from real data."""
-import argparse
 import datetime
 import glob
 import json

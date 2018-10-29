@@ -97,11 +97,8 @@ class MaxRetriesExceededError(Exception):
 
 class EnvironmentNotFoundError(Exception):
     """Error for environment not found."""
-    def __init__(self, account_number, name):
-        msg = (
-            'Unable to locate environment with account number '
-            '\'{}\' and name \'{}\'.'
-        ).format(account_number, name)
+    def __init__(self, uuid):
+        msg = ('Unable to locate environment with uuid \'{}\'.').format(uuid)
         super(EnvironmentNotFoundError, self).__init__(msg)
 
 

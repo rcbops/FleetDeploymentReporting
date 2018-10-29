@@ -307,10 +307,7 @@ class HostSnitcher(BaseSnitcher):
         :param session: neo4j driver session
         :type session: neo4j.v1.session.BoltSession
         """
-        env = EnvironmentEntity(
-            account_number=self.run.environment_account_number,
-            name=self.run.environment_name
-        )
+        env = EnvironmentEntity(uuid=self.run.environment_uuid)
 
         hosts = []
 

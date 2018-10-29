@@ -37,6 +37,7 @@ setup(
     author_email="james.absalon@rackspace.com",
     packages=[
         'cloud_snitch',
+        'cloud_snitch.migrate',
         'cloud_snitch.models',
         'cloud_snitch.snitchers'
     ],

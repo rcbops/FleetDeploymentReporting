@@ -87,6 +87,8 @@ class TestQuery(TestCase):
         q = Query('Host')
         expected = (
             "MATCH (environment:Environment)-[r0:HAS_HOST]->(host:Host) "
+            "\nMATCH (environment)-[r_environment_state:HAS_STATE]"
+            "->(environment_state:EnvironmentState) "
             "\nMATCH (host)-[r_host_state:HAS_STATE]->(host_state:HostState)"
         )
         self.assertTrue(expected in str(q))
@@ -102,7 +104,7 @@ class TestQuery(TestCase):
     def test_return_with_state(self):
         """Test return clause that should include state."""
         q = Query('Host')
-        expected = 'RETURN environment, host, host_state'
+        expected = 'RETURN environment, environment_state, host, host_state'
         self.assertTrue(expected in str(q))
 
     @tag('unit')
@@ -126,7 +128,7 @@ class TestQuery(TestCase):
     def test_orderby_default(self):
         """Test default orderby clause."""
         q = Query('Environment')
-        expected = "ORDER BY environment.account_number_name ASC"
+        expected = "ORDER BY environment.uuid ASC"
         self.assertTrue(expected in str(q))
 
     @tag('unit')
@@ -260,6 +262,7 @@ class TestQuery(TestCase):
         q = Query('Virtualenv')
         expected = (
             "r0.from <= $time < r0.to AND r1.from <= $time < r1.to "
+            "AND r_environment_state.from <= $time < r_environment_state.to "
             "AND r_host_state.from <= $time < r_host_state.to"
         )
         self.assertTrue(expected in str(q))
@@ -360,8 +363,11 @@ class TestColumnQuery(TestCase):
         q.add_column('Host', 'kernel', 'kernel')
         expected = (
             "MATCH (environment:Environment)-[r0:HAS_HOST]->(host:Host) "
+            "\nMATCH (environment)-[r_environment_state:HAS_STATE]"
+            "->(environment_state:EnvironmentState) "
             "\nMATCH (host)-[r_host_state:HAS_STATE]->(host_state:HostState) "
             "\nWHERE r0.from <= $time < r0.to AND "
+            "r_environment_state.from <= $time < r_environment_state.to AND "
             "r_host_state.from <= $time < r_host_state.to"
             "\nRETURN environment.account_number AS"
             " `Environment.account_number`,"

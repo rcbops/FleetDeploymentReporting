@@ -17,12 +17,11 @@ class EnvironmentEntity(VersionedEntity):
     label = 'Environment'
     state_label = 'EnvironmentState'
     properties = {
-        'account_number_name': VersionedProperty(
-            is_identity=True,
-            concat_properties=['account_number', 'name']
-        ),
+        'uuid': VersionedProperty(is_identity=True),
         'account_number': VersionedProperty(is_static=True),
-        'name': VersionedProperty(is_static=True)
+        'name': VersionedProperty(is_static=True),
+        'last_sync': VersionedProperty(is_state=True, type=int),
+        'status': VersionedProperty(is_state=True)
     }
 
     children = {

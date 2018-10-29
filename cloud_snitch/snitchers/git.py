@@ -139,18 +139,12 @@ class GitSnitcher(BaseSnitcher):
             logger.info('No data for git could be found.')
             return
 
-        # Let model compute environment identity
-        env = EnvironmentEntity(
-            account_number=gitdata['environment']['account_number'],
-            name=gitdata['environment']['name']
-        )
-        identity = env.identity
-
         # Try to locate environment by identity
-        env = EnvironmentEntity.find(session, identity)
+        uuid = self.run.environment_uuid
+        env = EnvironmentEntity.find(session, uuid)
         if env is None:
             logger.warning(
-                'Unable to locate environment {}.'.format(identity)
+                'Unable to locate environment {}.'.format(uuid)
             )
             return
 

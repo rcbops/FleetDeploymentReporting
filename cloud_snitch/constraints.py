@@ -35,7 +35,7 @@ def main():
     parser = base_parser(
         description="Set up neo4j constraints for cloud snitch entities."
     )
-    args = parser.parse_args()
+    parser.parse_args()
     driver = GraphDatabase.driver(
         settings.NEO4J_URI,
         auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)

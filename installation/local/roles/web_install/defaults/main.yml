@@ -88,8 +88,11 @@ cloud_snitch_web_pip_pkgs:
 
 cloud_snitch_web_alt_name: "{{ ansible_default_ipv4.address }}"
 cloud_snitch_web_self_signed_subject: "/C=US/ST=Texas/L=San Antonio/O=IT/CN={{ cloud_snitch_web_server_name }}/subjectAltName=IP.1={{ cloud_snitch_web_alt_name }}"
-cloud_snitch_web_ssl_key: /etc/ssl/private/cloudsnitchweb.key
-cloud_snitch_web_ssl_cert: /etc/ssl/certs/cloudsnitchweb.pem
+cloud_snitch_web_ssl_key_file: /etc/ssl/private/cloudsnitchweb.key
+cloud_snitch_web_ssl_cert_file: /etc/ssl/certs/cloudsnitchweb.pem
+# Set the following variables with values to use an existing cert instread of generating one.
+#cloud_snitch_web_ssl_key:
+#cloud_snitch_web_ssl_cert:
 
 cloud_snitch_web_celery_user: "{{ cloud_snitch_web_user }}"
 cloud_snitch_web_celery_group: "{{ cloud_snitch_web_group }}"

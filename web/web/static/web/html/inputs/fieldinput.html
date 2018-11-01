@@ -1,0 +1,16 @@
+<div class="hxBtnGroup hxPrimary" id="field_{{ $ctrl.id }}">
+  <button type="button" class="hxBtn" ng-click="$ctrl.toggle()" ng-blur="$ctrl.hide()">
+    <span>{{ $ctrl.value.type }} - {{ $ctrl.value.property }}</span>
+    <hx-icon type="angle-down"></hx-icon>
+  </button>
+  <button type="button" class="hxBtn" ng-click="$ctrl.delete()"><hx-icon type="times"></hx-icon></button>
+</div>
+<div ng-show="$ctrl.showMenu" class="fieldmenu">
+  <div class="menugroup" ng-repeat="(type, fields) in $ctrl.selections">
+    <div class="header">{{ type }}</div>
+    <div
+      ng-class="['menuitem', {current: $ctrl.isSelected(field)}]"
+      ng-repeat="field in fields"
+      ng-mousedown="$ctrl.change(field)">{{ field.property}}</div>
+  </div>
+</div>

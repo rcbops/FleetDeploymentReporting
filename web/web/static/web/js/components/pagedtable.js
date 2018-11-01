@@ -1,10 +1,6 @@
 function PagedTableController() {
     var self = this;
 
-    self.$onInit = function() {
-        self.sortable = self.sortable || false;
-    };
-
     self.rowClick = function(index) {
         self.onRowClick({
             index: index
@@ -12,12 +8,9 @@ function PagedTableController() {
     };
 
     self.sortChange = function(index) {
-        // Only trigger sort change if sortable.
-        if (self.sortable) {
-            self.onSortChange({
-                sortColumnIndex: index
-            });
-        }
+        self.onSortChange({
+            sortColumnIndex: index
+        });
     }
 }
 
@@ -25,7 +18,7 @@ angular.module('cloudSnitch').component('pagedtable', {
     templateUrl: '/static/web/html/pagedtable.html',
     controller: PagedTableController,
     bindings: {
-        sortable: '<',
+        thing: '<',
         sortColumn: '<',
         sortDirection: '<',
         titles: '<',

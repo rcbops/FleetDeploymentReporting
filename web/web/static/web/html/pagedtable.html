@@ -1,8 +1,18 @@
+<span class="subtitle">{{ $ctrl.total }} {{ $ctrl.thing }}s</span>
 <div class="searchResultsContainer">
   <table class="hxTable hxHoverable hxTable--condensed searchResults pagedTable">
     <thead>
       <tr>
-        <th ng-repeat="title in $ctrl.titles track by $index"><label>{{ title }}</label></th>
+        <th ng-repeat="title in $ctrl.titles track by $index">
+          <div class="titleWrapper">
+            <div class="iconWrapper">
+              <hx-icon ng-if="$ctrl.sortColumn != $index" type="sort" ng-click="$ctrl.sortChange($index)"></hx-icon>
+              <hx-icon ng-if="$ctrl.sortColumn == $index && $ctrl.sortDirection == 'asc'" type="sort-down" ng-click="$ctrl.sortChange($index)"></hx-icon>
+              <hx-icon ng-if="$ctrl.sortColumn == $index && $ctrl.sortDirection == 'desc'" type="sort-up" ng-click="$ctrl.sortChange($index)"></hx-icon>
+             </div><!-- iconWrapper -->
+             <div class="title">{{ title }}</div>
+          </div><!-- title wrapper -->
+        </th>
       </tr>
     </thead>
     <tbody>

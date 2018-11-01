@@ -1,4 +1,3 @@
-import hashlib
 import json
 import logging
 import os
@@ -27,13 +26,9 @@ class ConfigfileSnitcher(BaseSnitcher):
         :type filename: str
         """
         # Extract config and environment data.
+        env = EnvironmentEntity(uuid=self.run.environment_uuid)
         with open(filename, 'r') as f:
             configdata = json.loads(f.read())
-            envdict = configdata.get('environment', {})
-            env = EnvironmentEntity(
-                account_number=envdict.get('account_number'),
-                name=envdict.get('name')
-            )
             configdata = configdata.get('data', {})
 
         # Find parent host object - return early if not exists.

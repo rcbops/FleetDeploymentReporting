@@ -70,7 +70,7 @@ class TestTimesQuery(TestCase):
         id_ = 'someid'
         expected = (
             "MATCH p = (environment:Environment)-[*]->(other)"
-            "\nWHERE environment.account_number_name = $identity"
+            "\nWHERE environment.uuid = $identity"
             "\nWITH relationships(p) as rels"
             "\nUNWIND rels as r"
             "\nreturn DISTINCT r.from as t"

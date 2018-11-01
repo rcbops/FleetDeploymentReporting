@@ -23,10 +23,9 @@ class TestArgParser(unittest.TestCase):
     def test_defaults(self, m_now):
         """Test default arguments."""
         m_now.return_value = 1
-        args = ['test_account_number', 'test_name']
+        args = ['test_uuid']
         args = parser.parse_args(args)
-        self.assertEqual(args.account_number, 'test_account_number')
-        self.assertEqual(args.name, 'test_name')
+        self.assertEqual(args.uuid, 'test_uuid')
         self.assertFalse(args.skip)
         self.assertTrue(isinstance(args.time, int))
         self.assertTrue(args.time > 0)
@@ -35,32 +34,32 @@ class TestArgParser(unittest.TestCase):
     def test_non_defaults(self):
         """Test non default arguments."""
         # Test with -s option
-        args = ['test_account_number', 'test_name', '-s']
+        args = ['test_uuid', '-s']
         args = parser.parse_args(args)
         self.assertTrue(args.skip)
 
         # Test with --skip option
-        args = ['test_account_number', 'test_name', '--skip']
+        args = ['test_uuid', '--skip']
         args = parser.parse_args(args)
         self.assertTrue(args.skip)
 
         # Test --time option
-        args = ['test_account_number', 'test_name', '--time', '33']
+        args = ['test_uuid', '--time', '33']
         args = parser.parse_args(args)
         self.assertEqual(args.time, 33)
 
         # Test non integer --time option
-        args = ['test_account_number', 'test_name', '--time', 'notaint']
+        args = ['test_uuid', '--time', 'notaint']
         with self.assertRaises(SystemExit):
             parser.parse_args(args)
 
         # Test --limit option
-        args = ['test_account_number', 'test_name', '--limit', '100']
+        args = ['test_uuid', '--limit', '100']
         args = parser.parse_args(args)
         self.assertEqual(args.limit, 100)
 
         # Test non integer --limit option
-        args = ['test_account_number', 'test_name', '--limit', 'notaint']
+        args = ['test_uuid', '--limit', 'notaint']
         with self.assertRaises(SystemExit):
             parser.parse_args(args)
 
@@ -105,10 +104,8 @@ class FakeTransaction:
 
 
 class FakeEnvironment:
-    def __init__(self, account_number="12345", name="testenv"):
-        self.account_number = account_number
-        self.name = name
-        self.account_number_name = "{}-{}".format(account_number, name)
+    def __init__(self, uuid='test_uuid'):
+        self.uuid = uuid
 
 
 class TestSetToUntilZero(unittest.TestCase):
@@ -124,14 +121,11 @@ class TestSetToUntilZero(unittest.TestCase):
         session.begin_transaction.return_value = fake_tx
 
         with self.assertRaises(LoopStopperError):
-            deleted = set_to_until_zero(session, env, 1, limit=5)
+            set_to_until_zero(session, env, 1, limit=5)
 
         self.assertEqual(fake_tx.params['limit'], 5)
         self.assertEqual(fake_tx.params['time'], 1)
-        self.assertEqual(
-            fake_tx.params['account_number_name'],
-            env.account_number_name
-        )
+        self.assertEqual(fake_tx.params['uuid'], env.uuid)
 
     def test_loop_termination(self):
         """Test that loop terminates when deleted count from query is 0."""

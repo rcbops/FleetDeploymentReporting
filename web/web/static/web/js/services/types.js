@@ -13,7 +13,7 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         Configfile: ['path'],
         ConfiguredInterface: ['device'],
         Device: ['name'],
-        Environment: ['name', 'account_number'],
+        Environment: ['account_number', 'name'],
         GitRemote: ['name'],
         GitRepo: ['path'],
         GitUntrackedFile: ['path'],

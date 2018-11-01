@@ -13,35 +13,13 @@ div.close-outer {
 
 .searchResultsContainer {
   overflow: auto;
-  padding: 0.5em;
 }
 
 .searchResults tbody tr {
   cursor: pointer;
 }
-
-.cursor {
+.childToggle {
   cursor: pointer;
-}
-
-.left {
-  text-align: left;
-}
-
-.right {
-  text-align: right;
-}
-
-.center {
-  text-align: center;
-}
-
-.uppercase {
-  text-transform: uppercase;
-}
-
-.italic {
-  font-style: italic;
 }
 
 .configContents {
@@ -49,12 +27,8 @@ div.close-outer {
   width: 650px;
 }
 
-.clear {
-  clear: both;
-}
-
-h5 {
-  font-weight: 500;
+.childToggle .hxCol {
+  margin-bottom: 5px;
 }
 
 /* body layout */
@@ -67,53 +41,9 @@ body.hxHorizontal > #stage > #content {
   position: relative;
 }
 
-expandable-table-content .expandable {
-  border-top: 1px solid #999;
-}
-
-expandable-table-content:last-child .expandable {
-  border-bottom: 1px solid #999;
-}
-
-.options {
-  padding: 10px;
-}
-
-.options .group {
-  padding-top: 0.5em;
-  border-top: 1px solid #616161;
-}
-
-.options, .expandable {
-  background-color: #eee;
-}
-
-.expandable {
-  border-left: 1px solid #999;
-  border-right: 1px solid #999;
-  padding: 5px 10px;
-}
-
-.expandable .expander {
-  cursor: pointer;
-}
-
-.expandable .expander.hxRow {
-  margin: 0px;
-}
-
-.expandable .expander .hxCol {
-  margin: 0px;
-}
-
-.expandable .expandee {
-  background-color: #fff;
-  border: 1px solid #999;
-}
-
-.expandable .expandee .tableContainer {
-  overflow-x: auto;
-}
+/*body > #head {
+  height : 1.5rem;
+}*/
 
 .panesContainer, .reportingContainer {
   display: flex;
@@ -122,10 +52,6 @@ expandable-table-content:last-child .expandable {
   width: 100%;
   backface-visibility: hidden;
   will-change: overflow;
-}
-
-.panesContainer {
-  height: 100%;
 }
 
 .reportingContainer {
@@ -144,9 +70,20 @@ pane {
   position: relative;
 }
 
+/*
+pane > hx-panel > hx-panelbody {
+  overflow-x: auto;
+}
+*/
+
 hx-panel > hx-panelbody {
   padding : 1rem 1.5rem;
 }
+
+
+
+
+/* add pane control */
 
 div.addpane {
   height: 100%;
@@ -177,42 +114,13 @@ div.addpane-rotate {
   width: 2.5rem;
 }
 
+
+
+
 /* pane controls */
 
 pane .pane-container {
   padding-top: 0;
-}
-
-pane .title {
-  border-bottom: 1px solid #424242;
-}
-
-pane .group {
-  margin-bottom: 2em;
-}
-
-pane .group:last-child {
-  margin-bottom: 0.5em;
-}
-
-pane .hxBtn {
-  font-size: 1em;
-  font-weight: 600;
-  border-radius: 4px;
-  padding: 10px 12px;
-}
-
-panetopctrl .pane-ctrls .left {
-  text-align: left;
-}
-
-panetopctrl .pane-ctrls .right {
-  text-align: right;
-}
-
-panetopctrl .pane-ctrls .hxBtnGroup {
-  padding-right: 1em;
-  padding-left: 1em;
 }
 
 panetopctrl .pane-ctrls,
@@ -220,29 +128,11 @@ panetopctrl .pane-ctrls,
   background-color: #ddd;
   padding-left: 1rem;
   padding-right: 1rem;
+  margin-bottom: 0;
 }
 
-panetopctrl .pane-ctrls .hxBtn {
-  font-size: 1em;
-  line-height: 1em;
-  text-transform: uppercase;
-  padding: 12px 14px;
-}
 
-panetopctrl .pane-ctrls .hxBtn hx-icon {
-  position: relative;
-  margin-right: 0.15em;
-}
 
-panetopctrl .pane-ctrls .close hx-icon,
-panetopctrl .pane-ctrls .clone hx-icon,
-panetopctrl .pane-ctrls .back hx-icon {
-  top: 2px;
-}
-
-panetopctrl .pane-ctrls .diff hx-icon[type=technical-change] {
-  top: 3px;
-}
 
 /* typography */
 
@@ -254,6 +144,14 @@ body #head #page_title {
   margin-left : .5rem;
   font-family: 'Roboto', sans-serif;
 }
+
+
+.center {
+  text-align: center;
+}
+
+
+
 
 /* suggested deviations from helix */
 
@@ -281,10 +179,9 @@ h2, .hxHeading-2, .hxSectionTitle {
 .smallcap, label,
 table.hxTable thead tr th {
   font-weight: 500;
-  font-size: 0.8em;
+  font-size: .6em;
   letter-spacing: 1px;
-  color: #424242;
-  /* text-transform: uppercase;*/
+  text-transform: uppercase;
 }
 
 /* tables have too much top padding. the rest of the box models seem to have only bottom pad, this should follow the same pattern */
@@ -310,8 +207,12 @@ table.hxTable thead tr th {
   background-color: #fff;
 }
 
-.diffContainer hx-panelbody {
-  position: relative;
+.right {
+  text-align: right;
+}
+
+.left {
+  text-align: left;
 }
 
 svg#diff {
@@ -328,6 +229,7 @@ svg#diff path.link {
 .node {
   cursor: pointer;
 }
+
 
 div.diffNodeDetail {
     position: absolute;
@@ -351,6 +253,7 @@ div.diffNodeDetail hx-panel {
     background-color: #C8E6C9;
     color: #1B5E20;
 }
+
 
 .busyContainer {
   background-color: rgba(0,0,0,0.3);
@@ -412,6 +315,7 @@ div.diffNodeDetail hx-panel {
     color: #ffffff;
 }
 
+
 .pagination {
   text-align: center;
 }
@@ -462,78 +366,4 @@ div.diffNodeDetail hx-panel {
 
 .node circle.empty {
   fill: #ffffff;
-}
-
-.autoWidth {
-  width: auto;
-  display: inline;
-}
-
-.fieldWrapper {
-  float: left;
-  padding: 0.3em 0.15em;
-}
-
-.fieldmenu {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0px 3px 3px 0 rgba(0, 0, 0, 0.16);
-  display: block;
-  max-width: 20rem;
-  min-width: 10rem;
-  position: absolute;
-  z-index: 100;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.fieldmenu .menuitem {
-  background-color: transparent;
-  border-radius: 2px;
-  border: none;
-  color: #0c7c84;
-  cursor: pointer;
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1;
-  margin: 0;
-  padding: 0.25em 1em;
-}
-
-.fieldmenu .menuitem:hover {
-  background-color: #ddd;
-  border-color: transparent;
-  color: #16b9d4;
-}
-
-.fieldmenu .menuitem:active {
-  background-color: transparent;
-  border-color: transparent;
-  color: #0e94a6;
-}
-
-.fieldmenu .menuitem:focus {
-  box-shadow: none;
-}
-
-.fieldmenu .menuitem.current {
-  color: #0c7c84;
-  font-weight: bolder;
-}
-
-.fieldmenu .menugroup {
-  display: block;
-}
-
-.fieldmenu .menugroup .header {
-  color: #9e9e9e;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  padding: 0.25em 0.5em 0.1em 0.5em;
-}
-
-.fieldmenu .menugroup + .fieldmenu .menugroup {
-  margin-top: 0.5rem;
 }

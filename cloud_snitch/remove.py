@@ -1,13 +1,14 @@
 """Quick module for generating fake data from real data."""
+import argparse
 import logging
 import pprint
 
 from cloud_snitch import settings
 from cloud_snitch.cli_common import base_parser
-from cloud_snitch.cli_common import confirm_env_action
-from cloud_snitch.cli_common import find_environment
 from cloud_snitch.lock import lock_environment
+from cloud_snitch.models import EnvironmentEntity
 from cloud_snitch.models import registry
+from cloud_snitch.exc import EnvironmentNotFoundError
 from neo4j.v1 import GraphDatabase
 
 logger = logging.getLogger(__name__)
@@ -15,9 +16,15 @@ logger = logging.getLogger(__name__)
 parser = base_parser(description="Remove environment data.")
 
 parser.add_argument(
-    'uuid',
+    'account_number',
     type=str,
-    help='UUID of the customer environment to remove.'
+    help='Account number of customer environment to remove.'
+)
+
+parser.add_argument(
+    'name',
+    type=str,
+    help='Name of customer environment to remove.'
 )
 
 parser.add_argument(
@@ -25,6 +32,51 @@ parser.add_argument(
     action='store_true',
     help='Skip interactive confirmation.'
 )
+
+
+def find_environment(session, account_number, name):
+    """Find an environment by account number and name.
+
+    :param session: neo4j driver session
+    :type session: neo4j.v1.session.BoltSession
+    :param account number: Account number of environment
+    :type account number: str
+    :param name: Name of the environment
+    :type name: str
+    :returns: Environment entity
+    :rtype: EnvironmentEntity
+    """
+    env = EnvironmentEntity.find(session, '{}-{}'.format(account_number, name))
+    if env is None:
+        raise EnvironmentNotFoundError(account_number, name)
+    return env
+
+
+def confirm(account_number, name, skip=False):
+    """Confirm delete unless skipped.
+
+    :param account number: Account number of environment
+    :type account number: str
+    :param name: Name of the environment
+    :type name: str
+    :param skip: Whether or not to skip bypass
+    :type skip: bool
+    :returns: Whether or not remove is confirmed.
+    :rtype: bool
+    """
+    confirmed = skip
+    if not confirmed:
+        resp = ''
+        msg = (
+            'Confirming deletion of environment with account number \'{}\' '
+            'and name \'{}\' (y/n) --> '
+        ).format(account_number, name)
+
+        while (resp != 'y' and resp != 'n'):
+            resp = input(msg).lower()
+
+        confirmed = (resp == 'y')
+    return confirmed
 
 
 def delete_until_zero(session, match, params=None, limit=2000):
@@ -95,13 +147,15 @@ def prune(session, env, path, stats):
         stats[leaf] = None
         return stats
 
-    params = {'uuid': env.uuid}
+    # Set up some reusable pieces
+    where = 'WHERE e.account_number_name = $account_number_name'
+    params = {'account_number_name': env.account_number_name}
 
     # First detach and delete state nodes.
     if registry.state_properties(leaf):
         match = (
             'MATCH (e:Environment)-[*]->(:{})-[:HAS_STATE]->(n:{}State)'
-            'WHERE e.uuid = $uuid'
+            'WHERE e.account_number_name = $account_number_name'
         ).format(leaf, leaf)
         deleted = delete_until_zero(session, match, params=params, limit=5000)
         stats['{}State'.format(leaf)] = deleted
@@ -110,14 +164,14 @@ def prune(session, env, path, stats):
     if leaf != 'Environment':
         match = (
             'MATCH (e:Environment)-[*]->(n:{})'
-            'WHERE e.uuid = $uuid'
+            'WHERE e.account_number_name = $account_number_name'
         ).format(leaf)
     else:
         # Environment is a special case.
         # There are no paths from environment to self
         match = (
             'MATCH (n:Environment)'
-            'WHERE n.uuid = $uuid'
+            'WHERE n.account_number_name = $account_number_name'
         )
 
     deleted = delete_until_zero(session, match, params=params, limit=5000)
@@ -125,7 +179,7 @@ def prune(session, env, path, stats):
     return stats
 
 
-def remove(uuid, skip=False):
+def remove(account_number, name, skip=False):
     """Remove all data associated with an environment."""
     driver = GraphDatabase.driver(
         settings.NEO4J_URI,
@@ -133,17 +187,16 @@ def remove(uuid, skip=False):
     )
     with driver.session() as session:
         # Attempt to locate environment by account number and name
-        env = find_environment(session, uuid)
+        env = find_environment(session, account_number, name)
 
         # If found, confirm deletion
-        msg = 'Confirm deleting of environment with uuid \'{}\''.format(uuid)
-        confirmed = confirm_env_action(msg, skip=skip)
+        confirmed = confirm(account_number, name, skip=skip)
         if not confirmed:
             logger.info("Removal unconfirmed...cancelling.")
             exit(0)
 
         # Acquire lock and delete
-        with lock_environment(driver, env):
+        with lock_environment(driver, env.account_number, env.name):
 
             logger.debug("Acquired the lock.!!!")
             # get all paths
@@ -168,7 +221,7 @@ def remove(uuid, skip=False):
 
 def main():
     args = parser.parse_args()
-    remove(args.uuid, skip=args.skip)
+    remove(args.account_number, args.name, skip=args.skip)
 
 
 if __name__ == '__main__':

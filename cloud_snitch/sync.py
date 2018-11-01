@@ -3,6 +3,7 @@
 Expect this to change into something configured by yaml.
 Snitchers will also probably become python entry points.
 """
+import argparse
 import logging
 import time
 
@@ -58,7 +59,11 @@ def check_run_time(driver, run):
     """
     # Check to see if run data is new
     with driver.session() as session:
-        e = EnvironmentEntity.find(session, run.environment_uuid)
+        e_id = '-'.join([
+            run.environment_account_number,
+            run.environment_name
+        ])
+        e = EnvironmentEntity.find(session, e_id)
 
         # If the environment exists, check its last update
         if e is not None:
@@ -129,12 +134,9 @@ def sync_paths(paths):
             # Try to acquire environment lock.
             # @TODO - Implement wait until timeout loop.
             try:
-                env = EnvironmentEntity(
-                    uuid=run.environment_uuid,
-                    name=run.environment_name,
-                    account_number=run.environment_account_number
-                )
-                with lock_environment(driver, env):
+                account_number = run.environment_account_number
+                name = run.environment_name
+                with lock_environment(driver, account_number, name):
                     sync_run(driver, run)
             except EnvironmentLockedError as e:
                 logger.error(e)
@@ -150,8 +152,9 @@ def sort_key(item):
     :returns: String to sort by
     :rtype: str
     """
-    return '{}~{}'.format(
-        item.environment_uuid,
+    return '{}~{}~{}'.format(
+        item.environment_account_number,
+        item.environment_name,
         item.completed.isoformat()
     )
 
@@ -166,7 +169,10 @@ def groupby_key(item):
     :returns: String to group runs by
     :rtype: str
     """
-    return item.environment_uuid
+    return '{}~{}'.format(
+        item.environment_account_number,
+        item.environment_name
+    )
 
 
 def main():

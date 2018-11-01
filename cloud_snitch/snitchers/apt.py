@@ -43,7 +43,10 @@ class AptSnitcher(BaseSnitcher):
         :param session: neo4j driver session
         :type session: neo4j.v1.session.BoltSession
         """
-        env = EnvironmentEntity(uuid=self.run.environment_uuid)
+        env = EnvironmentEntity(
+            account_number=self.run.environment_account_number,
+            name=self.run.environment_name
+        )
 
         for hostname, filename in self._find_host_tuples(self.file_pattern):
             aptpkgs = []

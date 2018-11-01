@@ -1,3 +1,5 @@
+import unittest
+
 from .base import DefinitionTestCase
 from cloud_snitch.models import EnvironmentEntity
 from cloud_snitch.models import GitRepoEntity
@@ -10,15 +12,17 @@ class TestEnvironmentEntity(DefinitionTestCase):
     entity = EnvironmentEntity
     label = 'Environment'
     state_label = 'EnvironmentState'
-    identity_property = 'uuid'
+    identity_property = 'account_number_name'
     static_properties = [
         'account_number',
-        'name'
+        'name',
     ]
-    state_properties = [
-        'last_sync',
-        'status'
-    ]
+    concat_properties = {
+        'account_number_name': [
+            'account_number',
+            'name'
+        ]
+    }
     children = (
         ('hosts', ('HAS_HOST', HostEntity)),
         ('gitrepos', ('HAS_GIT_REPO', GitRepoEntity)),

@@ -28,7 +28,10 @@ class UservarsSnitcher(BaseSnitcher):
             return
 
         # Try to find the parent environment.
-        env = EnvironmentEntity(uuid=self.run.environment_uuid)
+        env = EnvironmentEntity(
+            account_number=self.run.environment_account_number,
+            name=self.run.environment_name
+        )
         identity = env.identity
         env = EnvironmentEntity.find(session, identity)
         if env is None:

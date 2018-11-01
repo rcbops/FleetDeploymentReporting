@@ -20,13 +20,9 @@ class EnvironmentSnitcher(BaseSnitcher):
         :rtype: HostEntity
         """
         env = EnvironmentEntity(
-            uuid=self.run.environment_uuid,
             account_number=self.run.environment_account_number,
-            name=self.run.environment_name,
-            last_sync=self.time_in_ms,
-            status='na'
+            name=self.run.environment_name
         )
-        # TODO - Update status to something real in the future.
         env.update(session, self.time_in_ms)
         return env
 

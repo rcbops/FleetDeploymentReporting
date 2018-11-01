@@ -1,3 +1,5 @@
+import unittest
+
 from .base import DefinitionTestCase
 from cloud_snitch.models import GitRemoteEntity
 from cloud_snitch.models import GitRepoEntity

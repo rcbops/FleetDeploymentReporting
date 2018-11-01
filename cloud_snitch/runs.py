@@ -91,15 +91,6 @@ class Run:
         """
         return self.run_data.get('environment', {}).get('name')
 
-    @property
-    def environment_uuid(self):
-        """Get the uuid of the environment.
-
-        :returns: Uuid of the environment.
-        :rtype: str
-        """
-        return self.run_data.get('environment', {}).get('uuid')
-
     def _save_data(self):
         """Save run data to disk"""
         with open(os.path.join(self.path, 'run_data.json'), 'w') as f:

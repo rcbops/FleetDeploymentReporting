@@ -26,11 +26,13 @@ def base_parser(**kwargs):
     return parser
 
 
-def confirm_env_action(msg, skip=False):
+def confirm_env_action(account_number, name, msg, skip=False):
     """Confirm an action on an environment.
 
-    :param env: Environment object
-    :type env: EnvironmentEntity
+    :param account number: Account number of environment
+    :type account number: str
+    :param name: Name of the environment
+    :type name: str
     :param msg: Message to display when asking for input.
     :type msg: str
     :param skip: Whether or not to skip bypass
@@ -48,17 +50,19 @@ def confirm_env_action(msg, skip=False):
     return confirmed
 
 
-def find_environment(session, uuid):
-    """Find an environment by uuid.
+def find_environment(session, account_number, name):
+    """Find an environment by account number and name.
 
     :param session: neo4j driver session
     :type session: neo4j.v1.session.BoltSession
-    :param uuid: UUID of the environment
-    :type uuid: str
+    :param account number: Account number of environment
+    :type account number: str
+    :param name: Name of the environment
+    :type name: str
     :returns: Environment entity
     :rtype: EnvironmentEntity
     """
-    env = EnvironmentEntity.find(session, uuid)
+    env = EnvironmentEntity.find(session, '{}-{}'.format(account_number, name))
     if env is None:
-        raise EnvironmentNotFoundError(uuid)
+        raise EnvironmentNotFoundError(account_number, name)
     return env

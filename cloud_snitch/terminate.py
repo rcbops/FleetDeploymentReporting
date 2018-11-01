@@ -1,5 +1,6 @@
 """Quick module for terminating relationships for an environment."""
 import logging
+import pprint
 import time
 
 from cloud_snitch import settings
@@ -8,6 +9,9 @@ from cloud_snitch.cli_common import base_parser
 from cloud_snitch.cli_common import confirm_env_action
 from cloud_snitch.cli_common import find_environment
 from cloud_snitch.lock import lock_environment
+from cloud_snitch.models import EnvironmentEntity
+from cloud_snitch.models import registry
+from cloud_snitch.exc import EnvironmentNotFoundError
 from neo4j.v1 import GraphDatabase
 
 logger = logging.getLogger(__name__)
@@ -20,9 +24,15 @@ parser = base_parser(
 )
 
 parser.add_argument(
-    'uuid',
+    'account_number',
     type=str,
-    help='UUID of environment to terminate.'
+    help='Account number of customer environment to terminate.'
+)
+
+parser.add_argument(
+    'name',
+    type=str,
+    help='Name of customer environment to terminate.'
 )
 
 parser.add_argument(
@@ -68,7 +78,7 @@ def set_to_until_zero(session, env, time, limit=2000):
         'time': time,
         'limit': limit,
         'EOT': utils.EOT,
-        'uuid': env.uuid
+        'account_number_name': env.account_number_name
     }
     total_changed = 0
     changed = 1
@@ -76,7 +86,7 @@ def set_to_until_zero(session, env, time, limit=2000):
     # Alter query for deleting in chunks
     cipher = (
         "MATCH p = "
-        "(e:Environment {uuid: $uuid})-[*]->(o)\n"  # noqa E501
+        "(e:Environment {account_number_name: $account_number_name})-[*]->(o)\n"  # noqa E501
         "WHERE ANY(rel in relationships(p) where rel.to = $EOT)\n"
         "WITH filter(rel in relationships(p) where rel.to = $EOT) "
         "as rels LIMIT $limit\n"
@@ -93,29 +103,30 @@ def set_to_until_zero(session, env, time, limit=2000):
     return total_changed
 
 
-def terminate(uuid, new_time, limit, skip=False):
+def terminate(account_number, name, new_time, limit, skip=False):
     """Remove all data associated with an environment."""
     driver = GraphDatabase.driver(
         settings.NEO4J_URI,
         auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)
     )
     with driver.session() as session:
-        # Attempt to locate environment by uuid
-        env = find_environment(session, uuid)
+        # Attempt to locate environment by account number and name
+        env = find_environment(session, account_number, name)
 
         # If found, confirm termination
         msg = (
-            'Confirming termination of environment with uuid \'{}\''
-            .format(uuid)
+            'Confirming termination of environment with account '
+            'number \'{}\' and name \'{}\''
+            .format(account_number, name)
         )
-        confirmed = confirm_env_action(msg, skip=skip)
+        confirmed = confirm_env_action(account_number, name, msg, skip=skip)
         if not confirmed:
             logger.info("Termination unconfirmed...cancelling.")
             exit(0)
 
         # Acquire lock and and terminate
         start = time.time()
-        with lock_environment(driver, env):
+        with lock_environment(driver, env.account_number, env.name):
 
             logger.debug("Acquired the lock.!!!")
 
@@ -136,7 +147,8 @@ def main():
     """Entry point for the console script."""
     args = parser.parse_args()
     terminate(
-        args.uuid,
+        args.account_number,
+        args.name,
         args.time,
         args.limit,
         skip=args.skip

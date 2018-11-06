@@ -11,8 +11,8 @@
 	# DocumentRoot /var/www/html
 
 	SSLEngine on
-	SSLCertificateFile {{ cloud_snitch_web_ssl_cert }}
-	SSLCertificateKeyFile {{ cloud_snitch_web_ssl_key }}
+	SSLCertificateFile {{ cloud_snitch_web_ssl_cert_file }}
+	SSLCertificateKeyFile {{ cloud_snitch_web_ssl_key_file }}
 
 	Alias /static/ {{ cloud_snitch_web_static_root }}/
 

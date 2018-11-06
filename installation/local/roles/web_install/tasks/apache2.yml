@@ -14,17 +14,41 @@
 - name: Apache - Self Signed Cert
   notify:
     - Restart Apache2
+  # We do not want to default to a self signed cert in production on partial configuration.
+  when: cloud_snitch_web_ssl_cert is not defined and cloud_snitch_web_ssl_key is not defined
   tags:
     - apache
     - config
   args:
-    creates: "{{ cloud_snitch_web_ssl_cert }}"
+    creates: "{{ cloud_snitch_web_ssl_cert_file }}"
   command: >
     openssl req -new -nodes -sha256 -x509
     -subj "{{ cloud_snitch_web_self_signed_subject }}"
     -days 3650
-    -keyout "{{ cloud_snitch_web_ssl_key }}"
-    -out "{{ cloud_snitch_web_ssl_cert }}"
+    -keyout "{{ cloud_snitch_web_ssl_key_file }}"
+    -out "{{ cloud_snitch_web_ssl_cert_file }}"
+
+- name: Apache - SSL Key
+  notify:
+    - Restart Apache2
+  when: cloud_snitch_web_ssl_key is defined
+  template:
+    src: ssl_key.j2
+    dest: "{{ cloud_snitch_web_ssl_key_file }}"
+  tags:
+    - config
+    - apache
+
+- name: Apache - SSL Cert
+  notify:
+    - Restart Apache2
+  when: cloud_snitch_web_ssl_cert is defined
+  template:
+    src: ssl_cert.j2
+    dest: "{{ cloud_snitch_web_ssl_cert_file }}"
+  tags:
+    - config
+    - apache
 
 - name: Apache - modules
   apache2_module:
@@ -49,7 +73,7 @@
   tags:
     - config
     - apache
-   
+
 - name: Apache - Cloud Snitch Web conf
   template:
     src: 090-cloudsnitch.conf.j2

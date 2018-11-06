@@ -9,19 +9,16 @@ logger = logging.getLogger(__name__)
 
 class EnvironmentLock:
     """Simple class for locking an environment."""
-    def __init__(self, driver, account_number, name):
+    def __init__(self, driver, env):
         """Init the lock
 
         :param driver: Instance of driver
         :type driver: neo4j.v1.GraphDatabase.driver
-        :param account_number: Environment account number
-        :type account_number: str
-        :param name: Environment name
-        :type name: str
+        :param env: Environment entity object
+        :type env: EnvironmentEntity
         """
         self.driver = driver
-        self.account_number = account_number
-        self.name = name
+        self.env = env
 
         # When key is 0, the lock is open
         self.key = 0
@@ -35,8 +32,9 @@ class EnvironmentLock:
         with self.driver.session() as session:
             self.key = EnvironmentLockEntity.lock(
                 session,
-                self.account_number,
-                self.name
+                self.env.uuid,
+                self.env.account_number,
+                self.env.name
             )
 
     @property
@@ -61,10 +59,9 @@ class EnvironmentLock:
         with self.driver.session() as session:
             released = EnvironmentLockEntity.release(
                 session,
-                self.account_number,
-                self.name, self.key
+                self.env.uuid,
+                self.key
             )
-
             if released:
                 self.key = 0
             else:
@@ -74,7 +71,7 @@ class EnvironmentLock:
 
 
 @contextlib.contextmanager
-def lock_environment(driver, account_number, name):
+def lock_environment(driver, env):
     """Lock an environment
 
     Prevents multiple sync instances from updating a single environment
@@ -82,24 +79,20 @@ def lock_environment(driver, account_number, name):
 
     :param driver: Driver instance
     :type driver: neo4j.v1.GraphDatabase.driver
-    :param account_number: Account number of environment to lock
-    :type account_number: str
-    :param name: Name of environment to lock
-    :type name: str
+    :param env: Environment object
+    :type env: EnvironmentEntity
     :yields: The environment lock object
     :ytype: Environment
     """
     # Start the lock object
-    lock = EnvironmentLock(
-        driver,
-        account_number,
-        name
-    )
+    lock = EnvironmentLock(driver, env)
     try:
         # Obtain the lock
         lock.lock()
-        logger.debug("Obtained lock on {}: {}".format(
-            lock.account_number,
+        logger.debug("Obtained lock on {} {} {}: {}".format(
+            lock.env.uuid,
+            lock.env.account_number,
+            lock.env.name,
             lock.key
         ))
         yield lock
@@ -107,7 +100,8 @@ def lock_environment(driver, account_number, name):
         # Attempt to release the lock
         if lock.locked:
             lock.release()
-            logger.debug("Released lock on {}: {}".format(
-                lock.account_number,
-                lock.name)
-            )
+            logger.debug("Released lock on {} {} {}".format(
+                lock.env.uuid,
+                lock.env.account_number,
+                lock.env.name
+            ))

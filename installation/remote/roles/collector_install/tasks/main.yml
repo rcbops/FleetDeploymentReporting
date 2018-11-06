@@ -8,6 +8,7 @@
   git:
     repo:  "{{ cloud_snitch_repo }}"
     dest:  "{{ cloud_snitch_repo_dir }}"
+    version: "{{ cloud_snitch_version }}"
 
 - name: Install GitPython into ansible runtime venv
   become: yes

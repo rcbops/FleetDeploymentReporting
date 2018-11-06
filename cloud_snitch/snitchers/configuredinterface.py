@@ -25,13 +25,9 @@ class ConfiguredInterfaceSnitcher(BaseSnitcher):
         :type filename: str
         """
         # Extract config and environment data.
+        env = EnvironmentEntity(uuid=self.run.environment_uuid)
         with open(filename, 'r') as f:
             data = json.loads(f.read())
-            envdict = data.get('environment', {})
-            env = EnvironmentEntity(
-                account_number=envdict.get('account_number'),
-                name=envdict.get('name')
-            )
             configdata = data.get('data', {})
 
         # Find parent host object - return early if not exists.

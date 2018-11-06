@@ -18,7 +18,7 @@ def main():
     parser = base_parser(
         description='Removes stale run data that have already synced.'
     )
-    args = parser.parse_args()
+    parser.parse_args()
 
     start = time.time()
     foundruns = runs.find_runs()

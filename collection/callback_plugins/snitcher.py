@@ -47,7 +47,8 @@ class FileHandler:
         self._doc = {
             'environment': {
                 'account_number': settings['environment']['account_number'],
-                'name': settings['environment']['name']
+                'name': settings['environment']['name'],
+                'uuid': settings['environment']['uuid']
             }
         }
 
@@ -217,7 +218,8 @@ class CallbackModule(CallbackBase):
             'started': now.isoformat(),
             'environment': {
                 'account_number': settings['environment']['account_number'],
-                'name': settings['environment']['name']
+                'name': settings['environment']['name'],
+                'uuid': settings['environment']['uuid']
             }
         })
 

@@ -33,21 +33,21 @@ class TestBaseParser(unittest.TestCase):
 class TestFindEnvironment(unittest.TestCase):
 
     @mock.patch(
-        'cloud_snitch.remove.EnvironmentEntity.find',
+        'cloud_snitch.cli_common.EnvironmentEntity.find',
         return_value=None
     )
     def test_find_no_match(self, m_find):
         """Test that error is raised on no match."""
         with self.assertRaises(EnvironmentNotFoundError):
-            find_environment('session', '12345', 'test')
+            find_environment('session', 'some-uuid')
 
     @mock.patch(
-        'cloud_snitch.remove.EnvironmentEntity.find',
+        'cloud_snitch.cli_common.EnvironmentEntity.find',
         return_value='testenv'
     )
     def test_find(self, m_find):
         """Test that value from find_environment is returned on success."""
-        env = find_environment('session', '12345', 'test')
+        env = find_environment('session', 'some-uuid')
         self.assertEqual(env, 'testenv')
 
 
@@ -57,19 +57,14 @@ class TestConfirmEnvAction(unittest.TestCase):
     @mock.patch('builtins.input')
     def test_skip_true(self, m_input):
         """Test that input is skipped when skip is true."""
-        confirmed = confirm_env_action(
-            '12345',
-            'test_name',
-            'test_msg',
-            skip=True
-        )
+        confirmed = confirm_env_action('test_msg', skip=True)
         m_input.assert_not_called()
         self.assertTrue(confirmed)
 
     @mock.patch('builtins.input', side_effect=['y'])
     def test_skip_default(self, m_input):
         """Test default behavior of skip(which is false)."""
-        confirmed = confirm_env_action('12345', 'test', 'test_msg')
+        confirmed = confirm_env_action('test_msg')
         m_input.assert_called_once_with('test_msg (y/n) --> ')
         self.assertTrue(confirmed)
 
@@ -77,17 +72,17 @@ class TestConfirmEnvAction(unittest.TestCase):
     def test_loop_until_valid(self, m_input):
         """Test loop until valid input."""
         m_input.side_effect = ['a', 'b', 'c', 'Y']
-        confirmed = confirm_env_action('12345', 'test', 'test_msg')
+        confirmed = confirm_env_action('test_msg')
         self.assertTrue(confirmed)
 
         m_input.side_effect = ['a', 'b', 'c', 'y']
-        confirmed = confirm_env_action('12345', 'test', 'test_msg')
+        confirmed = confirm_env_action('test_msg')
         self.assertTrue(confirmed)
 
         m_input.side_effect = ['a', 'b', 'c', 'N']
-        confirmed = confirm_env_action('12345', 'test', 'test_msg')
+        confirmed = confirm_env_action('test_msg')
         self.assertFalse(confirmed)
 
         m_input.side_effect = ['a', 'b', 'c', 'n']
-        confirmed = confirm_env_action('12345', 'test', 'test_msg')
+        confirmed = confirm_env_action('test_msg')
         self.assertFalse(confirmed)

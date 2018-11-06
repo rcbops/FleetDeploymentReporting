@@ -2,13 +2,9 @@ import mock
 import sys
 import unittest
 
-from argparse import ArgumentError
 from io import StringIO
 
-from cloud_snitch.exc import EnvironmentNotFoundError
-from cloud_snitch.remove import confirm
 from cloud_snitch.remove import delete_until_zero
-from cloud_snitch.remove import find_environment
 from cloud_snitch.remove import parser
 from cloud_snitch.remove import prune
 
@@ -32,76 +28,18 @@ class TestArgParser(unittest.TestCase):
 
     def test_defaults(self):
         """Test that skip defaults to false."""
-        args = parser.parse_args(['12345', 'testenv'])
+        args = parser.parse_args(['some-uuid'])
         self.assertFalse(args.skip)
 
     def test_dash_s(self):
         """Test skip with -s"""
-        args = parser.parse_args(['12345', 'testenv', '-s'])
+        args = parser.parse_args(['some-uuid', '-s'])
         self.assertTrue(args.skip)
 
     def test_dash_dash_yes(self):
         """Test skip with --skip"""
-        args = parser.parse_args(['12345', 'testenv', '--skip'])
+        args = parser.parse_args(['some-uuid', '--skip'])
         self.assertTrue(args.skip)
-
-
-class TestFindEnvironment(unittest.TestCase):
-
-    @mock.patch(
-        'cloud_snitch.remove.EnvironmentEntity.find',
-        return_value=None
-    )
-    def test_find_no_match(self, m_find):
-        """Test that error is raised on no match."""
-        with self.assertRaises(EnvironmentNotFoundError):
-            find_environment('session', '12345', 'test')
-
-    @mock.patch(
-        'cloud_snitch.remove.EnvironmentEntity.find',
-        return_value='testenv'
-    )
-    def test_find(self, m_find):
-        """Test that value from find_environment is returned on success."""
-        env = find_environment('session', '12345', 'test')
-        self.assertEqual(env, 'testenv')
-
-
-class TestConfirm(unittest.TestCase):
-    """Test the confirm function."""
-
-    @mock.patch('builtins.input')
-    def test_skip_true(self, m_input):
-        """Test that input is skipped when skip is true."""
-        confirmed = confirm('12345', 'test', skip=True)
-        m_input.assert_not_called()
-        self.assertTrue(confirmed)
-
-    @mock.patch('builtins.input', side_effect=['y'])
-    def test_skip_default(self, m_input):
-        """Test default behavior of skip(which is false)."""
-        confirmed = confirm('12345', 'test')
-        m_input.assert_called()
-        self.assertTrue(confirmed)
-
-    @mock.patch('builtins.input')
-    def test_loop_until_valid(self, m_input):
-        """Test loop until valid input."""
-        m_input.side_effect = ['a', 'b', 'c', 'Y']
-        confirmed = confirm('12345', 'test')
-        self.assertTrue(confirmed)
-
-        m_input.side_effect = ['a', 'b', 'c', 'y']
-        confirmed = confirm('12345', 'test')
-        self.assertTrue(confirmed)
-
-        m_input.side_effect = ['a', 'b', 'c', 'N']
-        confirmed = confirm('12345', 'test')
-        self.assertFalse(confirmed)
-
-        m_input.side_effect = ['a', 'b', 'c', 'n']
-        confirmed = confirm('12345', 'test')
-        self.assertFalse(confirmed)
 
 
 class LoopStopperError(Exception):
@@ -154,7 +92,7 @@ class TestDeleteUntilZero(unittest.TestCase):
         session.begin_transaction.return_value = fake_tx
 
         with self.assertRaises(LoopStopperError):
-            deleted = delete_until_zero(session, 'test', params=None, limit=5)
+            delete_until_zero(session, 'test', params=None, limit=5)
 
         self.assertEqual(
             fake_tx.query,

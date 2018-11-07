@@ -9,7 +9,6 @@ from django.core.cache import cache
 
 from .cache import cache_key
 from .diff import Diff
-from .diff import DiffResult
 
 from .exceptions import JobError
 from .exceptions import JobRunningError
@@ -57,7 +56,7 @@ def _diffdict(model, identity, left_time, right_time):
     :param right_time: Milliseconds since epoch on right side
     :type right_time: int
     :returns: Result of diff operation
-    :rtype: DiffResult
+    :rtype: dict
     """
     # Mark the diff as running to prevent multiple requests from sechduling
     # the same job.
@@ -66,9 +65,9 @@ def _diffdict(model, identity, left_time, right_time):
     # Compute the diff.
     try:
         d = Diff(model, identity, left_time, right_time)
-        r = d.result()
-        cache.set(key, r.diffdict, TIMEOUT)
-        return r.diffdict
+        r = d.to_dict()
+        cache.set(key, r, TIMEOUT)
+        return r
     except Exception as e:
         logger.exception('Unable to complete diff.')
         cache.set(key, STATUS_ERROR, ERROR_TIMEOUT)
@@ -86,7 +85,7 @@ def objectdiff(model, identity, left_time, right_time):
     :param right_time: Milliseconds since epoch on right side
     :type right_time: int
     :returns: Result of cached diff operation
-    :rtype: diff.DiffResult
+    :rtype: dict
     """
     # Try to get from cache first
     key = _diff_cache_key(model, identity, left_time, right_time)
@@ -105,7 +104,7 @@ def objectdiff(model, identity, left_time, right_time):
 
             # Wait an initial amount of time
             data = task.get(timeout=2)
-            return DiffResult(data)
+            return data
         except CeleryTimeoutError:
             logger.debug("Try looking later.")
             raise JobRunningError()
@@ -123,4 +122,4 @@ def objectdiff(model, identity, left_time, right_time):
     # Return diff result
     else:
         logger.debug("CACHE HIT")
-        return DiffResult(cached)
+        return cached

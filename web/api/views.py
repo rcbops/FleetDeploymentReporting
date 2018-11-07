@@ -9,14 +9,14 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from neo4jdriver.query import Query
 
+from .diff import NodeDiff
+
 from .decorators import cls_cached_result
 
 from .exceptions import JobError
 from .exceptions import JobRunningError
 
 from .serializers import DiffSerializer
-from .serializers import DiffNodeSerializer
-from .serializers import DiffNodesSerializer
 from .serializers import GenericSerializer
 from .serializers import ModelSerializer
 from .serializers import PropertySerializer
@@ -259,68 +259,8 @@ class ObjectDiffViewSet(viewsets.ViewSet):
         )
 
     @list_route(methods=['post'])
-    def node(self, request):
-        """Get a specific node in the diff tree."""
-        # Validate request
-        data = self._data(request, DiffNodeSerializer)
-
-        # Make sure both sides are kosher
-        self._check_sides(data)
-        try:
-            diff = objectdiff(
-                data['model'],
-                data['identity'],
-                data['left_time'],
-                data['right_time']
-            )
-        except JobRunningError:
-            return self._job_running_response()
-        except JobError:
-            return self._job_error_response()
-
-        # 404 if node not found.
-        node = diff.getnode(data['node_model'], data['node_identity'])
-        if node is None:
-            raise Http404()
-
-        results = GenericSerializer({
-            'node': node,
-            'nodecount': diff.diffdict['nodecount'],
-            'data': data
-        })
-        return Response(results.data)
-
-    @list_route(methods=['post'])
-    def nodes(self, request):
-        """Get a range of nodes from the diff tree."""
-        # Validate request
-        data = self._data(request, DiffNodesSerializer)
-
-        # Make sure both sides are kosher
-        self._check_sides(data)
-
-        try:
-            diff = objectdiff(
-                data['model'],
-                data['identity'],
-                data['left_time'],
-                data['right_time']
-            )
-        except JobRunningError:
-            return self._job_running_response()
-        except JobError:
-            return self._job_error_response()
-
-        results = GenericSerializer({
-            'nodes': diff.getnodes(data['offset'], data['limit']),
-            'nodecount': diff.diffdict['nodecount'],
-            'data': data
-        })
-        return Response(results.data)
-
-    @list_route(methods=['post'])
     def structure(self, request):
-        """Get structure of the tree."""
+        """Get diff structure."""
         # Validate the data
         data = self._data(request, DiffSerializer)
 
@@ -328,7 +268,7 @@ class ObjectDiffViewSet(viewsets.ViewSet):
         self._check_sides(data)
 
         try:
-            diff = objectdiff(
+            diffdict = objectdiff(
                 data['model'],
                 data['identity'],
                 data['left_time'],
@@ -341,9 +281,30 @@ class ObjectDiffViewSet(viewsets.ViewSet):
 
         # Return the response
         results = GenericSerializer({
-            'frame': diff.frame(),
-            'nodemap': diff.diffdict['nodemap'],
-            'nodecount': diff.diffdict['nodecount'],
-            'data': data
+            'data': data,
+            'frame': diffdict
+        })
+        return Response(results.data)
+
+    @list_route(methods=['post'])
+    def details(self, request):
+        """Diff node properties."""
+        # Validate the data
+        data = self._data(request, DiffSerializer)
+
+        diff = NodeDiff(
+            data['model'],
+            data['identity'],
+            data['left_time'],
+            data['right_time']
+        )
+
+        props = diff.to_list()
+        if not props:
+            raise Http404("Node node found.")
+
+        results = GenericSerializer({
+            'data': data,
+            'properties': props
         })
         return Response(results.data)

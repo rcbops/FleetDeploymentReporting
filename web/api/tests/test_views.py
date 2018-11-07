@@ -197,35 +197,17 @@ class TestObjectViewSetSearch(BaseApiTestCase):
         self.assertEquals(data['records'], 'testpage')
 
 
-class FakeDiffResult:
+class TestObjectDiffViewSetDetails(BaseApiTestCase):
 
-    def __init__(self, find_node=True):
-        self.find_node = find_node
-        self.diffdict = {'nodecount': 5, 'nodemap': 'nodemap'}
-
-    def frame(self):
-        return 'frame'
-
-    def getnode(self, model, identity):
-        return 'node' if self.find_node else None
-
-    def getnodes(self, offset, limit):
-        return [1, 2, 3]
-
-
-class TestObjectDiffViewSetNode(BaseApiTestCase):
-
-    baseurl = '/api/objectdiffs/node/'
+    baseurl = '/api/objectdiffs/details/'
 
     def setUp(self):
-        super(TestObjectDiffViewSetNode, self).setUp()
+        super(TestObjectDiffViewSetDetails, self).setUp()
         self.body = {
             'model': 'Environment',
             'identity': 'someid',
             'left_time': 1,
-            'right_time': 2,
-            'node_model': 'Environment',
-            'node_identity': 'someid'
+            'right_time': 2
         }
 
     @tag('unit')
@@ -240,137 +222,31 @@ class TestObjectDiffViewSetNode(BaseApiTestCase):
         self.assertEquals(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', return_value=[])
-    def test_left_not_found(self, m_fetch):
+    @mock.patch('api.views.NodeDiff')
+    def test_not_found(self, m_node_diff):
+        class FakeNodeDiff:
+            def to_list(self):
+                return []
+        m_node_diff.return_value = FakeNodeDiff()
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[], [1]])
-    def test_right_not_found(self, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch('api.views.objectdiff', side_effect=JobRunningError())
-    def test_job_running(self, m_diff, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_202_ACCEPTED)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch(
-        'api.views.objectdiff',
-        return_value=FakeDiffResult(find_node=False)
-    )
-    def test_node_not_found(self, m_diff, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch('api.views.objectdiff', side_effect=JobError())
-    def test_job_error(self, m_diff, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(
-            resp.status_code,
-            status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch(
-        'api.views.objectdiff',
-        return_value=FakeDiffResult()
-    )
-    def test_node_found(self, m_diff, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_200_OK)
-        data = resp.json()
-
-        self.assertTrue(isinstance(data['data'], dict))
-        self.assertEquals(data['nodecount'], 5)
-        self.assertEquals(data['node'], 'node')
-
-
-class TestObjectDiffViewSetNodes(BaseApiTestCase):
-
-    baseurl = '/api/objectdiffs/nodes/'
-
-    def setUp(self):
-        super(TestObjectDiffViewSetNodes, self).setUp()
-        self.body = {
-            'model': 'Environment',
-            'identity': 'someid',
-            'left_time': 1,
-            'right_time': 2,
-            'offset': 0,
-            'limit': 10
-        }
-
-    @tag('unit')
-    def test_without_auth(self):
-        resp = self.client.post(self.baseurl, {})
-        self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
-
-    @tag('unit')
-    def test_invalid_req(self):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, {})
-        self.assertEquals(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', return_value=[])
-    def test_left_not_found(self, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[], [1]])
-    def test_right_not_found(self, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch('api.views.objectdiff', side_effect=JobRunningError())
-    def test_job_running(self, m_diff, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(resp.status_code, status.HTTP_202_ACCEPTED)
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch('api.views.objectdiff', side_effect=JobError())
-    def test_job_error(self, m_diff, m_fetch):
-        self.client.login(**self.credentials)
-        resp = self.client.post(self.baseurl, self.body)
-        self.assertEquals(
-            resp.status_code,
-            status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-    @tag('unit')
-    @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch('api.views.objectdiff', return_value=FakeDiffResult())
-    def test_nodes(self, m_diff, m_fetch):
+    @mock.patch('api.views.NodeDiff')
+    def test_nodes(self, m_node_diff):
+        class FakeNodeDiff:
+            def to_list(self):
+                return ['test_prop']
+        m_node_diff.return_value = FakeNodeDiff()
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
         self.assertEquals(resp.status_code, status.HTTP_200_OK)
 
         data = resp.json()
         self.assertTrue(isinstance(data['data'], dict))
-        self.assertEquals(data['nodecount'], 5)
-        self.assertListEqual(data['nodes'], [1, 2, 3])
+        self.assertTrue(isinstance(data['properties'], list))
+        self.assertEqual(data['properties'][0], 'test_prop')
 
 
 class TestObjectDiffViewSetStructure(BaseApiTestCase):
@@ -432,7 +308,7 @@ class TestObjectDiffViewSetStructure(BaseApiTestCase):
 
     @tag('unit')
     @mock.patch('neo4jdriver.query.Query.fetch', side_effect=[[1], [1]])
-    @mock.patch('api.views.objectdiff', return_value=FakeDiffResult())
+    @mock.patch('api.views.objectdiff', return_value={'it': 'worked'})
     def test_frame(self, m_diff, m_fetch):
         self.client.login(**self.credentials)
         resp = self.client.post(self.baseurl, self.body)
@@ -440,6 +316,4 @@ class TestObjectDiffViewSetStructure(BaseApiTestCase):
 
         data = resp.json()
         self.assertTrue(isinstance(data['data'], dict))
-        self.assertEquals(data['nodecount'], 5)
-        self.assertEquals(data['nodemap'], 'nodemap')
-        self.assertEquals(data['frame'], 'frame')
+        self.assertEqual(data['frame']['it'], 'worked')

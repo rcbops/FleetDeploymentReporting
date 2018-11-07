@@ -1,0 +1,53 @@
+<div class="group title">
+  <div class="hxRow">
+    <div class="hxCol hxSpan-9 left">
+      <h2>{{ $ctrl.identity }}</h2>
+    </div>
+    <div class="hxSpan-3 right">
+      <select name="detailTime" ng-model="$ctrl.time" class="hxTextCtrl" ng-disabled="$ctrl.isBusy()" ng-change="$ctrl.update()">
+        <optgroup label="Search">
+          <option value="{{ $ctrl.searchTime }}">{{ $ctrl.searchTime }}</option>
+        </optgroup>
+        <optgroup label="Changes">
+          <option ng-repeat="t in $ctrl.times track by $index" value="{{ t }}"><hx-icon type="technical-change"></hx-icon>{{ t }}</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+</div>
+<div>
+  <bigbusy busy="$ctrl.isBusy()" text="'Loading...'"></bigbusy>
+  <hx-alert type="error" target="$ctrl.frameId"></hx-alert>
+  <div>
+    <table class="hxTable hxHoverable hxTable--condensed">
+      <tbody>
+        <tr ng-if="$ctrl.identity">
+          <td>identity</td>
+          <td>{{ $ctrl.identity }}</td>
+        </tr>
+        <tr ng-if="$ctrl.obj.created_at">
+          <td>discovered on</td>
+          <td>{{ $ctrl.obj.created_at | localtime }}</td>
+        </tr>
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr ng-repeat="key in $ctrl.properties">
+            <td>{{ key }}</td>
+            <td>
+                <pre class="configContents" ng-if="$ctrl.type == 'Configfile' && key == 'contents'"><code>{{ $ctrl.obj[key] }}</code></pre>
+                <span ng-if="!($ctrl.type == 'Configfile' && key == 'contents')">{{ $ctrl.obj[key] }}</span>
+            </td>
+        </tr>
+      </tbody>
+    </table>
+    <expandable-table-content
+      ng-repeat="key in $ctrl.childrenKeys"
+      title="$ctrl.children[key].records.length + ' ' + $ctrl.children[key].label + 's'"
+      placeholder="'Filter ' + $ctrl.children[key].label + 's'"
+      headers="$ctrl.children[key].headers"
+      expanded="false"
+      rows="$ctrl.children[key].rows"
+      on-row-click="$ctrl.rowClick($ctrl.children[key], index)"></expandable-table-content>
+  </div>
+</div>

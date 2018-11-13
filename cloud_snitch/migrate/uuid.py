@@ -18,23 +18,26 @@ class Property:
         return '{}.{}'.format(self.label.lower(), self.property)
 
 
-class IdentityChangeQuery:
-    """Models a query to change the identity of nodes in a subgraph."""
+class UpdateQuery:
+    """Models a query to update nodes based on path."""
 
     delimiter = '_'
 
-    def __init__(self, label, identity_properties, path):
+    def __init__(self, label, mapping, path):
         """Init the query.
 
         :param label: Name of the label
         :type label: str
-        :param identity_properties: Collection of properties
-        :type identity_properties: tuple|list
+        :param mapping: Mapping of properties to existing properties.
+            Each key indicates a property on this label. Each value
+            is a tuple of properties existing along the path to
+            concatenate
+        :type mapping: dict
         :param path: Path to the label(usually from the registry)
         :type path: List of label, reltype tuples
         """
         self.label = label
-        self.identity_properties = identity_properties
+        self.mapping = mapping
         self.path = path
 
     def match_clause(self):
@@ -57,16 +60,15 @@ class IdentityChangeQuery:
         :returns: Set clause of the query.
         :rtype: str
         """
-        value = []
-        for prop in self.identity_properties:
-            value.append(str(prop))
-        value = ' + \'_\' + '.join(value)
-        cipher = 'SET {}.{} = {}'.format(
-            self.var_from_label(self.label),
-            registry.identity_property(self.label),
-            value
-        )
-        return cipher
+        set_pieces = []
+        for target_prop, source_props in self.mapping.items():
+            value = ' + \'-\' + '.join([str(prop) for prop in source_props])
+            set_pieces.append('{}.{} = {}'.format(
+                self.var_from_label(self.label),
+                target_prop,
+                value
+            ))
+        return 'SET ' + ', '.join(set_pieces)
 
     def __str__(self):
         """Combines clauses into one string.
@@ -172,6 +174,32 @@ def execute(query):
             print("Summary: {}".format(summary.counters))
 
 
+def node_count():
+    """Count the number of nodes with each label.
+
+    Use this before migration and after migration to verify no
+    unwanted nodes have been created.
+
+    :returns: Mapping of label to counts.
+    :rtype: dict
+    """
+    counts = {}
+    labels = []
+    driver = get_neo4j()
+    for model_name, klass in registry.models.items():
+        labels.append(klass.label)
+        if registry.state_properties(model_name):
+            labels.append(klass.state_label)
+
+    for label in labels:
+        cipher = 'MATCH (n:{}) RETURN COUNT(*) as `total`'.format(label)
+        with driver.session() as session:
+            with session.begin_transaction() as tx:
+                res = tx.run(cipher).single()
+                counts[label] = res['total']
+    return counts
+
+
 if __name__ == '__main__':
     parser = base_parser(
         description=(
@@ -213,86 +241,119 @@ if __name__ == '__main__':
         # 'PythonPackage', # No action for python packages
         (
             'Configfile',
-            (
-                Property('Configfile', 'path'),
-                Property('Host', 'hostname_environment')
-            )
+            {
+                'path_host': (
+                    Property('Configfile', 'path'),
+                    Property('Host', 'hostname_environment')
+                ),
+                'host': (Property('Host', 'hostname_environment'),)
+            }
         ),
         (
             'ConfiguredInterface',
-            (
-                Property('ConfiguredInterface', 'device'),
-                Property('Host', 'hostname_environment')
-            )
+            {
+                'device_host': (
+                    Property('ConfiguredInterface', 'device'),
+                    Property('Host', 'hostname_environment')
+                ),
+                'host': (Property('Host', 'hostname_environment'),)
+            }
         ),
         (
             'Device',
-            (
-                Property('Device', 'name'),
-                Property('Host', 'hostname_environment')
-            )
+            {
+                'name_host': (
+                    Property('Device', 'name'),
+                    Property('Host', 'hostname_environment')
+                ),
+                'host': (Property('Host', 'hostname_environment'),)
+            }
         ),
         (
             'GitRemote',
-            (
-                Property('GitRemote', 'name'),
-                Property('GitRepo', 'path_environment')
-            )
+            {
+                'name_repo': (
+                    Property('GitRemote', 'name'),
+                    Property('GitRepo', 'path_environment')
+                ),
+                'repo': (Property('GitRepo', 'path_environment'),)
+            }
         ),
         (
             'GitRepo',
-            (
-                Property('GitRepo', 'path'),
-                Property('Environment', 'uuid')
-            )
+            {
+                'path_environment': (
+                    Property('GitRepo', 'path'),
+                    Property('Environment', 'uuid')
+                ),
+                'environment': (Property('Environment', 'uuid'),)
+            }
         ),
         (
             'Host',
-            (
-                Property('Host', 'hostname'),
-                Property('Environment', 'uuid')
-            )
+            {
+                'hostname_environment': (
+                    Property('Host', 'hostname'),
+                    Property('Environment', 'uuid')
+                ),
+                'environment': (Property('Environment', 'uuid'),)
+            }
         ),
         (
             'Interface',
-            (
-                Property('Interface', 'device'),
-                Property('Host', 'hostname_environment')
-            )
+            {
+                'device_host': (
+                    Property('Interface', 'device'),
+                    Property('Host', 'hostname_environment')
+                ),
+                'host': (Property('Host', 'hostname_environment'),)
+            }
         ),
         (
             'Mount',
-            (
-                Property('Mount', 'mount'),
-                Property('Host', 'hostname_environment')
-            )
+            {
+                'mount_host': (
+                    Property('Mount', 'mount'),
+                    Property('Host', 'hostname_environment')
+                ),
+                'host': (Property('Host', 'hostname_environment'),)
+            }
         ),
         (
             'Partition',
-            (
-                Property('Partition', 'name'),
-                Property('device', 'name_host')
-            )
+            {
+                'name_device': (
+                    Property('Partition', 'name'),
+                    Property('Device', 'name_host')
+                ),
+                'device': (Property('Device', 'name_host'),)
+            }
         ),
         (
             'Uservar',
-            (
-                Property('Uservar', 'name'),
-                Property('Environment', 'uuid')
-            )
+            {
+                'name_environment': (
+                    Property('Uservar', 'name'),
+                    Property('Environment', 'uuid')
+                ),
+                'environment': (Property('Environment', 'uuid'),)
+            }
         ),
         (
             'Virtualenv',
-            (
-                Property('Virtualenv', 'path'),
-                Property('Host', 'hostname_environment')
-            )
+            {
+                'path_host': (
+                    Property('Virtualenv', 'path'),
+                    Property('Host', 'hostname_environment')
+                ),
+                'host': (Property('Host', 'hostname_environment'),)
+            }
         )
     ]
 
     label_tuples = [(l, p, registry.path(l)) for l, p in label_tuples]
     label_tuples.sort(key=lambda x: len(x[2]))
-    queries = [IdentityChangeQuery(*t) for t in label_tuples]
+    queries = [UpdateQuery(*t) for t in label_tuples]
 
     if args.cipher_only:
         for query in queries:
@@ -302,9 +363,21 @@ if __name__ == '__main__':
         print(add_state())
         exit()
 
+    node_counts = node_count()
+
     # Perform migration
     for q in queries:
         execute(q)
+
+    # Examine new node counts
+    new_node_counts = node_count()
+    for label, n in new_node_counts.items():
+        if node_counts[label] != n and label != 'EnvironmentState':
+            print("Found a possible issue with {}: {} to {}".format(
+                label,
+                node_counts[label],
+                n
+            ))
 
     # Remove account_number_name property from environments.
     # Remove constraint on account_number_name for environment

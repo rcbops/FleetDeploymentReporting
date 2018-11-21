@@ -235,12 +235,21 @@ RAXAUTH_AUTH_URL = '{{ cloud_snitch_web_raxauth_auth_url }}'
 RAXAUTH_AUTH_URL = 'https://someurl.com'
 {% endif %}
 
+
+RAXAUTH_RPC_GROUPS = [
+{% for group in cloud_snitch_web_raxauth_rpc_groups %}
+    '{{ group }}',
+{% endfor %}
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+{% for cls in cloud_snitch_web_default_permission_classes %}
+        '{{ cls }}',
+{% endfor %}
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',

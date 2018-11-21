@@ -107,3 +107,10 @@ cloud_snitch_web_celery_log_file: "{{ cloud_snitch_web_log_dir }}/%n%I.log"
 cloud_snitch_web_celery_log_level: INFO
 
 cloud_snitch_testenv: False
+
+# List all of the default permission classes.
+# This will go into the REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES'] tuple in settings.py
+cloud_snitch_web_default_permission_classes:
+  - rest_framework.permissions.IsAuthenticated
+
+cloud_snitch_web_raxauth_rpc_groups: []

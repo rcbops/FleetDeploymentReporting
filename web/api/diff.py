@@ -1,390 +1,649 @@
 import logging
 
+from collections import OrderedDict
 from cloud_snitch.models import registry
 from neo4jdriver.query import Query
 
 logger = logging.getLogger(__name__)
+var_to_model_map = {m.lower(): m for m in registry.models}
 
-LEFT = 'left'
-RIGHT = 'right'
-BOTH = 'both'
+
+class DiffQuery(Query):
+
+    def __init__(self, path, identity, times, pagesize=5000):
+        """Init the diff query
+
+        :param path: Path to build a diff query around
+        :type path: list
+        :param identity: Starting node's identity
+        :type identity: str
+        :param times: Two times for comparison
+        :type times: tuple
+        :param pagesize: How many results to fetch at once
+        :type pagesize: int
+        """
+        self.path = path
+        self.end = self.path[-1]
+        self.full_path = registry.path(self.end)
+        self.t1 = times[0]
+        self.t2 = times[1]
+        self.identity = identity
+        self.pagesize = pagesize
+
+        self.selects = [
+            '{}.{}'.format(
+                self._var_from_label(m),
+                registry.identity_property(m)
+            ) for m in self.path
+        ]
+
+        self.params = {
+            't1': self.t1,
+            't2': self.t2,
+            'identity': self.identity
+        }
+
+    @classmethod
+    def _var_from_label(self, label):
+        """Uniform label to cipher variable computation.
+
+        :param label: A label to convert to a variable name
+        :type label: str
+        :returns: Converted label name
+        :rtype: str
+        """
+        return label.lower()
+
+    def fetch(self, page):
+        """Get a page of results.
+
+        :param page: Which page to fetch
+        :type page: int
+        :returns: Results from the fetch
+        :rtype: list
+        """
+        skip = (page - 1) * self.pagesize
+        q = '{} \nSKIP {}\nLIMIT {}'.format(str(self), skip, self.pagesize)
+        rows = []
+        for record in self._fetch(q):
+            row = OrderedDict()
+            for select in self.selects:
+                row[select] = record[select]
+            rows.append(row)
+        return rows
+
+    def fetch_all(self):
+        """Fetch all pages.
+
+        :yields: One result per match.
+        :ytype: OrderedDict
+        """
+        page = 1
+        go = True
+        while go:
+            rows = self.fetch(page)
+            for row in rows:
+                yield row
+            if not rows:
+                go = False
+            page += 1
+
+
+class DiffSideQuery(DiffQuery):
+    """Models a query to find subpaths.
+
+    Finds all paths on a 'side'. That is all paths of nodes that belong
+    to one time but not the second time.
+
+    This is used to find nodes that have been added or deleted.
+    """
+    def _match_clause(self):
+        """Build the multistage match clause.
+
+        Find all paths that match in t2. Then find all paths that match in t1
+        that are not in t2.
+
+        Example:
+        If your path is Environment->Host->AptPackage
+
+        MATCH
+            p_t2 =
+                (environment:Environment)-[:HAS_HOST]->
+                (host:Host)-[:HAS_APT_PACKAGE]->
+                (aptpackage:AptPackage)
+        WHERE
+            environment.uuid = $identity AND
+            ALL (r IN RELATIONSHIPS(p_t2) WHERE r.from <= $t2 < r.to)
+        WITH
+            COLLECT([environment,host,aptpackage]) as t2_nodes
+        MATCH
+            p_t1 =
+                (environment:Environment)-[:HAS_HOST]->
+                (host:Host)-[:HAS_APT_PACKAGE]->
+                (aptpackage:AptPackage)
+        WHERE
+            environment.uuid = $identity AND
+            ALL (r IN RELATIONSHIPS(p_t1) WHERE r.from <= $t1 < r.to) AND
+            NOT [environment,host,aptpackage] IN t2_nodes
+
+        :returns: Major portion of cipher query
+        :rtype: str
+        """
+        path_vars = []
+        for model, _ in self.full_path:
+            path_vars.append(self._var_from_label(model))
+        path_vars.append(self._var_from_label(self.end))
+
+        cipher = 'MATCH p_t2 = '
+        for model, reltype in self.full_path:
+            cipher += '({}:{})-[:{}]->'.format(
+                self._var_from_label(model),
+                model,
+                reltype
+            )
+        cipher += '({}:{})'.format(
+            self._var_from_label(self.end),
+            self.end
+        )
+
+        cipher += '\nWHERE '
+        cipher += '{}.{} = $identity AND '.format(
+            self._var_from_label(self.path[0]),
+            registry.identity_property(self.path[0])
+        )
+        cipher += 'ALL (r IN RELATIONSHIPS(p_t2) WHERE r.from <= $t2 < r.to)'
+        cipher += '\nWITH COLLECT([{}]) as t2_nodes'.format(
+            ','.join(path_vars)
+        )
+
+        cipher += '\nMATCH p_t1 = '
+        for model, reltype in self.full_path:
+            cipher += '({}:{})-[:{}]->'.format(
+                self._var_from_label(model),
+                model,
+                reltype
+            )
+        cipher += '({}:{})'.format(
+            self._var_from_label(self.end),
+            self.end
+        )
+        cipher += '\nWHERE '
+        cipher += '{}.{} = $identity AND '.format(
+            self._var_from_label(self.path[0]),
+            registry.identity_property(self.path[0])
+        )
+        cipher += 'ALL (r IN RELATIONSHIPS(p_t1) WHERE r.from <= $t1 < r.to)'
+        cipher += ' AND NOT [{}] IN t2_nodes'.format(','.join(path_vars))
+        return cipher
+
+    def _return_clause(self):
+        """Create the return clause of the query.
+
+        Example:
+        If the path is Environment->Host->AptPackage
+
+        RETURN
+            environment.uuid,
+            host.hostname_environment,
+            aptpackage.name_version
+
+        :returns: Return clause of the query
+        :rtype: str
+        """
+        return 'RETURN ' + ','.join(self.selects)
+
+    def _orderby_clause(self):
+        """Create the orderby clause of the query
+
+        Example:
+        If the path is Environment->Host->AptPackage
+
+        ORDER BY
+            environment.uuid,
+            host.hostname_environment,
+            aptpackage.name_version
+
+        :returns: Orderby clause of the query.
+        :rtype: str
+        """
+        return 'ORDER BY ' + ','.join(self.selects)
+
+    def __str__(self):
+        """Combine clauses into a single query.
+
+        :returns: Combined clauses
+        :rtype: str
+        """
+        return "\n".join([
+            self._match_clause(),
+            self._return_clause(),
+            self._orderby_clause()
+        ])
+
+
+class DiffStateQuery(DiffQuery):
+
+    def _match_clause(self):
+        """Build match query.
+
+        Should match starting at the start model and follow entity edges
+        in time to the end model.
+
+        From there, there should only be results if there are multiple
+        state nodes, one for time t1 and one for time t2.
+
+        Example:
+        If the path is Environment->Host
+
+        MATCH p_t1 = (environment:Environment)-[:HAS_HOST]->(host:Host)
+        MATCH p_t2 = (environment:Environment)-[:HAS_HOST]->(host:Host)
+        MATCH (host)-[r_t1_state:HAS_STATE]->(t1_state:HostState)
+        MATCH (host)-[r_t2_state:HAS_STATE]->(t2_state:HostState)
+
+        :returns: Match clause of the the query
+        :rtype str:
+        """
+        cipher = "MATCH p_t1 = "
+        for model, reltype in self.full_path:
+            cipher += "({}:{})-[:{}]->".format(
+                self._var_from_label(model),
+                model,
+                reltype
+            )
+        cipher += "({}:{})".format(
+            self._var_from_label(self.end),
+            self.end
+        )
+
+        cipher += "\nMATCH p_t2 = "
+        for model, reltype in self.full_path:
+            cipher += "({}:{})-[:{}]->".format(
+                self._var_from_label(model),
+                model,
+                reltype
+            )
+        cipher += "({}:{})".format(
+            self._var_from_label(self.end),
+            self.end
+        )
+
+        # Match state on 'a' time
+        cipher += (
+            "\nMATCH ({})-[r_t1_state:HAS_STATE]->(t1_state:{}State)".format(
+                self._var_from_label(self.end),
+                self.end
+            )
+        )
+
+        # Match state on 'b' time
+        cipher += (
+            "\nMATCH ({})-[r_t2_state:HAS_STATE]->(t2_state:{}State)".format(
+                self._var_from_label(self.end),
+                self.end
+            )
+        )
+        return cipher
+
+    def _where_clause(self):
+        """Build the where clause.
+
+        Example:
+        If the path is Environment->Host
+
+        WHERE
+            environment.uuid = $identity AND
+            r_t1_state.from <= $t1 < r_t1_state.to AND
+            r_t2_state.from <= $t2 < r_t2_state.to AND
+            t1_state <> t2_state AND
+            ALL (r IN RELATIONSHIPS(p_t1) WHERE r.from <= $t1 < r.to) AND
+            ALL (r in RELATIONSHIPS(p_t2) WHERE r.from <= $t2 < r.to)
+
+        :returns: Where clause
+        :rtype: str
+        """
+        wheres = ['{}.{} = $identity'.format(
+            self._var_from_label(self.path[0]),
+            registry.identity_property(self.path[0])
+        )]
+
+        wheres.append('r_t1_state.from <= $t1 < r_t1_state.to')
+        wheres.append('r_t2_state.from <= $t2 < r_t2_state.to')
+        wheres.append('t1_state <> t2_state')
+
+        wheres.append(
+            'ALL (r IN RELATIONSHIPS(p_t1) WHERE r.from <= $t1 < r.to)'
+        )
+        wheres.append(
+            'ALL (r in RELATIONSHIPS(p_t2) WHERE r.from <= $t2 < r.to)'
+        )
+
+        cipher = "WHERE " + ' AND '.join(wheres)
+        return cipher
+
+    def _return_clause(self):
+        """Generate return clause of the query.
+
+        Should contain the identity property of every node in the path.
+
+        Example:
+        If the path is Environment->Host
+
+        RETURN
+            environment.uuid,
+            host.hostname_environment
+
+        :returns: Return portion of the query
+        :rtype: str
+        """
+        return 'RETURN ' + ','.join(self.selects)
+
+    def _orderby_clause(self):
+        """Build the order by clause
+
+        Example:
+        If the path is Environment->Host
+
+        ORDER BY
+            environment.uuid,
+            host.hostname_environment
+
+        :returns: Orderby clause
+        :rtype: str
+        """
+        return 'ORDER BY ' + ','.join(self.selects)
+
+    def __str__(self):
+        """Combine all clauses into a single query.
+
+        :returns: Combined clauses
+        :rtype: str
+        """
+        return "\n".join([
+            self._match_clause(),
+            self._where_clause(),
+            self._return_clause(),
+            self._orderby_clause()
+        ])
+
+
+class Identity:
+    """Models entire identity of a node."""
+    def __init__(self, label, prop, identity):
+        """Init the identity
+
+        :param label: Label of the node.
+        :type label: str
+        :param prop: Name of the identity property of the node
+        :type prop: str
+        :param identity: Value of the identity property of the node
+        :type identity: str
+        """
+        self.label = var_to_model_map.get(label, label)
+        self.prop = prop
+        self.value = identity
+
+    @property
+    def hash_key(self):
+        """Returns a key to use for hashmaps.
+
+        Key is a 3 tuple with literals for value, prop, and value
+
+        :returns: Hashable tuple
+        :rtype: tuple
+        """
+        return (self.label, self.prop, self.value)
 
 
 class Node:
-    """Model a node in a graph of the differences."""
+    """Models a node in the diff graph."""
+    def __init__(self, identity, flags=None):
+        """Init the node
 
-    def __init__(self, identity, model):
-        """Init the node.
-
-        :param identity: Identity of the node
-        :type identity: str
-        :param model: Type|Label of the node
-        :type model: str
+        :param identity: Identity object for the node
+        :type identity: Identity
+        :param flags: Flags for the node.
+            Should be a list containing any of ['t1', 't2']
+            A node with only a flag of 't1' was present in t1
+            A node with only a flag of 't2' was present in t2
+            A node with both 't1' and 't2' was changed from t1 to t2
+            A node with neither 't1' or 't2' was unmodified but is part
+                of the path to a modified node.
+        :type flags: List
         """
-        self.model = model
         self.identity = identity
-        self.parents = set()
-        self.left_props = {}
-        self.both_props = {}
-        self.right_props = {}
         self.children = {}
-        self.changed = False
-        self.cleaned = False
-        self.rel_changed = False
+        self.flags = set(flags or [])
 
-    @property
-    def dirty(self):
-        """Determine if this node's properties are dirty.
+    def flag(self, flags):
+        """Set additional flags for the node.
 
-        :returns: True for dirty, False otherwise
-        :rtype: bool
+        :param flags: List of additional flags.
+        :type flags: list
         """
-        self.clean()
-        return self.left_props or self.right_props or self.rel_changed
+        if not isinstance(flags, list):
+            flags = [flags]
+        for flag in flags:
+            self.flags.add(flag)
 
-    def update(self, d, side):
-        """Update properties by d
+    def add_child(self, child_node):
+        """Add a relationship from this node to a child node.
 
-        :param d: Key value map of properties.
-        :type d: dict
-        :param side: Which side is d coming from(left|right)
-        :type side: str
+        :param child_node: Descendent of this node. There is a path of length
+            one from this node to the child node.
+        :type child_node: Node
         """
-        for key, value in d.items():
-            self.add_property(key, value, side)
+        self.children[child_node.identity.hash_key] = child_node
 
-    def clean(self):
-        """Collect properties that are the same on both."""
-        # Dont clean if already cleaned.
-        if self.cleaned:
-            return
+    def to_dict(self):
+        """Creates a dictionary representation of this node.
 
-        # Start a list of properties that can be moved.
-        toremove = []
-        for key, value in self.left_props.items():
-            if value == self.right_props.get(key):
-                toremove.append(key)
-                self.both_props[key] = value
+        Representation will be serializable.
 
-        # Remove properties from both sides
-        for i in toremove:
-            del self.left_props[i]
-            del self.right_props[i]
-
-        # Check relationships:
-        for model, modeldict in self.children.items():
-            for identity, reldict in modeldict.items():
-                if reldict['side'] != 'both':
-                    self.rel_changed = True
-
-        # Mark as cleaned.
-        self.cleaned = True
-
-    def add_property(self, key, value, side):
-        """Add property to the node.
-
-        :param key: Key|Name of the property
-        :type key: str
-        :param value: str
-        :type value: str
-        :param side: Which side is the property coming from.
-        :type side: str
-        """
-        if side == LEFT:
-            this = self.left_props
-        else:
-            this = self.right_props
-        this[key] = value
-
-    def add_child(self, model, node, side):
-        """Add child to the node.
-
-        :param model: Type|Label of the child node.
-        :type model: str
-        :param node: Node to add
-        :type node: Node
-        :param side: Which side is the node coming from?
-        :type side: str
-        """
-        model_rel = self.children.setdefault(model, {})
-        node_rel = model_rel.setdefault(node.identity, {
-            'side': side,
-            'node': node
-        })
-        if side != node_rel['side']:
-            node_rel['side'] = BOTH
-
-    def remove_child(self, model, identity):
-        """Remove a child.
-
-        :param model: Type|Label of the node to remove
-        :type model: str
-        :param identity: Identity of the node
-        :type identity: str
-        """
-        if model in self.children:
-            if identity in self.children[model]:
-                if self.children[model][identity]['side'] == 'both':
-                    del self.children[model][identity]
-                    return True
-        return False
-
-    def todict(self):
-        """Dictionary representation of the node.
-
-        :param rel_side: Which side does the node belong to
-        :type rel_side: str
-        :returns: Dict representation of node
+        :returns: Serializable dictionary
         :rtype: dict
         """
-        d = {
-            'model': self.model,
-            'left': self.left_props,
-            'both': self.both_props,
-            'right': self.right_props,
+        return {
+            'model': self.identity.label,
+            'id': self.identity.value,
+            'flags': list(self.flags),
+            'children': [
+                c.to_dict() for c in sorted(
+                    self.children.values(),
+                    key=lambda x: x.identity.hash_key
+                )
+            ]
         }
-        return d
-
-    def toframe(self, rel_side=None):
-        """Create structural representation of the node.
-
-        :param rel_side: Which side of the diff is the node on?
-        :type rel_side: string
-        :returns: Dict representation of structure.
-        :rtype: dict
-        """
-        children = []
-        d = {
-            'side': rel_side,
-            'model': self.model,
-            'id': self.identity,
-            'children': children
-        }
-        for model, modeldict in self.children.items():
-            for identity, nodedict in modeldict.items():
-                children.append(nodedict['node'].toframe(nodedict['side']))
-        return d
-
-
-class DiffResult:
-    """Convenience class for interfacing with a diffdict."""
-    def __init__(self, diffdict):
-        """Init the DiffResult
-
-        :param diffdict: Dict representation of diff
-        :type diffdict: dict
-        """
-        self.diffdict = diffdict
-
-    def getnodes(self, offset, limit):
-        """Get up to limit nodes starting at offset.
-
-        :param offset: Where to start
-        :type offset: int
-        :param limit: Maximum number of nodes to retrieve
-        :type limit: int
-        """
-        return self.diffdict['nodes'][offset:(offset + limit)]
-
-    def getnode(self, model, identity):
-        """Get a specific node identified by model and id.
-
-        :param model: Name of the model
-        :type model: str
-        :param identity: Id of an object
-        :type identity: str
-        :returns: Dict representation of node or None
-        :rtype: dict|None
-        """
-        index = self.diffdict['nodemap'].get(model, {}).get(identity)
-        if index is not None:
-            return self.diffdict['nodes'][index]
-        return None
-
-    def frame(self):
-        """Get the frame of the diff
-
-        :returns: Dict representation of structure or frame
-        :rtype: dict
-        """
-        return self.diffdict['frame']
 
 
 class Diff:
     """Models a graph that is a diff of two objects."""
 
-    pagesize = 1000
+    def add_child(self, child_node):
+        """Add a child node to the diff.
 
-    def __init__(self, model, identity, left_time, right_time):
+        Any child added here will be a root of the diff.
+
+        This should only occur one or zero times.
+
+        :param child_node: Root node to add
+        :type childr_node: Node
+        """
+        self.children[child_node.identity.hash_key] = child_node
+
+    def feed(self, row, flags):
+        """Feed one row of a diff query to the diff structure.
+
+        Will create additional nodes and paths where they do no exist.
+
+        :param row: Query result row
+        :type row: OrderedDict
+        :param flags: List of flags
+        :type flags: list
+        """
+        if not isinstance(flags, list):
+            flags = [flags]
+
+        # Start with a pseudo node of self
+        current = self
+
+        # Only add flags to end nodes. Start counter
+        count = 0
+
+        # Iterate over each part of the row
+        for label_dot_prop, value in row.items():
+            count += 1
+            label, prop = label_dot_prop.split('.', 1)
+            identity = Identity(label, prop, value)
+
+            # Check for existing node - create node if not existing
+            node = current.children.get(identity.hash_key)
+            if node is None:
+                node = Node(identity)
+                current.add_child(node)
+
+            # Add flags to end node
+            if count == len(row):
+                node.flag(flags)
+            current = node
+
+    def to_dict(self):
+        """Create serializable dictionary representation of diff structure.
+
+        :returns: Serializable dictionary
+        :rtype: dict
+        """
+        for node in self.children.values():
+            return node.to_dict()
+        else:
+            return {}
+
+    def __init__(self, model, identity, t1, t2):
         """Init the diff
 
         :param model: Type|Label of the root node
         :type model: str
         :param identity: Identity of the root node
         :type identity: str
-        :param left_time: First timestamp in milliseconds
-        :type left_time: int
-        :param right_time: Second timestamp in milliseconds
-        :type right_time: int
+        :param t1: First timestamp in milliseconds
+        :type t1: int
+        :param t2: Second timestamp in milliseconds
+        :type t2: int
         """
-        self.nodes = {}
         self.model = model
         self.identity = identity
-        self.left_time = left_time
-        self.right_time = right_time
+        self.t1 = t1
+        self.t2 = t2
 
-        # Feed data from the left
-        self.feedleft()
+        self.children = {}
 
-        # Feed data from the right
-        self.feedright()
-
-        # Move unchanged properties to both
-        self.clean()
-
-        # Remove unchanged nodes with unchanged children.
-        self.prune()
-
-    def getnode(self, model, data):
-        """Get a node of model type matching data.
-
-        Create a new node if one does not exist.
-
-        :param model: Name of the model
-        :type model: str
-        :param data: Dict representation of node
-        :type data: dict
-        :returns: Node with matching data
-        :rtype: Node
-        """
-        identity = data[registry.identity_property(model)]
-        nodemap = self.nodes.setdefault(model, {})
-        node = nodemap.setdefault(identity, Node(identity, model))
-        return node
-
-    def feedpath(self, path, time, side):
-        """Feed all of a path from a side to the diff.
-
-        :param path: List of models indicating path through data to a model
-        :type path: list
-        :param time: Integer milliseconds since epoch
-        :type time: int
-        :param side: Which side to feed the diff from.
-        :type side: str
-        """
-        # Build query
-        q = Query(path[-1]) \
-            .filter(
-                registry.identity_property(self.model),
-                '=',
-                self.identity, self.model
-            ).time(time)
-
-        # Start at page 1 and page through all results.
-        page = 1
-        records = q.page(page, self.pagesize)
-        while (records):
-            for record in records:
-                parent = None
-                for label in path:
-                    # Update diff with results
-                    node = self.getnode(label, record[label])
-                    node.update(record[label], side)
-
-                    # Make parent -> child relationship
-                    if parent is not None:
-                        parent.add_child(label, node, side)
-                        node.parents.add(parent)
-
-                    # Advance parent for next part of path.
-                    parent = node
-
-            page += 1
-            records = q.page(page, self.pagesize)
-
-    def feed(self, time, side):
-        """Feed all paths from a side to the diff.
-
-        :param time: Integer milliseconds since epoch
-        :type side: Which side to feed from
-        """
-        # Iterarate over every path.
+        # Get list of paths
         paths = registry.forest.paths_from(self.model)
+        paths.append([self.model])
+        paths = sorted(paths, key=lambda x: len(x))
+
         for p in paths:
-            self.feedpath(p, time, side)
+            q = DiffSideQuery(p, identity, (t1, t2))
+            for row in q.fetch_all():
+                self.feed(row, 't1')
 
-    def feedleft(self):
-        """Feed data from the left side."""
-        self.feed(self.left_time, LEFT)
+            q = DiffSideQuery(p, identity, (t2, t1))
+            for row in q.fetch_all():
+                self.feed(row, 't2')
 
-    def feedright(self):
-        """Feed data from the right side."""
-        self.feed(self.right_time, RIGHT)
+            if registry.state_properties(p[-1]):
+                q = DiffStateQuery(p, identity, (t1, t2))
+                for row in q.fetch_all():
+                    self.feed(row, ['t1', 't2'])
 
-    def clean(self):
-        """Mark nodes that have changed as changed.
 
-        Mark all ancestors of changed nodes as changed.
+class NodeDiff(Query):
+
+    def __init__(self, model, identity, t1, t2):
+        """Init the NodeDiff
+
+        :param model: Type of the node
+        :type model: str
+        :param identity: Identity of the node
+        :type identity: str
+        :param t1: A time in milliseconds
+        :type t1: int
+        :param t2: A time in milliseconds
+        :type t2: int
         """
-        # Iterate over the model -> nodes dictionary
-        for model, nodedict in self.nodes.items():
-            # Iterate over the identity -> node dictionary
-            for identity, node in nodedict.items():
-                # If node is dirty, mark entire path as changed
-                if node.dirty:
-                    stack = [node]
-                    while stack:
-                        current = stack.pop()
-                        # If already changed, no need to continue.
-                        if current.changed:
-                            continue
-                        current.changed = True
-                        for parent in current.parents:
-                            stack.append(parent)
+        self.model = model
+        self.t1 = t1
+        self.t2 = t2
+        self.full_path = registry.path(self.model)
+        self.params = {'identity': identity}
 
-    def prune(self):
-        """Remove unchanged nodes that also have unchanged children."""
-        for model, nodedict in self.nodes.items():
-            toremove = []
-            # Remove unchanged children from parents
-            for identity, node in nodedict.items():
-                if not node.changed:
-                    # Add to remove list if removed from every parent
-                    removed = [
-                        p.remove_child(model, identity)
-                        for p in node.parents
-                    ]
-                    if all(removed):
-                        toremove.append(identity)
-            # Remove unchanged nodes from datasructure
-            for key in toremove:
-                del nodedict[key]
+        self.node_t1 = self.node_at_time(self.t1)
+        self.node_t2 = self.node_at_time(self.t2)
 
-    def result(self):
-        """Create diff result that can be cached/chunked.
+    def to_list(self):
+        """Create a list of serialized properties.
 
-        :returns: Result of the diff
-        :rtype: DiffResult
+        :returns: List of properties. Each property is an object with:
+            name, t1, and t2 where t1 and t2 are values at t1 and t2.
+        :rtype: list
         """
-        diffdict = {
-            'frame': None,
-            'nodes': [],
-            'nodemap': {},
-            'nodecount': 0
-        }
-        rootnodes = self.nodes[self.model]
-        if rootnodes:
-            diffdict['frame'] = next(iter(rootnodes.values())).toframe()
-            index = 0
-            for model, nodedict in self.nodes.items():
-                modelmap = {}
-                for identity, node in nodedict.items():
-                    n = node.todict()
-                    diffdict['nodes'].append(n)
-                    modelmap[identity] = index
-                    index += 1
-                if modelmap:
-                    diffdict['nodemap'][model] = modelmap
+        result_list = []
 
-        diffdict['nodecount'] = len(diffdict['nodes'])
-        return DiffResult(diffdict)
+        # Gather list of all properties and then sort by property name
+        props = sorted(list(
+            set(self.node_t1.keys()) |
+            set(self.node_t2.keys())
+        ))
+        for prop in props:
+            result_list.append({
+                'name': prop,
+                't1': self.node_t1.get(prop),
+                't2': self.node_t2.get(prop)
+            })
+        return result_list
+
+    def node_at_time(self, t):
+        """Get a node from the database at time t.
+
+        :param t: A time in milliseconds
+        :type t: int
+        :returns: A dictionary of properties
+        :rtype: dict
+        """
+        var_models = []
+        rels = []
+        returns = ['n']
+        for model, reltype in self.full_path:
+            var_models.append((model.lower(), model))
+            rels.append(reltype)
+        var_models.append(('n', self.model))
+
+        if registry.state_properties(self.model):
+            var_models.append(('ns', registry.models[self.model].state_label))
+            rels.append('HAS_STATE')
+            returns.append('ns')
+
+        cipher = 'MATCH p = ({}:{})'.format(var_models[0][0], var_models[0][1])
+
+        for var_model, rel in zip(var_models[1:], rels):
+            var, model = var_model
+            cipher += '-[:{}]->({}:{})'.format(rel, var, model)
+
+        cipher += (
+            ' WHERE ALL (r IN RELATIONSHIPS(p) WHERE r.from <= $t < r.to) AND'
+        )
+        cipher += (
+            ' n.{} = $identity'.format(registry.identity_property(self.model))
+        )
+        cipher += ' RETURN ' + ','.join(returns) + ' LIMIT 1'
+
+        self.params['t'] = t
+
+        record = self._fetch(cipher).single()
+        if record is None:
+            node = {}
+        else:
+            node = {k: v for k, v in record['n'].items()}
+            if 'ns' in record:
+                for k, v in record['ns'].items():
+                    node[k] = v
+        return node

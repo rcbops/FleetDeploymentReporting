@@ -168,23 +168,3 @@ class DiffSerializer(Serializer):
     identity = CharField(max_length=256, required=True)
     left_time = IntegerField(min_value=0, required=True)
     right_time = IntegerField(min_value=0, required=True)
-
-
-class DiffNodesSerializer(Serializer):
-    """Serializer for requesting a range of nodes from an offset."""
-    model = ChoiceField([m.label for m in registry.models.values()])
-    identity = CharField(max_length=256, required=True)
-    left_time = IntegerField(min_value=0, required=True)
-    right_time = IntegerField(min_value=0, required=True)
-    offset = IntegerField(min_value=0, required=True)
-    limit = IntegerField(min_value=1, required=True)
-
-
-class DiffNodeSerializer(Serializer):
-    """Serializer for requesting a specific node."""
-    model = ChoiceField([m.label for m in registry.models.values()])
-    identity = CharField(max_length=256, required=True)
-    left_time = IntegerField(min_value=0, required=True)
-    right_time = IntegerField(min_value=0, required=True)
-    node_model = ChoiceField([m.label for m in registry.models.values()])
-    node_identity = CharField(max_length=256, required=True)

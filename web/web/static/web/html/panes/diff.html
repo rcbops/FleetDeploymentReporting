@@ -19,36 +19,17 @@
         <h2>{{ $ctrl.humanState() }}</h2>
       </div>
     </div>
+
     <!-- Detail view begin -->
-    <div ng-if="$ctrl.detailNode && $ctrl.detailNodeType" class="diffNodeDetail hxBox-xl">
-      <hx-panel>
-        <hx-panelhead>
-          <h3>{{ $ctrl.detailNodeType }}: {{ $ctrl.detailNodeId }}</h3>
-        </hx-panelhead>
-        <hx-panelbody>
-          <table class="hxTable hxTable--condensed">
-            <thead>
-              <tr>
-                <th></th>
-                <th>{{ $ctrl.diff.leftTime }}</th>
-                <th>{{ $ctrl.diff.rightTime }}</th>
-             </tr>
-            </head>
-            <tbody>
-              <tr ng-repeat="prop in $ctrl.detailProps()">
-                <td>{{ prop }}</td>
-                <td class="{{ $ctrl.detailProp(prop, 'left').css }}">{{ $ctrl.detailProp(prop, 'left').val }}</td>
-                <td class="{{ $ctrl.detailProp(prop, 'right').css }}">{{ $ctrl.detailProp(prop, 'right').val }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </hx-panelbody>
-        <hx-panelfoot>
-          <button class="hxBtn hxPrimary" ng-click="$ctrl.closeDetail()">Close</button>
-        </hx-panelfoot>
-      </hx-panel>
-    </div>
+    <diff-details
+      ng-if="$ctrl.details"
+      type="$ctrl.details.type"
+      identity="$ctrl.details.identity"
+      left-time="$ctrl.diff.leftTime"
+      right-time="$ctrl.diff.rightTime"
+      on-close="$ctrl.closeDetails()" />
     <!--detail view end -->
+
     <svg id="diff" ng-show="$ctrl.state == 'done'">
       <defs>
         <radialGradient id="addedGradient" cx="50%" cy="50%" r="50%">

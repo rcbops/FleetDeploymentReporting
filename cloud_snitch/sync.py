@@ -6,11 +6,6 @@ Snitchers will also probably become python entry points.
 import logging
 import time
 
-from concurrent.futures import ProcessPoolExecutor
-from concurrent.futures import as_completed
-
-from itertools import groupby
-
 from cloud_snitch.snitchers.apt import AptSnitcher
 from cloud_snitch.snitchers.configfile import ConfigfileSnitcher
 from cloud_snitch.snitchers.environment import EnvironmentSnitcher
@@ -25,9 +20,6 @@ from cloud_snitch import runs
 from cloud_snitch import utils
 from cloud_snitch.cli_common import base_parser
 from cloud_snitch.driver import DriverContext
-from cloud_snitch.exc import EnvironmentLockedError
-from cloud_snitch.exc import RunInvalidStatusError
-from cloud_snitch.exc import RunAlreadySyncedError
 from cloud_snitch.exc import RunContainsOldDataError
 from cloud_snitch.models import EnvironmentEntity
 from cloud_snitch.lock import lock_environment
@@ -39,10 +31,12 @@ parser = base_parser(
     description="Ingest collected snitch data to neo4j."
 )
 parser.add_argument(
-    '--concurrency',
-    type=int,
-    default=1,
-    help="How many concurrent processes to use."
+    'path',
+    help='Path or archived collection run.'
+)
+parser.add_argument(
+    '--key',
+    help='Base64 encoded 256 bit AES key. For testing/debug only.'
 )
 
 
@@ -96,98 +90,45 @@ def sync_run(driver, run):
     :param run: Run to sync
     :type run: runs.Run
     """
-    try:
-        check_run_time(driver, run)
-        run.start()
-        logger.info("Starting collection on {}".format(run.path))
-        consume(driver, run)
-        logger.info("Run completion time: {}".format(
-            utils.milliseconds(run.completed)
-        ))
-        run.finish()
-    except RunAlreadySyncedError as e:
-        logger.info(e)
-    except RunInvalidStatusError as e:
-        logger.info(e)
-    except RunContainsOldDataError as e:
-        logger.info(e)
-    except Exception:
-        logger.exception('Unable to complete run.')
-    run.error()
+    check_run_time(driver, run)
+    run.start()
+    logger.info("Starting collection on {}".format(run.path))
+    consume(driver, run)
+    logger.info("Run completion time: {}".format(
+        utils.milliseconds(run.completed)
+    ))
+    run.finish()
 
 
-def sync_paths(paths):
-    """Sync all runs indicated by paths.
+def sync_single(path, key=None):
+    """Used to sync a single discrete set of run data.
 
-    :param paths: list of paths indicating runs.
-    :type paths: list
+    :param path: Path to run data
+    :type path: str
+    :param key: Encryption/Decryption base 64 encoded key
+    :type key: str
     """
-    # Start a neo4j driver context.
     with DriverContext() as driver:
-        for path in paths:
-            run = runs.Run(path)
-            # Try to acquire environment lock.
-            # @TODO - Implement wait until timeout loop.
-            try:
-                env = EnvironmentEntity(
-                    uuid=run.environment_uuid,
-                    name=run.environment_name,
-                    account_number=run.environment_account_number
-                )
-                with lock_environment(driver, env):
-                    sync_run(driver, run)
-            except EnvironmentLockedError as e:
-                logger.error(e)
-
-
-def sort_key(item):
-    """Returns a string to sort by for a run.
-
-    Meant to be the key function in sorted()
-
-    :param item: Run instance
-    :type item: cloud_snitch.runs.Run
-    :returns: String to sort by
-    :rtype: str
-    """
-    return '{}~{}'.format(
-        item.environment_uuid,
-        item.completed.isoformat()
-    )
-
-
-def groupby_key(item):
-    """Returns a string to group runs by.
-
-    Meant to be the key function in itertools.groupby
-
-    :param item: Run instance
-    :type item: cloud_snitch.runs.Run
-    :returns: String to group runs by
-    :rtype: str
-    """
-    return item.environment_uuid
+        run = runs.Run(path, key=key)
+        env = EnvironmentEntity(
+            uuid=run.environment_uuid,
+            name=run.environment_name,
+            account_number=run.environment_account_number
+        )
+        with lock_environment(driver, env):
+            sync_run(driver, run)
 
 
 def main():
     start = time.time()
     args = parser.parse_args()
-    foundruns = runs.find_runs()
-    foundruns = sorted(foundruns, key=sort_key)
-    with ProcessPoolExecutor(max_workers=args.concurrency) as executor:
-        future_to_sync = set()
-        for _, group in groupby(foundruns, groupby_key):
-            paths = [r.path for r in group]
-            future_to_sync.add(executor.submit(sync_paths, paths))
 
-        for future in as_completed(future_to_sync):
-            try:
-                future.result()
-            except Exception:
-                logger.exception(
-                    'An exception occurred while processing group.'
-                )
-    logger.info("Finished in {:.3f} seconds".format(time.time() - start))
+    try:
+        sync_single(args.path, key=args.key)
+    except Exception:
+        logger.exception('Could not sync.')
+    finally:
+        logger.info("Finished in {:.3f} seconds".format(time.time() - start))
 
 
 if __name__ == '__main__':

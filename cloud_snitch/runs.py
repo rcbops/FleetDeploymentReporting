@@ -1,13 +1,18 @@
-import datetime
+import base64
 import json
 import logging
 import os
+import struct
+import tarfile
 
-from cloud_snitch import settings
 from cloud_snitch import utils
+from cloud_snitch.exc import ArchiveObjectError
+from cloud_snitch.exc import InvalidKeyError
 from cloud_snitch.exc import RunAlreadySyncedError
 from cloud_snitch.exc import RunInvalidError
 from cloud_snitch.exc import RunInvalidStatusError
+
+from Crypto.Cipher import AES
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +20,120 @@ logger = logging.getLogger(__name__)
 _CURRENT_RUN = None
 
 
+class RunArchive:
+    """Class for reading optionally encrypted run data json files.
+
+    The archive must be .tar.gz
+
+    """
+    encoding = 'utf-8'
+
+    def __init__(self, filename, key=None, mode='r:gz'):
+        """Initialize the file object.
+
+        :param filename: Filename of archive
+        :type filename: str
+        :param key: Base64 encoded AES 256 key
+        :type key: str
+        :param mode: Tarfile read mode (r:gz, r:*, etc)
+        :type mode: string
+        """
+        self.filename = filename
+
+        # Prepare key if provided.
+        self.key = key
+        if self.key is not None:
+            try:
+                self.key = base64.b64decode(self.key)
+            except Exception:
+                raise InvalidKeyError()
+
+        self.mode = mode
+        self.filemap = {}
+
+        # Build the file map
+        tf = None
+        try:
+            tf = tarfile.open(self.filename, self.mode)
+            for name in tf.getnames():
+                _, tail = os.path.split(name)
+                self.filemap[tail] = name
+        finally:
+            if tf:
+                tf.close()
+
+    def read(self, membername):
+        """Read data from a file.
+
+        Will decrypt if enabled.
+        Will return string.
+
+        :returns: Unserialized json object
+        :rtype: dict
+        """
+        tf = None
+        try:
+            fullname = self.filemap.get(membername, '')
+            tf = tarfile.open(self.filename, self.mode)
+            f = tf.extractfile(fullname)
+            if self.key:
+                # Read original bytes length first
+                length = struct.unpack('<Q', f.read(struct.calcsize('Q')))[0]
+
+                # Read initialization vector next
+                iv = f.read(AES.block_size)
+                cipher = AES.new(self.key, AES.MODE_CBC, iv)
+
+                # Read and decrypt rest of string.
+                decrypted = cipher.decrypt(f.read())
+
+                # Remove padding
+                data = decrypted[:length]
+            else:
+                data = f.read()
+
+            # Return decoded string.
+            return json.loads(data.decode(self.encoding))
+
+        except ValueError:
+            raise ArchiveObjectError(membername)
+
+        finally:
+            if tf:
+                tf.close()
+
+
 class Run:
     """Models a running of the collection of data."""
+
+    def __init__(self, path, key=None):
+        """Inits the run
+
+        :param path: Path on disk that contains the run
+        :type path: str
+        :param key: Encryption key to encrypt and decrypt run data
+        :type key: base64 encoded AES256 key.
+        """
+        self.path = path
+        try:
+            self.archive = RunArchive(self.path, key=key)
+            self.run_data = self._read_data()
+        except FileNotFoundError:
+            raise RunInvalidError(self.path)
+        except IOError:
+            raise RunInvalidError(self.path)
+        except ValueError:
+            raise RunInvalidError(self.path)
+        self._completed = None
+
+    @property
+    def filenames(self):
+        """List names of files in the run archive.
+
+        :returns: List of tails of all filenames in the archive.
+        :rtype: list
+        """
+        return self.archive.filemap.keys()
 
     def _read_data(self):
         """Reads run data.
@@ -24,13 +141,17 @@ class Run:
         :returns: Run data loaded from file.
         :rtype: dict
         """
-        try:
-            with open(os.path.join(self.path, 'run_data.json'), 'r') as f:
-                return json.loads(f.read())
-        except IOError:
-            raise RunInvalidError(self.path)
-        except ValueError:
-            raise RunInvalidError(self.path)
+        return self.get_object('run_data.json')
+
+    def get_object(self, filename):
+        """Get deserialized json object from a file in the run.
+
+        :param filename: Name of the file containing the object.
+        :type filename: str
+        :returns: The object if it exists or None
+        :rtype: Dict|None
+        """
+        return self.archive.read(filename)
 
     @property
     def completed(self):
@@ -100,86 +221,25 @@ class Run:
         """
         return self.run_data.get('environment', {}).get('uuid')
 
-    def _save_data(self):
-        """Save run data to disk"""
-        with open(os.path.join(self.path, 'run_data.json'), 'w') as f:
-            f.write(json.dumps(self.run_data))
-
-    def __init__(self, path):
-        """Inits the run
-
-        :param path: Path on disk that contains the run
-        :type path: str
-        :param run_data: Data about the run
-        :type run_data: dict
-        """
-        self.path = path
+    def update(self):
+        """Reload data from disk."""
         self.run_data = self._read_data()
-        self._completed = None
 
     def start(self):
-        """Mark run as syncing.
-
-        Changes run status to 'syncing'
-        """
+        """Execution hook for start of a run."""
         self.update()
         if self.status != 'finished':
             raise RunInvalidStatusError(self)
         if self.run_data.get('synced') is not None:
             raise RunAlreadySyncedError(self)
 
-        self.run_data['status'] = 'syncing'
-        self._save_data()
-
-    def update(self):
-        """Reload data from disk just."""
-        self.run_data = self._read_data()
-
     def finish(self):
-        """Mark run as finished.
-
-        Changes run status to 'finished'
-        Changes synced to now
-        """
-        self.run_data['status'] = 'finished'
-        self.run_data['synced'] = datetime.datetime.utcnow().isoformat()
-        self._save_data()
+        """Execute hook for successful sync."""
+        pass
 
     def error(self):
-        """Mark run as just finished.
-
-        An unexpected exception occurred.
-        """
-        self.run_data['status'] = 'finished'
-        self._save_data()
-
-
-def find_runs():
-    """Create a list of run objects from the configured data directory.
-
-    :returns: List of run objects
-    :rtype: list
-    """
-    runs = []
-    for root, dirs, files in os.walk(settings.DATA_DIR):
-        for d in dirs:
-            run_data = os.path.join(root, d, 'run_data.json')
-            if os.path.isfile(run_data):
-                try:
-                    runs.append(Run(os.path.dirname(run_data)))
-                except RunInvalidError:
-                    continue
-
-    # Exclude runs that are incomplete
-    filtered = []
-    for run in runs:
-        if run.completed is None:
-            logger.warn('Found incomplete run at {}'.format(run.path))
-            continue
-        filtered.append(run)
-
-    # Sort runs by completed timestamp
-    return sorted(filtered, key=lambda r: r.completed)
+        """Execute hook for unsuccessful sync."""
+        pass
 
 
 def set_current(run):

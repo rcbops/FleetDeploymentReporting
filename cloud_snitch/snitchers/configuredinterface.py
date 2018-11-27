@@ -1,4 +1,3 @@
-import json
 import logging
 
 from .base import BaseSnitcher
@@ -26,9 +25,7 @@ class ConfiguredInterfaceSnitcher(BaseSnitcher):
         """
         # Extract config and environment data.
         env = EnvironmentEntity(uuid=self.run.environment_uuid)
-        with open(filename, 'r') as f:
-            data = json.loads(f.read())
-            configdata = data.get('data', {})
+        configdata = self.run.get_object(filename).get('data', {})
 
         # Find parent host object - return early if not exists.
         host = HostEntity(hostname=hostname, environment=env.identity)

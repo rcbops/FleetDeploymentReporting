@@ -1,4 +1,3 @@
-import json
 import logging
 
 from .base import BaseSnitcher
@@ -58,9 +57,8 @@ class AptSnitcher(BaseSnitcher):
                 continue
 
             # Read data from file
-            with open(filename, 'r') as f:
-                aptdata = json.loads(f.read())
-                aptlist = aptdata.get('data', [])
+            aptdata = self.run.get_object(filename)
+            aptlist = aptdata.get('data', [])
 
             # Iterate over package maps
             for aptdict in aptlist:

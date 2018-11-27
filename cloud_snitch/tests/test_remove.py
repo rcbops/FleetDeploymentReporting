@@ -118,12 +118,10 @@ class TestDeleteUntilZero(unittest.TestCase):
 
 
 class FakeEnvironment:
-    def __init__(self, account_number='12345', name='testenv'):
+    def __init__(self, uuid='uuid', account_number='12345', name='testenv'):
+        self.uuid = uuid
         self.account_number = account_number
         self.name = name
-        self.account_number_name = (
-            '{}-{}'.format(self.account_number, self.name)
-        )
 
 
 class TestPrune(unittest.TestCase):

@@ -5,6 +5,8 @@ Not all sections in Table of Contents will be used, required or accurate.
 
 
 
+
+
 # Overview
 
 #### 1. [Scope of this Document](#scope-of-this-document)
@@ -15,6 +17,13 @@ Not all sections in Table of Contents will be used, required or accurate.
 #### 1 [Inception](#inception)
 
 * #### 1.1 [Concept Proposal](#concept-proposal)
+    
+    Definition: Brief, informal discussion/description of the proposed product, feature or design change
+    Activities: 
+        - Use case discussion
+        - 
+        - 
+    Deliverables:
 
 * #### 1.2 [Prototyping](#prototyping)
 
@@ -31,9 +40,9 @@ Not all sections in Table of Contents will be used, required or accurate.
 * #### 2.1 [Vision & Scope Specification](#vision--scope-specification)
 (Dev Priorities)
 
-* #### 2.4 [Design & Tech Specifications](#tech-specifications)
+#### 3 [Design](#design)
 
-* #### 2.6 [Training Plan](#process-step-training-plan)
+* #### 2.4 [Design & Tech Specifications](#tech-specifications)
 
 * #### 2.7 [Functional and Structural Test Plans](#functional--structural-test-plans)
 
@@ -42,13 +51,17 @@ Not all sections in Table of Contents will be used, required or accurate.
 * #### 2.9 [Release Plan](#release-plan)
     (Upgrade plans/schedules, Patch windows)
 
+* #### 2.6 [Training Plan](#process-step-training-plan)
+
 * #### 2.10 [Review Plans](#review-plans)
     (Proliferating information to teams. Read docs a year)
 
-#### 3 [Develop](#develop)
+#### 4 [Development](#develop)
 (TODO: Daniel)
 
 * #### 3.1 [Submit Code Changes](#write-code)
+
+* #### 3.2 [Code Review](#code-review)
 
 * #### 3.2 [Unit Test](#unit-test)
 
@@ -56,9 +69,7 @@ Not all sections in Table of Contents will be used, required or accurate.
 
 * #### 3.4 [Incremental Review](#incremental-review)
 
-#### 4 [QA](#qa)
-
-* #### 4.1 [Code Review](#code-review)
+#### 5 [Testing/Integration](#testing-integration)
 
 * #### 4.2 [Build](#build)
 
@@ -72,7 +83,7 @@ Not all sections in Table of Contents will be used, required or accurate.
 
 * #### 4.7 [User Acceptance and Training](#user-acceptance-training)
 
-#### 5 [Deploy](#deploy)
+#### 6 [Deployment](#deploy)
 
 * #### 5.1 [Release Approval](#release-approval)
 
@@ -81,6 +92,18 @@ Not all sections in Table of Contents will be used, required or accurate.
 * #### 5.3 [Confirm Release](#confirm-release)
 
 * #### 5.4 [Project Metrics](#project-metrics)
+
+#### 7 [Maintenance](#maintenance)
+
+ * #### 7.1 []
+
+
+#### []
+
+
+
+
+
 
 #### 6 [Rapid SDLC Patterns](#rapid-sdlc-patterns)
 
@@ -95,6 +118,8 @@ Not all sections in Table of Contents will be used, required or accurate.
 #### 7 [Other Process Patterns](#other-process-patterns)
 
 * #### 7.1 [Process Pattern for Account](#process-pattern-for-account)
+
+
 
 
 # Deliverables
@@ -151,9 +176,7 @@ Not all sections in Table of Contents will be used, required or accurate.
 
 <!-- The preceding TOC was generated with Atom's markdown-toc plugin -->
 
-
 # Planning
-
 
 ## Goals & Intentions
 

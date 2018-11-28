@@ -1,7 +1,6 @@
 from django.test import tag
 from django.test import SimpleTestCase
 
-from reports.mtu import MTUQuery
 from reports.mtu import MTUSerializer
 from reports.mtu import MTUReport
 

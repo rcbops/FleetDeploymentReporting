@@ -46,7 +46,7 @@ hx-alert:not(:last-child) {
   margin-bottom: 1rem;
 }
 
-hx-alert[target="master_alert"] {
+hx-alert#master_alert {
   position: absolute;
   right: 1rem;
   top: 2rem;

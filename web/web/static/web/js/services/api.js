@@ -354,20 +354,18 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
         });
     };
 
-    service.diffNodes = function(model, identity, leftTime, rightTime, offset, limit) {
+    service.diffNodes = function(model, identity, leftTime, rightTime) {
         var req = {
             model: model,
             identity:identity,
             left_time: convertTime(leftTime),
-            right_time: convertTime(rightTime),
-            offset: offset,
-            limit: limit
+            right_time: convertTime(rightTime)
         };
         var defer = $q.defer()
         return $http({
             method: 'POST',
             headers: makeHeaders(),
-            url: '/api/objectdiffs/nodes/',
+            url: '/api/objectdiffs/details/',
             data: req
         }).then(function(resp) {
             // Success

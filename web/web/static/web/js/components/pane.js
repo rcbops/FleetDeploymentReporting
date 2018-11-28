@@ -1019,16 +1019,9 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     var self = this;
 
     var frame = undefined;
-    var nodeMap = undefined;
-    var nodes = undefined;
-    var nodeCount = 0;
-
+    var details = null;
     var pollStructure;
-    var pollNodes;
-
     var pollInterval = 3000;
-    var nodePageSize = 500;
-    var nodeOffset = 0;
 
     var totalNodes = 0;
     var maxLabelLength = 0;
@@ -1057,11 +1050,6 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
 
     self.$onInit = function() {
         self.state = 'loadingStructure';
-
-        self.detailNode = undefined;
-        self.detailNodeType = undefined;
-        self.detailNodeId = undefined;
-
         // self.diff Comes from data binding.
         self.prevDiff = undefined;
         self.update();
@@ -1135,15 +1123,7 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     function label(d) {
         var model = d.model || d.data.model;
         var id = d.id || d.data.id;
-        var index = nodeMap[model][id];
-        var node = nodes[index];
-        var label = model + ": ";
-        var labelProp = typesService.diffLabelView[model];
-        if (node && angular.isDefined(labelProp))
-            label += nodeProp(node, labelProp);
-        else
-            label += id;
-        return label;
+        return model + ": " + id;
     }
 
     /**
@@ -1379,16 +1359,20 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
                     else
                         classes += ' node--leaf';
 
-                    switch (d.data.side) {
-                        case 'left':
-                            classes += ' removed';
+                    switch(d.data.flags.length) {
+                        case 1:
+                            if (d.data.flags[0] == 't1') {
+                                classes += ' removed';
+                            } else if (d.data.flags[0] == 't2') {
+                                classes += ' added';
+                            }
                             break;
-                        case 'right':
-                            classes += ' added';
+                        case 2:
+                            classes += ' both';
                             break;
                         default:
                             classes += ' unchanged';
-                            break;
+
                     }
                     return classes;
                 })
@@ -1470,64 +1454,17 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
         });
     }
 
-    function nodeProp(node, prop) {
-        if (angular.isDefined(node.both[prop])) { return node.both[prop]; }
-        if (angular.isDefined(node.right[prop])) { return node.right[prop]; }
-        if (angular.isDefined(node.left[prop])) { return node.left[prop]; }
-        return "";
-    }
-
-    function updateLabels() {
-        if (!angular.isDefined(tree) || !angular.isDefined(root)) { return; }
-
-        var node = g.selectAll(".node")
-        node.selectAll("text").text(label);
-    };
-
-    function getNodes() {
-        var offset = nodeOffset;
-        cloudSnitchApi.diffNodes(self.diff.type, self.diff.id, self.diff.leftTime, self.diff.rightTime, offset, nodePageSize)
-        .then(function(result) {
-            // Check if the diff tree is finished
-            if (!angular.isDefined(result.nodes)) { return; }
-
-            // Check if this is a redundant request.
-            if (nodeOffset > offset) { return; }
-
-            // Update the nodes array.
-            for (var i = 0; i < result.nodes.length; i++) {
-                nodes[offset + i] = result.nodes[i];
-            }
-
-            // Update node offset for next polling
-            nodeOffset += result.nodes.length;
-
-            // Check if this is the last request
-            if (result.nodes.length < nodePageSize) {
-                stopPollingNodes();
-                // Update labels
-                updateLabels();
-                self.state = 'done';
-            }
-        }, function(resp) {
-            stopPollingNodes();
-            self.state = 'error';
-            messagingService.error("diff",
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
-        });
-    }
-
+    /**
+     * Handles a node click and spawns a diffdetails component.
+     */
     function nodeClickHandler(d) {
         d3.event.preventDefault();
-        var index = nodeMap[d.data.model][d.data.id];
-        if (angular.isDefined(index) && nodes[index]) {
-            $scope.$apply(function() {
-                self.detailNodeType = d.data.model;
-                self.detailNode = nodes[index];
-                self.detailNodeId = d.data.id;
-            });
-        }
+        $scope.$apply(function() {
+            self.details = {
+                type: d.data.model,
+                identity: d.data.id
+            };
+        });
     }
 
     /**
@@ -1541,15 +1478,8 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     };
 
     /**
-     * Stop controller for polling for nodes.
+     * Compute human friendly state.
      */
-    function stopPollingNodes() {
-        if (angular.isDefined(pollNodes)) {
-            $interval.cancel(pollNodes);
-            pollNodes = undefined;
-        }
-    }
-
     self.humanState = function() {
         switch (self.state) {
             case 'empty':
@@ -1558,8 +1488,6 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
                 return 'Error loading diff';
             case 'loadingStructure':
                 return 'Loading Structure';
-            case 'loadingNodes':
-                return 'Loading Nodes';
             case 'done':
                 return 'Done';
             default:
@@ -1567,48 +1495,16 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
         }
     };
 
-    self.detailProps = function() {
-        var props = [];
-        angular.forEach(self.detailNode.left, function(value, key) {
-            props.push(key);
-        });
-        angular.forEach(self.detailNode.right, function(value, key) {
-            props.push(key);
-        });
-        angular.forEach(self.detailNode.both, function(value, key) {
-            props.push(key);
-        });
-        props = props.filter(function(value, index, self) {
-            return self.indexOf(value) === index;
-        });
-        props.sort();
-        return props;
+    /**
+     * Close details component and unset self.details.
+     */
+    self.closeDetails = function () {
+        self.details = undefined;
     }
 
-    self.detailProp = function(prop, side) {
-        var r = {
-            val: '',
-            css: ''
-        }
-        if (angular.isDefined(self.detailNode.both[prop])) {
-            r.val = self.detailNode.both[prop];
-        }
-        else {
-            r.val = self.detailNode[side][prop] || '';
-            if (side == 'left')
-                r.css = 'diffLeft';
-            else
-                r.css = 'diffRight';
-        }
-        return r;
-    };
-
-    self.closeDetail = function () {
-        self.detailNode = undefined;
-        self.detailNodeType = undefined;
-        self.detailNodeId = undefined;
-    }
-
+    /**
+     * Grab the structure of the diff.
+     */
     function getStructure() {
         cloudSnitchApi.diffStructure(self.diff.type, self.diff.id, self.diff.leftTime, self.diff.rightTime)
         .then(function(result) {
@@ -1619,51 +1515,53 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
 
             stopPolling();
 
-            if (result.frame !== null) {
-                self.state = 'loadingNodes';
+            if (Object.keys(result.frame).length !== 0 && result.frame.constructor === Object) {
                 frame = result.frame;
-                nodeMap = result.nodemap;
-                nodeCount = result.nodecount;
-                nodes = new Array(nodeCount);
-                pollNodes = $interval(getNodes, pollInterval);
                 render();
+                self.state = 'done';
             } else {
                 self.state = 'empty'
                 frame = null;
-                nodeMap = null;
-                nodeCount = 0;
-                nodes = [];
             }
         }, function(resp) {
             stopPolling();
             self.state = 'error'
-            messagingService.error("diff",
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                "diff",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
         });
     }
 
+    /**
+     * Update the diff.
+     */
     self.update = function() {
         frame = undefined;
-        nodeMap = undefined;
-        nodes = undefined;
-        nodeCount = 0;
         self.state = 'loadingStructure';
         pollStructure = $interval(getStructure, pollInterval);
     };
 
+    /**
+     * Stop polling if still going when diff is closed.
+     */
     self.$onDestroy = function() {
         stopPolling();
-        stopPollingNodes();
     };
 
+    /**
+     * Rerender the graph if window size changes.
+     */
     angular.element($window).bind('resize', function() {
         if (self.state != 'loadingStructure') {
             render();
-            updateLabels();
         }
     });
 
+    /**
+     * Close the diff component.
+     */
     self.close = function() {
         self.onClose({});
     };
@@ -1683,6 +1581,81 @@ angular.module('cloudSnitch').component('diffView', {
     ],
     bindings: {
         diff: '<',
+        onClose: '&'
+    }
+});
+
+function DiffDetailsController(cloudSnitchApi, messagingService) {
+    var self = this;
+
+    /**
+     * Init the diff detail component.
+     */
+    self.$onInit = function() {
+        self.prevType = undefined;
+        self.prevIdentity = undefined;
+        self.properties = [];
+    };
+
+    /**
+     * Determine if we need to update.
+     *
+     * The user can click on different nodes without closing this component.
+     */
+    self.$doCheck = function() {
+        if (self.prevType != self.type || self.prevIdentity != self.identity) {
+            self.update();
+            self.prevType = self.type;
+            self.prevIdentity = self.identity;
+        }
+    };
+
+    /**
+     * Determine if the property at index is different between t1 and t2.
+     *
+     * This is used to determine if properties should be highlighted for
+     * their differences.
+     */
+    self.isDifferent = function(index) {
+        return self.properties[index].t1 != self.properties[index].t2;
+    };
+
+    /**
+     * Update the properties.
+     */
+    self.update = function() {
+        self.properties = [];
+        self.busy = true;
+        cloudSnitchApi.diffNodes(self.type, self.identity, self.leftTime, self.rightTime)
+        .then(function(result) {
+            self.properties = result.properties;
+            self.busy = false;
+        }, function(resp) {
+            self.busy = false;
+            messagingService.error(
+                "diffdetails",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
+        });
+    };
+
+    /**
+     * Register a close event.
+     */
+    self.close = function() {
+        self.onClose({});
+    };
+}
+
+angular.module('cloudSnitch').component('diffDetails', {
+    templateUrl: '/static/web/html/panes/diffdetails.html',
+    controller: ['cloudSnitchApi', 'messagingService', DiffDetailsController],
+    bindings: {
+        type: '<',
+        identity: '<',
+        leftTime: '<',
+        rightTime: '<',
         onClose: '&'
     }
 });

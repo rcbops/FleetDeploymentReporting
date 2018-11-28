@@ -1,0 +1,29 @@
+<div class="diffNodeDetail hxBox-xl">
+  <hx-panel>
+    <hx-panelhead>
+      <h3>{{ $ctrl.type }}: {{ $ctrl.identity }}</h3>
+    </hx-panelhead>
+    <hx-panelbody>
+      <hx-alert target="'diffdetails'" />
+      <table class="hxTable hxTable--condensed">
+        <thead>
+          <tr>
+            <th></th>
+            <th>{{ $ctrl.leftTime }}</th>
+            <th>{{ $ctrl.rightTime }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="prop in $ctrl.properties">
+            <td>{{ prop.name }}</td>
+            <td ng-class="{diffLeft: $ctrl.isDifferent($index)}">{{ prop.t1 }}</td>
+            <td ng-class="{diffRight: $ctrl.isDifferent($index)}">{{ prop.t2 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </hx-panelbody>
+    <hx-panelfoot>
+      <button class="hxBtn hxPrimary" ng-click="$ctrl.close()">Close</button>
+    </hx-panelfoot>
+  </hx-panel>
+</div>

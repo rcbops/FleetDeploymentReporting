@@ -1,0 +1,5 @@
+- name: Apply ansible-hardening to FDR infra
+  hosts: fdr_infra
+  become: yes
+  roles:
+    - ansible-hardening

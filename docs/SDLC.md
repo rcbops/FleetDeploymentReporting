@@ -4,122 +4,296 @@ Not all sections in Table of Contents will be used, required or accurate.
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 
-
-
-
-# Overview
-
-#### 1. [Scope of this Document](#scope-of-this-document)
-
-
 # Process Specification
 
 #### 1 [Inception](#inception)
 
 * #### 1.1 [Concept Proposal](#concept-proposal)
     
-    Definition: Brief, informal discussion/description of the proposed product, feature or design change
-    Activities: 
+    * Definition: Brief, informal discussion/description of the proposed product, feature or design change
+    * Activities: 
+        - Discussion/Description of the following
         - Use case discussion
-        - 
-        - 
-    Deliverables:
+        - Business implication discussions
+        - Externalities to the project i.e. dependencies, affected parties
 
 * #### 1.2 [Prototyping](#prototyping)
 
+    * Definition: Produce working prototype that can be demoed.
+    * Activities:
+        - Update or create code in github
+        - Deploy new code to development environment.
+        - Add enough test data/infrastructure to perform a demo
+    * Deliverables:
+        - New code in github
+        - Short-lived demo deployment
+
 * #### 1.3 [Roles & Requirements](#roles--requirements)
+
+    * Definition: Define roles of team members and requirements of product 
+    * Activities:
+        - Determine roles and expectations of managers, developers, operators and users
+        - Define process and requirements for disseminating project information   
+    * Deliverables:
+        - RACI
+        - System to require/remind team members to review documentation
 
 * #### 1.4 [Operations & Maintenance](#operations--maintenance)
 
-* #### 1.5 [SDLC Definition](#the-full-sdlc)
+    * Definition: Process and design of system(s) that facilitate secure, reliable and long term deployments
+    * Activities:
+        - Document steps to deploy, migrate, scale and debug
+        - Define processes for handling alerts and escalation
+    * Deliverables:
+        - Operations Documentation
+        - Implement notification and communication paths
+
+* #### 1.5 [Software Development Lifecycle (SDLC) Definition](#the-full-sdlc)
+
+    * Definition: Documentation describing the SDLC
+    * Activities:
+        - Determine the requirements of the project and limitations of the tools/environments
+        - Design SDLC
+    * Deliverables:
+        - SDLC diagram and description
 
 * #### 1.6 [SDLC Tools](#sdlc-tools)
+
+    * Definition: Documentation of the tools required for the SDLC
+    * Activities:
+        - Find all tools used within the SDLC
+    * Deliverables:
+        - Table with name and description of tooling
 
 #### 2 [Planning](#planning)
 
 * #### 2.1 [Vision & Scope Specification](#vision--scope-specification)
-(Dev Priorities)
+
+    * Definition: Description and discussion of project updates
+    * Activities:
+        - Summarize the update and it's purpose
+        - Add priority to summary
+        - Set status of update
+        - Discuss relevant research, discoveries or changes to requirements
+    * Deliverables:
+        - Kanban card(s)
 
 #### 3 [Design](#design)
 
-* #### 2.4 [Design & Tech Specifications](#tech-specifications)
+* #### 3.1 [Design & Tech Specifications](#tech-specifications)
 
-* #### 2.7 [Functional and Structural Test Plans](#functional--structural-test-plans)
+    * Definition: Diagrams and outlines of changes to be made
+    * Activities:
+        - Create high level solutions
+        - Whiteboard, discuss and adjust solution
+        - Small first pass at code
+        - Determine other software or teams to involve
+        - Discover required data sources
+        - Consider security implications and solutions
+    * Deliverables:
+        - Diagrams/implementation plan or first pass of code
+        - Notes/comments or emails for other teams to contact
 
-* #### 2.8 [Impact, Capacity and Monitoring](#impact-capacity-and-monitoring)
+* #### 3.2 [Functional and Structural Test Plans](#functional-and-structural-test-plans)
 
-* #### 2.9 [Release Plan](#release-plan)
-    (Upgrade plans/schedules, Patch windows)
+    * Definition: Plans on how to test various aspects of the new solution
+    * Activities:
+        - Determine test framework
+        - Understand types of tests and possible pitfalls
+        - Create tests that define acceptance criteria for new code
+    * Deliverables:
+        - Documentation of any new testing frameworks or processes
+        - Tests in codebase
 
-* #### 2.6 [Training Plan](#process-step-training-plan)
+* #### 3.3 [Impact, Capacity and Monitoring](#impact-capacity-and-monitoring)
 
-* #### 2.10 [Review Plans](#review-plans)
-    (Proliferating information to teams. Read docs a year)
+    * Definition: Define monitors to create, how and when to handle capacity based on monitors and impact to end users and operations
+    * Activities:
+        - Define the metrics to determine capacity
+        - Determine ranges that require scaling up or down
+        - Create alerts and response processes
+    * Deliverables:
+        - Alert/response documentation
+
+* #### 3.4 [Release Plan](#release-plan)
+
+    * Definition: Define plans for upgrades, schedules for releases and patch windows
+    * Activities:
+        - Define release schedules
+        - Create process for updating project to new versions
+        - Create process for patching operating systems and dependencies
+        - Define upgrade plans via configuration management tools
+    * Deliverables:
+        - Documentation for release schedules, patches and updates
+
+* #### 3.5 [Training Plan](#training-plan)
+
+    * Defition: Outlines for creating and holding training sessions 
+    * Activites:
+        - Produce training guide frameworks
+        - Create process to schedule training for operators and users
+    * Deliverables:
+        - Training doc frameworks
+        - Training scheduling process
+
+* #### 3.6 [Review Plans](#review-plans)
+
+    * Definition: Plan to disseminate information and documentation
+    * Activities:
+        - Decide how often team members must review documenatation for compliance
+    * Deliverables:
+        - Documentation of team member requirements
 
 #### 4 [Development](#develop)
-(TODO: Daniel)
 
-* #### 3.1 [Submit Code Changes](#write-code)
+* #### 4.1 [Submit Code Changes](#write-code)
 
-* #### 3.2 [Code Review](#code-review)
+    * Definition: Developers produce code and send off for review
+    * Activities:
+        - Create and test new code in development environment
+        - Send PR to development branch of main repository
+    * Deliverables:
+        - Pull Request
 
-* #### 3.2 [Unit Test](#unit-test)
+* #### 4.2 [Code Review](#code-review)
 
-* #### 3.3 [Collect Unit Test Results](#collect-unit-test-results)
+    * Definition: Peers review code and approve or requeset changes/discussion
+    * Activities:
+        - Team member who is not code author reads through code
+        - Ensure clarity and ease of understanding
+        - Deploy code to dev environment and attempt to find issues
+        - Consider and bring up security issues
+    * Deliverables:
+        - Github reviews and comments 
 
-* #### 3.4 [Incremental Review](#incremental-review)
+* #### 4.3 [Unit Test](#unit-test)
+
+    * Definition: Automation gets pull request code and runs tests 
+    * Activities:
+        - CI/CD system runs unit test job
+    * Deliverables:
+        - Passing checks on github
+
+* #### 4.4 [Collect Unit Test Results](#collect-unit-test-results)
+
+    * Definition: Test results should be long lasting and backed up
+    * Activities:
+        - CI/CD system should save test logs
+        - Backup for 
+    * Deliverables:
+        - Logs from test runs
+        - Storage for backups and older logs
+
+* #### 4.5 [Incremental Review](#incremental-review)
+
+    * Definition: Loop through development cycle until unit tests pass and peer approval achieved 
+    * Activities:
+        - Continue from start of development cycle
+    * Deliverables:
+        - Code merged into development branch
 
 #### 5 [Testing/Integration](#testing-integration)
 
-* #### 4.2 [Build](#build)
+* #### 5.1 [Build](#build)
 
-* #### 4.3 [Release to Development](#release-to-development)
+    * Definition: Automation retrieves and builds peer approved and unit tested code from development branch 
+    * Activities:
+        - Create code artifacts and/or images
+        - Install up-to-date dependencies to ensure security and compatability
+    * Deliverables:
+        - Code artifacts/Images
 
-* #### 4.4 [Release to QA](#release-to-qa)
+* #### 5.2 [Release to Development and Run Second Round of Tests](#release-to-development)
 
-* #### 4.5 [Execute Test Plans](#execute-test-plans)
+    * Definition: Create development environment and install code
+    * Activities:
+        - Create short-lived environment for second round of testing
+        - Run green-field installation code
+    * Deliverables:
+        - Test logs
+        - Master branch with new code after successful deploy and test
+        - Environment of failed deploy/test
 
-* #### 4.6 [Training Doc](#training-doc)
+* #### 5.3 [Release to QA](#release-to-qa)
 
-* #### 4.7 [User Acceptance and Training](#user-acceptance-training)
+    * Notes: Would be great if we could test upgrade paths via old images or just deploying versions and testing upgrades
+    * Definition: Send code to environment with more accurate data to run long lived tests and load tests
+    * Activities:
+        - Upgrade QA environment to new version
+        - Ensure data migrations worked
+        - Enable monitoring
+    * Deliverables:
+        - Monitoring alerts
+        - Environment location
+
+* #### 5.4 [Execute Long Term Tests Plans](#execute-long-term-test-plans)
+
+    * Definition: Run tests and close-to-production workloads against QA environment
+    * Activities:
+        - test workloads, repeat close-to-production input
+        - Run security tests
+    * Deliverables:
+        - Test results
+        - Alerts
+        - Responses to issues
+
+* #### 5.5 [Training Doc](#training-doc)
+
+    * Definition: Create training documentation for new features or products
+    * Activities:
+        - Document information necessary for both users and operations based on templates
+    * Deliverables:
+        - Training documentation
+
+* #### 5.6 [User Acceptance and Training](#user-acceptance-training)
+
+    * Definition: Provide beta versions to users or demos. Train users on new features/products
+    * Activities:
+        - Deploy a beta version to get user feedback
+        - Implement required changes by starting from planning stage
+        - Schedule training sessions
+    * Deliverables:
+        - Beta environment or demo
+        - User feedback
+        - Training sessions
 
 #### 6 [Deployment](#deploy)
 
-* #### 5.1 [Release Approval](#release-approval)
+    * #### 6.1 [Release Approval](#release-approval)
 
-* #### 5.2 [Release to Production](#release-to-production)
+        * Definition: Allow users, operations and developers to approve new releases. Security issues may bypass users and operations
+        * Activities:
+            - Schedule release/patch window
+            - Talk to everyone affected to gain agreement
+        * Deliverables:
+            - Approval via discussion
 
-* #### 5.3 [Confirm Release](#confirm-release)
+    * #### 6.2 [Release to Production](#release-to-production)
 
-* #### 5.4 [Project Metrics](#project-metrics)
+        * Definition: Upgrade code in environment via rollout or in-place upgrade 
+        * Activities:
+            - Backup current data and environments
+            - During scheduled windows run upgrade scripts
+            - Notify users, operations and developers when release complete
+        * Deliverables:
+            - Notifications to users, operations and developers
+            - Upgraded production environment
+
+    * #### 6.3 [Confirm Release](#confirm-release)
+
+        * Definition: Consider user, operational and monitoring feedback and be ready to rollback 
+        * Activities:
+            - Read all comments, alerts and concerns
+            - Rollback if major issues arise
 
 #### 7 [Maintenance](#maintenance)
 
- * #### 7.1 []
+    * #### 7.1 [Monitor, Resolve and Mitigate Issues](#monitor-resolve-and-mitigate-issues)
 
-
-#### []
-
-
-
-
-
-
-#### 6 [Rapid SDLC Patterns](#rapid-sdlc-patterns)
-
-* #### 6.1 [SDLC for Content Modifications and Tasks](#sdlc-for-content-modifications-and-tasks)
-
-* #### 6.2 [SDLC for Production Data Change](#sdlc-for-production-data-change)
-
-* #### 6.3 [SDLC for Release Management Wrapper](#sdlc-for-release-management-wrapper)
-
-* #### 6.4 [SDLC for Research](#sdlc-for-research)
-
-#### 7 [Other Process Patterns](#other-process-patterns)
-
-* #### 7.1 [Process Pattern for Account](#process-pattern-for-account)
-
-
+        * Definition: Monitor and update system to ensure system runs securely and smoothly 
+        * Activities:
+            - Respond to monitoring alerts within appropriate timeframes
+            - Start patch/upgrade processes when vulnerabilities discovered
 
 
 # Deliverables

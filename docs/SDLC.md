@@ -4,236 +4,416 @@ Not all sections in Table of Contents will be used, required or accurate.
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 
-
-# Overview
-
-#### 1. [Scope of this Document](#scope-of-this-document)
-
-
 # Process Specification
 
 #### 1 [Inception](#inception)
 
 * #### 1.1 [Concept Proposal](#concept-proposal)
+    
+    * Definition: Brief, informal discussion/description of the proposed product, feature or design change
+    * Activities: 
+        - Discussion/Description of the following
+        - Use case discussion
+        - Business implication discussions
+        - Externalities to the project i.e. dependencies, affected parties
 
 * #### 1.2 [Prototyping](#prototyping)
 
+    * Definition: Produce working prototype that can be demoed.
+    * Activities:
+        - Update or create code in github
+        - Deploy new code to development environment.
+        - Add enough test data/infrastructure to perform a demo
+    * Deliverables:
+        - New code in github
+        - Short-lived demo deployment
+
 * #### 1.3 [Roles & Requirements](#roles--requirements)
+
+    * Definition: Define roles of team members and requirements of product 
+    * Activities:
+        - Determine roles and expectations of managers, developers, operators and users
+        - Define process and requirements for disseminating project information   
+    * Deliverables:
+        - RACI
+        - System to require/remind team members to review documentation
 
 * #### 1.4 [Operations & Maintenance](#operations--maintenance)
 
-* #### 1.5 [SDLC Definition](#the-full-sdlc)
+    * Definition: Process and design of system(s) that facilitate secure, reliable and long term deployments
+    * Activities:
+        - Document steps to deploy, migrate, scale and debug
+        - Define processes for handling alerts and escalation
+    * Deliverables:
+        - Operations Documentation
+        - Implement notification and communication paths
+
+* #### 1.5 [Software Development Lifecycle (SDLC) Definition](#software-development-lifecycle)
+
+    * Definition: Documentation describing the SDLC
+    * Activities:
+        - Determine the requirements of the project and limitations of the tools/environments
+        - Design SDLC
+    * Deliverables:
+        - SDLC diagram and description
 
 * #### 1.6 [SDLC Tools](#sdlc-tools)
+
+    * Definition: Documentation of the tools required for the SDLC
+    * Activities:
+        - Find all tools used within the SDLC
+    * Deliverables:
+        - Table with name and description of tooling
+
+* #### 1.7 [Secure Coding Guidelines](#secure-coding-guidelines)
+
+    * Definition: Guidelines by which to develop and review code to ensure security
+    * Activities:
+        - Create and agreee upon guidelines for producing code
+        - Research common guidelines and agree upon a subset which will apply to specific project
+        - Document means of enforcing guidelines
+    * Deliverables:
+        - Documentation of guidelines
 
 #### 2 [Planning](#planning)
 
 * #### 2.1 [Vision & Scope Specification](#vision--scope-specification)
-(Dev Priorities)
 
-* #### 2.4 [Design & Tech Specifications](#tech-specifications)
+    * Definition: Description and discussion of project updates
+    * Activities:
+        - Summarize the update and it's purpose
+        - Add priority to summary
+        - Set status of update
+        - Discuss relevant research, discoveries or changes to requirements
+    * Deliverables:
+        - Kanban card(s)
 
-* #### 2.6 [Training Plan](#process-step-training-plan)
+#### 3 [Design](#design)
 
-* #### 2.7 [Functional and Structural Test Plans](#functional--structural-test-plans)
+* #### 3.1 [Design & Tech Specifications](#design--tech-specifications)
 
-* #### 2.8 [Impact, Capacity and Monitoring](#impact-capacity-and-monitoring)
+    * Definition: Diagrams and outlines of changes to be made
+    * Activities:
+        - Create high level solutions
+        - Whiteboard, discuss and adjust solution
+        - Small first pass at code
+        - Determine other software or teams to involve
+        - Discover required data sources
+        - Consider security implications and solutions
+    * Deliverables:
+        - Diagrams/implementation plan or first pass of code
+        - Notes/comments or emails for other teams to contact
 
-* #### 2.9 [Release Plan](#release-plan)
-    (Upgrade plans/schedules, Patch windows)
+* #### 3.2 [Functional and Structural Test Plans](#functional-and-structural-test-plans)
 
-* #### 2.10 [Review Plans](#review-plans)
-    (Proliferating information to teams. Read docs a year)
+    * Definition: Plans on how to test various aspects of the new solution
+    * Activities:
+        - Determine test framework
+        - Understand types of tests and possible pitfalls
+        - Create tests that define acceptance criteria for new code
+    * Deliverables:
+        - Documentation of any new testing frameworks or processes
+        - Tests in codebase
 
-#### 3 [Develop](#develop)
-(TODO: Daniel)
+* #### 3.3 [Impact, Capacity and Monitoring](#impact-capacity-and-monitoring)
 
-* #### 3.1 [Submit Code Changes](#write-code)
+    * Definition: Define monitors to create, how and when to handle capacity based on monitors and impact to end users and operations
+    * Activities:
+        - Define the metrics to determine capacity
+        - Determine ranges that require scaling up or down
+        - Create alerts and response processes
+    * Deliverables:
+        - Alert/response documentation
 
-* #### 3.2 [Unit Test](#unit-test)
+* #### 3.4 [Release Plan](#release-plan)
 
-* #### 3.3 [Collect Unit Test Results](#collect-unit-test-results)
+    * Definition: Define plans for upgrades, schedules for releases and patch windows
+    * Activities:
+        - Define release schedules
+        - Create process for updating project to new versions
+        - Create process for patching operating systems and dependencies
+        - Define upgrade plans via configuration management tools
+    * Deliverables:
+        - Documentation for release schedules, patches and updates
 
-* #### 3.4 [Incremental Review](#incremental-review)
+* #### 3.5 [Training Plan](#training-plan)
 
-#### 4 [QA](#qa)
+    * Defition: Outlines for creating and holding training sessions 
+    * Activites:
+        - Produce training guide frameworks
+        - Create process to schedule training for operators and users
+    * Deliverables:
+        - Training doc frameworks
+        - Training scheduling process
 
-* #### 4.1 [Code Review](#code-review)
+* #### 3.6 [Review Plans](#review-plans)
 
-* #### 4.2 [Build](#build)
+    * Definition: Plan to disseminate information and documentation
+    * Activities:
+        - Decide how often team members must review documenatation for compliance
+    * Deliverables:
+        - Documentation of team member requirements
 
-* #### 4.3 [Release to Development](#release-to-development)
+#### 4 [Development](#develop)
 
-* #### 4.4 [Release to QA](#release-to-qa)
+* #### 4.1 [Submit Code Changes](#write-code)
 
-* #### 4.5 [Execute Test Plans](#execute-test-plans)
+    * Definition: Developers produce code and send off for review
+    * Activities:
+        - Create and test new code in development environment
+        - Send PR to development branch of main repository
+    * Deliverables:
+        - Pull Request
 
-* #### 4.6 [Training Doc](#training-doc)
+* #### 4.3 [Unit Test](#unit-test)
 
-* #### 4.7 [User Acceptance and Training](#user-acceptance-training)
+    * Definition: Automation gets pull request code and runs tests 
+    * Activities:
+        - CI/CD system runs unit test job
+    * Deliverables:
+        - Passing checks on github
 
-#### 5 [Deploy](#deploy)
+* #### 4.4 [Review Failing Test Results](#review-failing-test-results)
 
-* #### 5.1 [Release Approval](#release-approval)
+    * Definition: Test results should be long lasting and backed up
+    * Activities:
+        - CI/CD system should saves test logs
+        - Developer or peer reviews failures from unit tests
+        - Developer fixes issues and pushes to pull request
+    * Deliverables:
+        - Logs from test runs
+        - Bug fixes within PR
 
-* #### 5.2 [Release to Production](#release-to-production)
+* #### 4.2 [Code Review](#code-review)
 
-* #### 5.3 [Confirm Release](#confirm-release)
+    * Definition: Peers review code and approve or requeset changes/discussion
+    * Activities:
+        - Team member who is not code author reads through code
+        - Ensure clarity and ease of understanding
+        - Deploy code to dev environment and attempt to find issues
+        - Consider and bring up security issues
+    * Deliverables:
+        - Github reviews and comments 
 
-* #### 5.4 [Project Metrics](#project-metrics)
+* #### 4.5 [Incremental Review](#incremental-review)
 
-#### 6 [Rapid SDLC Patterns](#rapid-sdlc-patterns)
+    * Definition: Loop through development cycle until unit tests pass and peer approval achieved 
+    * Activities:
+        - Continue from start of development cycle
+    * Deliverables:
+        - Code merged into development branch
 
-* #### 6.1 [SDLC for Content Modifications and Tasks](#sdlc-for-content-modifications-and-tasks)
+#### 5 [Testing/Integration](#testingintegration)
 
-* #### 6.2 [SDLC for Production Data Change](#sdlc-for-production-data-change)
+* #### 5.1 [Build and Release to Development](#build-and-release-to-development)
 
-* #### 6.3 [SDLC for Release Management Wrapper](#sdlc-for-release-management-wrapper)
+    * Definition: Automation retrieves and builds peer approved and unit tested code from development branch 
+    * Activities:
+        - Create code artifacts and/or images
+        - Install up-to-date dependencies to ensure security and compatability
+    * Deliverables:
+        - Code artifacts/Images
 
-* #### 6.4 [SDLC for Research](#sdlc-for-research)
+* #### 5.2 [Release to Development and Run Second Round of Tests](#release-to-development)
 
-#### 7 [Other Process Patterns](#other-process-patterns)
+    * Definition: Create development environment and install code
+    * Activities:
+        - Create short-lived environment for second round of testing
+        - Run green-field installation code
+    * Deliverables:
+        - Test logs
+        - Master branch with new code after successful deploy and test
+        - Environment of failed deploy/test
 
-* #### 7.1 [Process Pattern for Account](#process-pattern-for-account)
+* #### 5.3 [Release to QA](#release-to-qa)
 
+    * Notes: Would be great if we could test upgrade paths via old images or just deploying versions and testing upgrades
+    * Definition: Send code to environment with more accurate data to run long lived tests and load tests
+    * Activities:
+        - Upgrade QA environment to new version
+        - Ensure data migrations worked
+        - Enable monitoring
+    * Deliverables:
+        - Monitoring alerts
+        - Environment location
 
-# Deliverables
+* #### 5.4 [Execute Long Term Tests Plans](#execute-long-term-test-plans)
 
+    * Definition: Run tests and close-to-production workloads against QA environment
+    * Activities:
+        - test workloads, repeat close-to-production input
+        - Run security tests
+    * Deliverables:
+        - Test results
+        - Alerts
+        - Responses to issues
 
-#### Operations & Maintenance Deliverables (Satisfy [1.4](#operations--maintenance))
+* #### 5.5 [Training Doc](#training-doc)
 
-- #### 1.4.1 [Monitoring](#monitoring)
-- #### 1.4.2 [RACI](#raci)
+    * Definition: Create training documentation for new features or products
+    * Activities:
+        - Document information necessary for both users and operations based on templates
+    * Deliverables:
+        - Training documentation
 
-#### SDLC Definition Deliverables (Satisfy [1.5](#sdlc-definition))
+* #### 5.6 [User Acceptance and Training](#user-acceptance-training)
 
-- #### 1.5.1 [SDLC Diagram and Process](#sdlc-diagram-and-process)
+    * Definition: Provide beta versions to users or demos. Train users on new features/products
+    * Activities:
+        - Deploy a beta version to get user feedback
+        - Implement required changes by starting from planning stage
+        - Schedule training sessions
+    * Deliverables:
+        - Beta environment or demo
+        - User feedback
+        - Training sessions
 
-#### SDLC Tooling Deliverables (Satisfy [1.6](#sdlc-tooling))
+#### 6 [Deployment](#deploy)
 
-- #### 1.6.1 [Jenkins](#jenkins)
-- #### 1.6.2 [Ansible](#ansible)
-- #### 1.6.3 [RS Monitoring](#rs-monitoring)
-- #### 1.6.4 [Slack](#slack)
+* #### 6.1 [Release Approval](#release-approval)
 
-#### Vision & Scope Specification Deliverables (Satisfy [2.1](#vision--scope-specification))
+    * Definition: Allow users, operations and developers to approve new releases. Security issues may bypass users and operations
+    * Activities:
+        - Schedule release/patch window
+        - Talk to everyone affected to gain agreement
+    * Deliverables:
+        - Approval via discussion
 
-- #### 2.1.1 [Goals & Intentions](#deliverable-goals--intentions)
-- #### 2.1.2 [Scope & Feasibility](#deliverable-scope--feasibility)
-- #### 2.1.3 [Resources & Limits](#deliverable-resources--limits)
-- #### 2.1.4 [Cost/Time to Deliver](#deliverable-costtime-to-deliver)
-- #### 2.1.5 [Risks](#deliverable-risks)
-- #### 2.1.6 [Additional Benefits](#deliverable-additional-benefits)
+* #### 6.2 [Release to Production](#release-to-production)
 
-#### Project Plan Deliverables (Satisfy [2.2](#project-plan))
+    * Definition: Upgrade code in environment via rollout or in-place upgrade 
+    * Activities:
+        - Backup current data and environments
+        - During scheduled windows run upgrade scripts
+        - Notify users, operations and developers when release complete
+    * Deliverables:
+        - Notifications to users, operations and developers
+        - Upgraded production environment
 
-- #### 2.2.1 [Project Plan](#deliverable-project-plan)
-- #### 2.2.2 [Milestones](#deliverable-milestones)
-- #### 2.2.3 [Additional Links](#deliverable-additional-links)
-- #### 2.2.4 [Changelog](#deliverable-changelog)
+* #### 6.3 [Confirm Release](#confirm-release)
 
-#### Design Deliverables (Satisfy [2.4](#design))
+    * Definition: Consider user, operational and monitoring feedback and be ready to rollback 
+    * Activities:
+        - Read all comments, alerts and concerns
+        - Rollback if major issues arise
 
-- #### 2.4.1 [Analysis & Requirements](#deliverable-analysis-requirements)
-- #### 2.4.2 [Architecture & Diagrams](#deliverable-architecture--diagrams)
-- #### 2.4.3 [Development Models](#deliverable-development-models)
-- #### 2.4.4 [Versioning & Release Scheme](#deliverable-versioning--release-scheme)
+#### 7 [Maintenance](#maintenance)
 
-#### Tech Specification (Satisfy [2.5](#tech-specification)
+* #### 7.1 [Monitor, Resolve and Mitigate Issues](#monitor-resolve-and-mitigate-issues)
 
-- #### 2.5.1 [APIs](#deliverable-apis)
-- #### 2.5.2 [Storage](#deliverable-storage)
-- #### 2.5.3 [Security](#deliverable-security)
-(END TODO: Daniel)
+    * Definition: Monitor and update system to ensure system runs securely and smoothly 
+    * Activities:
+        - Respond to monitoring alerts within appropriate timeframes
+        - Start patch/upgrade processes when vulnerabilities discovered
 
 <!-- /TOC -->
 
 
 <!-- The preceding TOC was generated with Atom's markdown-toc plugin -->
 
+# Inception
+
+
+## Operations & Maintenance
+
+#### RACI
+
+## Software Development Lifecycle
+
+#### High Level SDLC
+
+![](images/SDLC.png)
+
+#### Code Change Review Process
+
+![](images/code_change_review_process.png)
+
+    Figure 2: Flow for handling code changes via pull requests and reviews (PCI 6.3.2)
+
+
+## SDLC Tools
+
+- Jira
+    * Project management
+    * Feature descriptions, designs and requirements discussions
+- Jenkins
+    * Automation for building, testing and deployment
+- Django testing framework
+    * Testing for web application
+- Vagrant (subject to change)
+    * Infrastructure provisioning for development and testing environments
+- Ansible
+    * Configuration management automation for green field deploys and upgrades
+- Github
+    * Source code management
+    * Code review discussions
+- Logging ?
+- Security Testing ?
+- RS Monitoring
+- Slack
+
 
 # Planning
 
+## Vision and Scope Specification
 
-## Goals & Intentions
+Each change will have a corresponding Kanban card with description.
+[Cloud Snitch Jira](https://rpc-openstack.atlassian.net/secure/RapidBoard.jspa?rapidView=123)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce risus orci, tincidunt et ipsum posuere, ultrices pharetra ligula. Ut bibendum sollicitudin neque sit amet eleifend. Etiam vitae nunc erat. Aliquam luctus neque dui, a molestie arcu efficitur quis. Nulla facilisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam semper tortor ut tristique rutrum. Mauris nec erat et libero congue auctor porta scelerisque sapien. Quisque ac fermentum turpis. Nunc turpis magna, ornare nec porta et, fringilla ut risus.
+Each should describe some subset of the following:
 
+    * Goals & Intentions
+    * Scope & Feasibility
+    * Resources & Limits
+    * Cost/Time to Deliver
+    * Risks
+    * Additional Benefits
+    * Project Plan
+    * Milestones
+    * Additional Links
 
-## Scope & Feasibility
+# Design
 
- Aliquam at orci ullamcorper, venenatis lectus id, iaculis nulla. Praesent fringilla nisi at felis eleifend euismod at sodales nibh. Phasellus eleifend ligula turpis, id malesuada risus dictum sit amet. Nunc elementum eros dolor, aliquam rhoncus elit luctus quis. Aliquam a neque fringilla, vulputate neque sit amet, maximus elit. Suspendisse potenti. Nunc faucibus, turpis id pellentesque convallis, nulla elit imperdiet lectus, at pretium libero urna a sapien.
+## Design & Tech Specifications
 
+Architecture of the FleetDeploymentReporting Tool is as follow:
 
-## Resources & Limits
+![](images/architecture.png)
 
- Etiam et porta libero. Pellentesque libero leo, dignissim sed ipsum non, ultricies ultrices leo. Curabitur mollis maximus leo eu elementum. Morbi et dui dictum, semper justo et, rhoncus elit. Donec sollicitudin quis tellus vel tristique. Phasellus vehicula volutpat massa ac interdum. Etiam vel mattis tortor. Morbi cursus velit ex.
+Tech specifications for new features can be added as bullet points and/or links whiteboard images in the corresponding Kanban card.
+[Cloud Snitch Jira](https://rpc-openstack.atlassian.net/secure/RapidBoard.jspa?rapidView=123)
 
+Update sections with changes to following as it is relevant.
 
-## Cost/Time to Deliver
+#### Design
+- [Architecture & Diagram changes](#)
+- [Development Models](#)
 
- In et arcu at eros semper semper et vitae magna. Fusce ullamcorper dolor ut urna lobortis varius. Nam velit elit, tempor a viverra at, scelerisque in arcu. Maecenas fermentum libero ac est mollis, sit amet viverra massa gravida. Vestibulum viverra ante ac lectus scelerisque bibendum. Integer scelerisque, tellus porta sagittis maximus, enim erat lacinia est, eu viverra mauris odio a mauris. Nulla sagittis, lacus eu cursus mollis, mauris turpis accumsan erat, vitae tristique tortor nibh eget turpis. Etiam turpis ligula, ornare a lectus id, iaculis consectetur nulla.
-
-## Risks
-
-Donec cursus consectetur leo. Pellentesque mattis, tortor eu sollicitudin porta, magna ante laoreet purus, et tincidunt libero orci eget erat. Nullam et blandit est. Maecenas volutpat, sem molestie hendrerit consequat, nisl massa tincidunt neque, ac cursus enim nunc vel metus.
-
-## Additional Benefits
-
- In et arcu at eros semper semper et vitae magna. Fusce ullamcorper dolor ut urna lobortis varius. Nam velit elit, tempor a viverra at, scelerisque in arcu. Maecenas fermentum libero ac est mollis, sit amet viverra massa gravida. Vestibulum viverra ante ac lectus scelerisque bibendum. Integer scelerisque, tellus porta sagittis maximus, enim erat lacinia est, eu viverra mauris odio a mauris. Nulla sagittis, lacus eu cursus mollis, mauris turpis accumsan erat, vitae tristique tortor nibh eget turpis. Etiam turpis ligula, ornare a lectus id, iaculis consectetur nulla.
-
-# Analysis & Requirements
-
-
-## Architecture & Diagrams
-
- Etiam et porta libero. Pellentesque libero leo, dignissim sed ipsum non, ultricies ultrices leo. Curabitur mollis maximus leo eu elementum. Morbi et dui dictum, semper justo et, rhoncus elit. Donec sollicitudin quis tellus vel tristique. Phasellus vehicula volutpat massa ac interdum. Etiam vel mattis tortor. Morbi cursus velit ex.
-
-
-## Development Models
-
- Donec cursus consectetur leo. Pellentesque mattis, tortor eu sollicitudin porta, magna ante laoreet purus, et tincidunt libero orci eget erat. Nullam et blandit est. Maecenas volutpat, sem molestie hendrerit consequat, nisl massa tincidunt neque, ac cursus enim nunc vel metus. Sed in bibendum diam. Morbi in congue mauris. Donec vel magna a urna sagittis ultricies. Sed consequat ornare tristique. Aliquam tempor est vel ligula hendrerit, eu placerat leo ullamcorper. Nulla pellentesque eros ut lacus mollis, ac posuere mauris tempor. Nullam rutrum semper posuere. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer id felis libero.
-
-## APIs
+#### Tech Specifications
+- [APIs](#api)
+- [Storage](#storage)
+- [Security](#security)
 
 
-## Versioning & Release Scheme
+## Functional and Structural Test Plans
 
- Aliquam at orci ullamcorper, venenatis lectus id, iaculis nulla. Praesent fringilla nisi at felis eleifend euismod at sodales nibh. Phasellus eleifend ligula turpis, id malesuada risus dictum sit amet. Nunc elementum eros dolor, aliquam rhoncus elit luctus quis. Aliquam a neque fringilla, vulputate neque sit amet, maximus elit. Suspendisse potenti. Nunc faucibus, turpis id pellentesque convallis, nulla elit imperdiet lectus, at pretium libero urna a sapien.
+[Web App Backend Tests](https://github.com/rcbops/FleetDeploymentReporting/tree/develop/cloud_snitch/tests)
 
-
-## Security
-
-Authentication is an area we need to work with UAM on, but we intend on implementing the following security components:
-
-- token authentication, shared with UAM.
-
-- SSL certificates from Rackspace certs
-
-- DNS name to a proper domain in rpc.rackspace.com, mirrored in application name headers.
-
-- Audit log of all changes and identity of authors.
-
-- Restricted infrastructure operations to external team than developers
-
-- No encryption at rest should be needed, as the data secrets are already in other systems. This only stores locations to retrieve secure data.
-
-- No disclosure data is stored (personal/medical records)
+- Django testing framework
+- Cover basic models and functionality of the web application
 
 
-## Project Plan
+## Impact, Capacity and Monitoring
 
-## Milestones
+Alerts signalling errors or failures will be set up via (ALERT TECHNOLOGY?) and send messages to the Cloud Snitch development and operations team slack channel. They must be reviewed, communicated and handled according to the RACI documentation.
 
-## Additional Links
+(INSERT TABLE OF ALERTS, RESPONSES AND SEVERITY)
 
-## Changelog
+In order to meet load requirements of end users the capacity should be increased/decreased according to the following chart.
 
+(INSERT TABLE OF METRICS AND REQUIRED CAPACITY)
 
-# Operations & Maintenance
-
-
-## Monitoring
+#### Monitoring
 
 We will monitor trends in the following:
 
@@ -248,6 +428,160 @@ We will monitor trends in the following:
 
 We will alert when services are unreachable or the error rate increases. Specific rates and percentiles are yet to be determined.
 
+## Release Plan
+
+- Release to be scheduled once a month.
+- Update all dependencies to latest versions
+- Upgrades to be done in a manner that allows 
+- Versioning schema. Semantic versioning with addition of a digit to represent Jenkins build number:
+    * a - major (incremented when you make incompatible API changes)
+    * b - minor (incremented when you add functionality in a backwards-compatible manner)
+    * c - revision (incremented when you make backwards-compatible bug fixes)
+    * d - build (incremented by automation system i.e. Jenkins)
 
 
-## RACI
+## Training Plan
+
+## Review Plans
+
+All Cloud Snitch operations and developments team members must review documentation and send pull request to that affect once a year.
+(Implement strategy to accomplish this. Comments on changelog PR?)
+
+# Development
+
+## Submit Code Changes
+
+- Develop and test changes locally before opening a pull request to "develop" branch on central repository
+- Check current pull request here [Snitch Github PRs](#https://github.com/rcbops/FleetDeploymentReporting/pulls)
+- Determine versioning changes that need to be made according to versioning schema in [release plan](#release-plan)
+
+## Unit Test
+
+- Automation (Jenkins) takes pull request and uses python virtual environment to install python dependencies
+- Jenkins runs unit tests against code itself without full deployment
+
+## Review Failing Test Results
+
+- Test results can be seen from the "Details" link when Jenkins reports failures
+- Code owner must review failing tests and discover problems within new or testing system
+- Peers may optionally review tests to assist debugging
+- Code owner must push bug fix pull request and allow re-run of unit tests 
+
+## Code Review
+
+- Peer code reviewers must review code and ensure coding guidelines are followed
+- Test changes locally to best of ability
+- Code developer must respond to comments and/or requests for changes
+
+## Incremental Review
+
+- Loop through this Development phase until all unit tests pass and approval from peers
+
+# Testing/Integration
+
+## Build and Release to Development
+
+- Jenkins gets all code that has been merged into develop branch
+- Jenkins uses provisioning system to create new development environment
+- Jenkins sets up inventory and everything to prepare for ansible run
+- Ansible uses newly created development environment and deploys new code
+- Ansible creates configuration files and dependencies
+- Ansbile starts services, ensure all components have endpoint locations and dynamic data
+
+## Run Second Round of Tests and Merge to Master
+
+- Use new development environment to run tests against
+- Tests shoud include
+    * Unit tests
+    * Functional Tests
+    * Component Tests
+    * Fuzz tests
+    * Static analysis
+    * Property based tests
+    * Coverage tests
+    * Benchmark tests
+    * Aggression tests
+    * Contract tests
+    * Lint tests
+    * Acceptance tests
+    * Mutation tests
+    * Smoke tests
+    * UI/UX tests
+    * Usability tests
+    * Penetration tests
+    * Threat modelling
+    * Integration tests
+
+## Release to QA
+
+- Upgrade QA environment with new code
+- Ensure upgrade process works as expected
+- Check ansible, application and service logs for immediate errors
+
+## Execute Long Term Tests Plans
+
+- Use QA Tests for longer term tests
+    * Tap compare
+    * Network monitoring
+    * Load tests
+    * Shadowing
+    * Config tests
+
+## Training Doc
+
+- Update training documentation for any plans
+
+## User Acceptance and Training
+
+# Deployment
+
+## Deploy to Production
+
+- Deploy code to virtual machines in the production environment
+- Provide beta users optional access to new production environment
+- Provide developer users mandatory access to new production enviornment
+
+## Release Approval
+
+- Allow tests to run against production workload on pre-release production environment
+    * Canarying
+    * Monitoring
+    * Traffic shaping
+    * Feature flagging
+    * Exception tracking
+- Receive feedback and approval from beta and developer users
+
+## Release to Production
+
+- Change over all production load balancers
+- Provide messages to users
+
+## Confirm Release
+
+- Tests within released environment
+    * Teeing
+    * Profiling
+    * Logs/events
+    * Chaos testing
+    * Monitoring
+    * A/B Tests
+    * Tracing
+    * Dynamic Exploration
+    * Real user monitoring
+    * Auditing
+    * Oncall experience
+
+# Maintenance
+
+## Monitor, Resolve and Mitigate Issues
+
+- Deploy each month
+    * Allow patching updates
+- Watch the following dependencies for all available security patches and deploy within 1 month of release (PCI 6.2)
+    * (List of dependencies)
+
+
+# Operations & Maintenance
+
+
+

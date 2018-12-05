@@ -13,6 +13,11 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.provision "shell", inline: <<-SHELL
+     set -x
+
+     echo "Setting random password for root"
+     echo "root:$(openssl rand -base64 32)" | chpasswd
+
      echo "Install Packages"
      sudo apt-get update
      sudo apt-get install -y python-pip python3.5 python3.5-dev:
@@ -30,6 +35,16 @@ Vagrant.configure("2") do |config|
      virtualenv --python=python3.5 /opt/venvs/cloudsnitch
      source /opt/venvs/cloudsnitch/bin/activate
      pip install ansible
+
+     if [ #{ENV['RUN_INFRA']} == true ]; then
+       echo "Running infrastructure setup plays"
+       cd /vagrant/installation/local
+       ansible-galaxy install -r ansible_requirements.yml
+       ansible-playbook infrastructure.yml
+       echo "Completed infrastructure setup plays"
+     else
+       echo "Skipped infrastructure setup plays"
+     fi
 
      echo "Performing local installation"
      cd /vagrant/installation/local

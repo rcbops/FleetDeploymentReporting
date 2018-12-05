@@ -27,6 +27,7 @@ pipeline {
   agent { label 'master' }
 
   environment {
+    RUN_INFRA = true
     RUN_TEST = true
     RUN_REMOTE = false
   }

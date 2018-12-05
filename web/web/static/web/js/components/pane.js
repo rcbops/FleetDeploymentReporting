@@ -1296,9 +1296,11 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
         translateTree();
 
         // Collapse all children of roots children before rendering.
-        root.children.forEach(function(child){
-            collapse(child);
-        });
+        if (angular.isDefined(root.children)) {
+            root.children.forEach(function(child){
+                collapse(child);
+            });
+        }
 
         update(root);
         centerNode(root);

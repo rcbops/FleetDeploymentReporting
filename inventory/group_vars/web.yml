@@ -1,0 +1,12 @@
+cloud_snitch_web_neo4j_username: "{{ pwsafe_neo4j_username }}"
+cloud_snitch_web_neo4j_password: "{{ pwsafe_neo4j_password }}"
+cloud_snitch_web_neo4j_uri: "bolt://10.10.10.7"
+cloud_snitch_web_secret_key: "{{ pwsafe_cloud_snitch_web_secret_key_password }}"
+cloud_snitch_web_superuser_username: "{{ pwsafe_cloud_snitch_web_super_user_username }}"
+cloud_snitch_web_superuser_email: 'someone@somewhere.com'
+cloud_snitch_web_superuser_password: "{{ pwsafe_cloud_snitch_web_super_user_password }}"
+cloud_snitch_web_raxauth_enabled: True
+cloud_snitch_web_raxauth_auth_url: https://identity-internal.api.rackspacecloud.com/v2.0
+
+cloud_snitch_web_port: 80
+cloud_snitch_web_ssl_port: 443

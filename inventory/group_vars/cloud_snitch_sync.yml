@@ -1,0 +1,7 @@
+cloud_snitch_neo4j_enabled: True
+cloud_snitch_neo4j_password: "{{ pwsafe_neo4j_password }}"
+cloud_snitch_neo4j_username: "{{ pwsafe_neo4j_username }}"
+cloud_snitch_neo4j_uri: bolt://10.10.10.7
+cloud_snitch_neo4j_log_level: 'WARNING'
+cloud_snitch_sync_concurrency: 8
+cloud_snitch_sync_timeout: 7200

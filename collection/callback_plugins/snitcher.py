@@ -17,12 +17,49 @@ except ImportError:
         def __init__(self, *args, **kwargs):
             pass
 
-# Attempt to load configuration
+# Attempt to load configuration from file
 conf_file = os.environ.get(
     'CLOUD_SNITCH_CONF_FILE',
     '/etc/cloud_snitch/cloud_snitch.yml')
 with open(conf_file, 'r') as f:
     settings = yaml.load(f.read())
+
+# Merge in configuration from environment variables.
+var_map = {
+    'enabled': {
+        'name': 'CLOUD_SNITCH_ENABLED',
+        'required': False
+    },
+    'environment.account_number': {
+        'name': 'CLOUD_SNITCH_ENVIRONMENT_ACCOUNT_NUMBER',
+        'required': True
+    },
+    'environment.name': {
+        'name': 'CLOUD_SNITCH_ENVIRONMENT_NAME',
+        'required': True
+    },
+    'environment.uuid': {
+        'name': 'CLOUD_SNITCH_ENVIRONMENT_UUID',
+        'required': True,
+    },
+    'run_id': {
+        'name': 'CLOUD_SNITCH_RUN_ID',
+        'required': False
+    },
+    'crypt_enabled': {
+        'name': 'CLOUD_SNITCH_CRYPT_ENABLED',
+        'required': False
+    },
+    'crypt_key': {
+        'name': 'CLOUD_SNITCH_CRYPT_KEY',
+        'required': False
+    }
+}
+for key, var_dict in var_map.items():
+    val = os.environ.get(var_dict['name'])
+    if not val and var_dict['required']:
+        raise Exception('{} not set.'.format(var_dict['name']))
+    settings[key] = val
 
 DOCUMENTATION = '''
     callback: snitcher
@@ -35,6 +72,9 @@ DOCUMENTATION = '''
       - Environment Variable CLOUD_SNITCH_CRYPT_ENABLED (for encryption)
       - Environment Variable CLOUD_SNITCH_CRYPT_KEY (for encryption)
       - Environment Variable CLOUD_SNITCH_RUN_ID
+      - Environment Variable CLOUD_SNITCH_ENVIRONMENT_ACCOUNT_NUMBER
+      - Environment Variable CLOUD_SNITCH_ENVIRONMENT_NAME
+      - Environment Variable CLOUD_SNITCH_ENVIRONMENT_UUID
     requirements:
 '''
 
@@ -58,12 +98,12 @@ class File:
         self.filename = filename
 
         # crypt_enabled is only true if environment var is some
-        crypt_enabled = os.environ.get('CLOUD_SNITCH_CRYPT_ENABLED', '')
+        crypt_enabled = settings.get('crypt_enabled')
         crypt_enabled = crypt_enabled.lower()
         self.crypt_enabled = crypt_enabled in self.valid_enabled
 
         # Retrieve crypt key and base64 decode it.
-        self.crypt_key = os.environ.get('CLOUD_SNITCH_CRYPT_KEY', '')
+        self.crypt_key = settings.get('crypt_key')
         self.crypt_key = base64.b64decode(self.crypt_key)
 
         if self.crypt_enabled and not self.crypt_key:
@@ -148,9 +188,9 @@ class FileHandler:
 
         self._doc = {
             'environment': {
-                'account_number': settings['environment']['account_number'],
-                'name': settings['environment']['name'],
-                'uuid': settings['environment']['uuid']
+                'account_number': settings.get('environment.account_number'),
+                'name': settings.get('environment.name'),
+                'uuid': settings.get('environment.uuid')
             }
         }
 
@@ -252,7 +292,7 @@ class CallbackModule(CallbackBase):
         """Enables or disables plugin based on environment."""
         super(CallbackModule, self).__init__(display)
         self.basedir = settings.get('data_dir')
-        if os.environ.get('CLOUD_SNITCH_ENABLED', False):
+        if settings.get('enabled'):
             self.disabled = False
             if not self.basedir:
                 raise Exception("No data directory configured.")
@@ -305,10 +345,8 @@ class CallbackModule(CallbackBase):
         """Start new directory."""
         # Name the new directory according to run id
         now = datetime.datetime.utcnow()
-        self.dirpath = os.path.join(
-            self.basedir,
-            os.environ.get('CLOUD_SNITCH_RUN_ID', str(uuid.uuid4()))
-        )
+        run_id = settings.get('run_id') or str(uuid.uuid4())
+        self.dirpath = os.path.join(self.basedir, run_id)
 
         # Create the new directory
         if not os.path.exists(self.dirpath):
@@ -319,9 +357,9 @@ class CallbackModule(CallbackBase):
             'status': 'running',
             'started': now.isoformat(),
             'environment': {
-                'account_number': settings['environment']['account_number'],
-                'name': settings['environment']['name'],
-                'uuid': settings['environment']['uuid']
+                'account_number': settings.get('environment.account_number'),
+                'name': settings.get('environment.name'),
+                'uuid': settings.get('environment.uuid')
             }
         })
 

@@ -1,21 +1,5 @@
 ---
 #{{ ansible_managed }}
-environment:
-  account_number: "{{ cloud_snitch_environment_account_number }}"
-  name: "{{ cloud_snitch_environment_name }}"
-  uuid: "{{ cloud_snitch_environment_uuid }}"
-
-log_format: "{{ cloud_snitch_log_format }}"
-log_level: "{{ cloud_snitch_log_level|upper }}"
-
-neo4j_log_level: "{{ cloud_snitch_neo4j_log_level|upper }}"
-
-# Neo4j connections
-neo4j:
-  username: "{{ cloud_snitch_neo4j_username }}"
-  password: "{{ cloud_snitch_neo4j_password }}"
-  uri: "{{ cloud_snitch_neo4j_uri }}"
-
 # Location to store local data
 data_dir: "{{ cloud_snitch_data_dir }}"
 

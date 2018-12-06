@@ -12,6 +12,9 @@
     CLOUD_SNITCH_CRYPT_ENABLED: "{{ cloud_snitch_crypt_enabled }}"
     CLOUD_SNITCH_CRYPT_KEY: "{{ crypto_aes_key }}"
     CLOUD_SNITCH_RUN_ID: "{{ run_id }}"
+    CLOUD_SNITCH_ENVIRONMENT_ACCOUNT_NUMBER: "{{ cloud_snitch_environment_account_number }}"
+    CLOUD_SNITCH_ENVIRONMENT_NAME: "{{ cloud_snitch_environment_name }}"
+    CLOUD_SNITCH_ENVIRONMENT_UUID: "{{ cloud_snitch_environment_uuid }}"
   ignore_errors: yes
   args:
     chdir: "{{ cloud_snitch_playbook | dirname }}"
@@ -30,6 +33,9 @@
     CLOUD_SNITCH_CRYPT_ENABLED: "{{ cloud_snitch_crypt_enabled }}"
     CLOUD_SNITCH_CRYPT_KEY: "{{ crypto_aes_key }}"
     CLOUD_SNITCH_RUN_ID: "{{ run_id }}"
+    CLOUD_SNITCH_ENVIRONMENT_ACCOUNT_NUMBER: "{{ cloud_snitch_environment_account_number }}"
+    CLOUD_SNITCH_ENVIRONMENT_NAME: "{{ cloud_snitch_environment_name }}"
+    CLOUD_SNITCH_ENVIRONMENT_UUID: "{{ cloud_snitch_environment_uuid }}"
     ANSIBLE_INVENTORY: "{{ cloud_snitch_inventory_locations | join(':') }}"
     ANSIBLE_SSH_PIPELINING: "True"
     ANSIBLE_HOST_KEY_CHECKING: "False"
@@ -74,6 +80,9 @@
   become: yes
   file:
     state: absent
-    path: "{{ cloud_snitch_data_dir }}/{{ run_id }}.tar.gz"
+    path: "{{ item }}"
+  with_items:
+    - "{{ cloud_snitch_data_dir }}/{{ run_id }}.tar.gz"
+    - "{{ cloud_snitch_data_dir }}/{{ run_id }}"
   tags:
     - collect

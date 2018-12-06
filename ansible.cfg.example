@@ -1,5 +1,6 @@
 [defaults]
-inventory = /opt/FleetDeploymentReporting/inventory/
+#inventory = /opt/FleetDeploymentReporting/inventories/aaronslab
+#inventory = /opt/FleetDeploymentReporting/inventories/kronos
 remote_tmp = ~/.ansible.nonpriv/tmp
 retry_files_enabled = False
 

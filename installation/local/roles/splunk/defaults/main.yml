@@ -1,0 +1,14 @@
+# This is the current version specified by the SAAC team.  I initally tried
+# 7.2.1, but it had errors on some of the config pushed down from SAAC's
+# infrastructure
+
+# SAAC maintains the a link to the "latest" package [here](https://one.rackspace.com/pages/viewpage.action?pageId=196183520#SplunkPCIPlaybook-ManualInstallInstructions)
+
+splunk_deb_url: https://download.splunk.com/products/universalforwarder/releases/7.1.2/linux/splunkforwarder-7.1.2-a0c72a66db66-linux-2.6-amd64.deb
+splunk_deb_md5: 47115146ca10dbc8f00befef04b33cd7
+
+# This is the deployment server specified by the SAAC team
+splunk_deployment_server_uri: 10.12.180.99:8089
+
+# This is the device's official PCI asset name
+splunk_eris_hostname: "{{ ansible_fqdn }}"

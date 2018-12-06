@@ -1,6 +1,26 @@
 # cloud_snitch
 Gathers information from an osa cloud
 
+### How to install
+
+The following steps assume you are on the deployment host (typically ingest-01).
+
+1. Clone rpc-uam to /opt/rpc-uam
+
+```
+git clone git@github.com:rcbops/rpc-uam.git /opt/rpc-uam
+```
+
+2. Clone FDR to /opt/FleetDeploymentReporting
+```
+git@github.com:rcbops/FleetDeploymentReporting.git /opt/FleetDeploymentReporting
+```
+
+3. Configure ansible to use FDR's version-controlled inventory
+```
+cp /opt/FleetDeploymentReporting/ansible.cfg.example /etc/ansible/ansible.cfg
+```
+
 ### How to run
 ```shell
 # From the cloud_snitch repo directory

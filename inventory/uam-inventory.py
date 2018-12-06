@@ -1,1 +1,0 @@
-../../rpc-uam/ansible/inventory/inventory.py

@@ -1,0 +1,6 @@
+neo4j_heap_initial_size: 1000m
+neo4j_heap_max_size: 1000m
+neo4j_pagecache_size: 256m
+neo4j_home: /var/lib/neo4j
+neo4j_password: "{{ pwsafe_neo4j_password }}"
+neo4j_crypt_enabled: True

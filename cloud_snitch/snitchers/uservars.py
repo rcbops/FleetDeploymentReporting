@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 
 from .base import BaseSnitcher
 from cloud_snitch.models import EnvironmentEntity
@@ -19,10 +18,8 @@ class UservarsSnitcher(BaseSnitcher):
         :type session: neo4j.v1.session.BoltSession
         """
         # Load saved git data
-        filename = os.path.join(self._basedir(), 'uservars.json')
         try:
-            with open(filename, 'r') as f:
-                uservars_dict = json.loads(f.read())
+            uservars_dict = self.run.get_object('uservars.json')
         except IOError:
             logger.info('No data for uservars could be found.')
             return

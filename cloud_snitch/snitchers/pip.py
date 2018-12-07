@@ -1,4 +1,3 @@
-import json
 import logging
 
 from .base import BaseSnitcher
@@ -78,9 +77,7 @@ class PipSnitcher(BaseSnitcher):
                 )
                 continue
 
-            with open(filename, 'r') as f:
-                pipdict = json.loads(f.read())
-                pipdict = pipdict.get('data', {})
+            pipdict = self.run.get_object(filename).get('data', {})
 
             for path, pkglist in pipdict.items():
                 virtualenv = self._update_virtualenv(

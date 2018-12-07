@@ -1,3 +1,25 @@
+class ArchiveObjectError(Exception):
+    """Error for unable to decode archive object."""
+    def __init__(self, name):
+        """Init the error.
+
+        :param name: Name of the object
+        :type name: str
+        """
+        msg = (
+            'Could not decode object \'{}\'. Check that object is JSON and '
+            'that the encryption key (if provided) is correct.'
+        ).format(name)
+        super(ArchiveObjectError, self).__init__(msg)
+
+
+class InvalidKeyError(Exception):
+    """Error for invalid encryption key."""
+    def __init__(self):
+        msg = "Keys should be base64 encoded 256 bit AES keys."
+        super(InvalidKeyError, self).__init__(msg)
+
+
 class PropertyAlreadyExistsError(Exception):
     """Error for duplicate properties on the same model."""
     def __init__(self, label, prop):

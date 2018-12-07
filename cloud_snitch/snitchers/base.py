@@ -39,17 +39,13 @@ class BaseSnitcher(object):
         :returns: List of tuples of (hostname, filename)
         :rtype: list
         """
-        basedir = self._basedir()
         host_tuples = []
         exp = re.compile(pattern)
 
-        for f in os.listdir(basedir):
+        for f in self.run.filenames:
             r = exp.search(f)
             if r:
-                hostname = r.group('hostname')
-                host_tuples.append(
-                    (hostname, os.path.join(basedir, f))
-                )
+                host_tuples.append((r.group('hostname'), f))
 
         return host_tuples
 

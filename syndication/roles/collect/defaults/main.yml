@@ -15,3 +15,7 @@ cloud_snitch_collection_poll: 30
 
 cloud_snitch_default_forks: "{{ [ansible_processor_vcpus - 2, 8]| max }}"
 cloud_snitch_forks: "{{ cloud_snitch_default_forks }}"
+
+cloud_snitch_environment_account_number: "{{ core_account }}"
+cloud_snitch_environment_name: "{{ customer_name }}-{{ environment_name }}"
+cloud_snitch_environment_uuid: "{{ id }}"

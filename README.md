@@ -13,7 +13,7 @@ git clone git@github.com:rcbops/rpc-uam.git /opt/rpc-uam
 
 2. Clone FDR to /opt/FleetDeploymentReporting
 ```
-git@github.com:rcbops/FleetDeploymentReporting.git /opt/FleetDeploymentReporting
+git clone git@github.com:rcbops/FleetDeploymentReporting.git /opt/FleetDeploymentReporting
 ```
 
 3. Configure ansible to use FDR's version-controlled inventory

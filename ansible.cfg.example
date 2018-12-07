@@ -1,3 +1,10 @@
 [defaults]
 inventory = /opt/FleetDeploymentReporting/inventory/
+remote_tmp = ~/.ansible.nonpriv/tmp
 retry_files_enabled = False
+
+[ssh_connection]
+retries = 0
+ssh_args = -o ControlMaster=no
+scp_if_ssh = True
+pipelining = True

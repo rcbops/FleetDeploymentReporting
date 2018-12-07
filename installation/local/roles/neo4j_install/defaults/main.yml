@@ -21,6 +21,7 @@ neo4j_ssl_policy_name: 'cloudsnitch'
 neo4j_ssl_policy_base_directory: 'certificates/{{ neo4j_ssl_policy_name }}'
 neo4j_ssl_policy_trust_all: 'true'
 neo4j_ssl_policy_allow_key_generation: 'true'
+neo4j_ssl_policy_tls_versions: 'TLSv1.2'
 
 # values are 'NONE', 'OPTIONAL', 'REQUIRE'
 # Setting to anything other than None will break the web browser

@@ -21,6 +21,11 @@ git clone git@github.com:rcbops/FleetDeploymentReporting.git /opt/FleetDeploymen
 cp /opt/FleetDeploymentReporting/ansible.cfg.example /etc/ansible/ansible.cfg
 ```
 
+4. Select the appropriate inventory based on the environment (e.g. `aaronslab` or `kronos`) by uncommenting it in `/etc/ansible/ansible.cfg`
+```
+sed -i '/^#.*kronos/s/^#//' /etc/ansible/ansible.cfg
+```
+
 ### How to run
 ```shell
 # From the cloud_snitch repo directory

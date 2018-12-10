@@ -107,18 +107,25 @@ class Forest:
         paths = []
 
         current_node = self.nodes.get(label)
+        if current_node is None:
+            return []
+
         stack = [current_node]
         while (stack):
             current = stack[-1]
-            visited.add(current)
+            # Add current path if not yet visited
+            if current not in visited:
+                paths.append([n.label for n in stack])
+                visited.add(current)
+
             for rel_name, child_node in current.children.items():
                 if child_node not in visited:
                     stack.append(child_node)
                     break
             else:
-                if not current.children:
-                    paths.append([n.label for n in stack])
                 stack.pop()
+
+        paths = sorted(paths, key=lambda x: len(x))
         return paths
 
 

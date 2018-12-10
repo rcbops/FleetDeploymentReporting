@@ -538,9 +538,6 @@ class Diff:
 
         # Get list of paths
         paths = registry.forest.paths_from(self.model)
-        paths.append([self.model])
-        paths = sorted(paths, key=lambda x: len(x))
-
         for p in paths:
             q = DiffSideQuery(p, identity, (t1, t2))
             for row in q.fetch_all():

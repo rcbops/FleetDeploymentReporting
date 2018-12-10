@@ -1,0 +1,5 @@
+- name: Apply splunk role to fdr_infra hosts
+  hosts: fdr_infra
+  become: yes
+  roles:
+    - splunk

@@ -1,18 +1,19 @@
 
 <!-- MarkdownTOC autolink="true" -->
 
-- [Inception](#inception)
-    - [Concept Proposal](#concept-proposal)
-    - [Roles & Requirements](#roles--requirements)
-    - [Operations & Maintenance](#operations--maintenance)
-        - [RACI](#raci)
-    - [Training Plan \(PCI 6.5\)](#training-plan-pci-65)
+- [Organization, Processes and Guidelines](#organization-processes-and-guidelines)
     - [Software Development Lifecycle](#software-development-lifecycle)
         - [High Level SDLC](#high-level-sdlc)
         - [Code Change Review Process](#code-change-review-process)
     - [SDLC Tools](#sdlc-tools)
     - [Secure Coding Guidelines \(PCI 6.5, 6.7\)](#secure-coding-guidelines-pci-65-67)
+    - [Roles & Requirements](#roles--requirements)
+    - [Operations & Maintenance](#operations--maintenance)
+        - [RACI](#raci)
     - [Review Plans \(PCI 6.7\)](#review-plans-pci-67)
+    - [Training Plans \(PCI 6.5\)](#training-plans-pci-65)
+- [Inception](#inception)
+    - [Concept Proposal](#concept-proposal)
 - [Planning](#planning)
     - [Vision & Scope Specification](#vision--scope-specification)
 - [Design](#design)
@@ -54,48 +55,7 @@
 
 
 
-# Inception
-
-## Concept Proposal
-* Definition: Brief, informal discussion/description of the proposed product, feature or design change
-* Activities: 
-    - Discussion/Description of the following
-    - Use case discussion
-    - Business implication discussions
-    - Externalities to the project i.e. dependencies, affected parties
-
-## Roles & Requirements
-* Definition: Define roles of team members and requirements of product 
-* Activities:
-    - Determine roles and expectations of managers, developers, operators and users
-    - Define process and requirements for disseminating project information   
-* Deliverables:
-    - RACI
-    - System to require/remind team members to review documentation
-
-
-## Operations & Maintenance
-* Definition: Process and design of system(s) that facilitate secure, reliable and long term deployments
-* Activities:
-    - Document steps to deploy, migrate, scale and debug
-    - Define processes for handling alerts and escalation
-* Deliverables:
-    - Operations Documentation
-    - Implement notification and communication paths
-
-
-#### RACI
-
-## Training Plan (PCI 6.5)
-* Defition: Outlines for creating and holding training sessions
-* Activites:
-    - Produce training guide frameworks
-    - Create process to schedule training for operators and users
-* Deliverables:
-    - Training doc frameworks
-    - Training scheduling process
-
-- To schedule training contact pcdevops@rackspace.com
+# Organization, Processes and Guidelines
 
 ## Software Development Lifecycle
 * Definition: Documentation describing the SDLC
@@ -170,7 +130,25 @@ Incorporating information security throughout the software-development lifecycle
 
 12.1 Establish, publish, maintain, and disseminate a security policy.
 
+## Roles & Requirements
+* Definition: Define roles of team members and requirements of product
+* Activities:
+    - Determine roles and expectations of managers, developers, operators and users
+    - Define process and requirements for disseminating project information
+* Deliverables:
+    - RACI
+    - System to require/remind team members to review documentation
 
+## Operations & Maintenance
+* Definition: Process and design of system(s) that facilitate secure, reliable and long term deployments
+* Activities:
+    - Document steps to deploy, migrate, scale and debug
+    - Define processes for handling alerts and escalation
+* Deliverables:
+    - Operations Documentation
+    - Implement notification and communication paths
+
+#### RACI
 
 ## Review Plans (PCI 6.7)
 * Definition: Plan to disseminate information and documentation
@@ -181,6 +159,28 @@ Incorporating information security throughout the software-development lifecycle
 
 All Cloud Snitch operations and developments team members must review documentation and send pull request to that affect once a year.
 (Implement strategy to accomplish this. Comments on changelog PR?)
+
+## Training Plans (PCI 6.5)
+* Defition: Outlines for creating and holding training sessions
+* Activites:
+    - Produce training guide frameworks
+    - Create process to schedule training for operators and users
+* Deliverables:
+    - Training doc frameworks
+    - Training scheduling process
+
+- To schedule training contact pcdevops@rackspace.com
+
+# Inception
+
+## Concept Proposal
+* Definition: Brief, informal discussion/description of the proposed product, feature or design change
+* Activities:
+    - Discussion/Description of the following
+    - Use case discussion
+    - Business implication discussions
+    - Externalities to the project i.e. dependencies, affected parties
+
 
 # Planning
 

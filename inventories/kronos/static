@@ -1,0 +1,17 @@
+[cloud_snitch_sync]
+ingest-01
+
+[web]
+web-01
+
+[neo4j]
+neo4j-01
+
+[jump]
+jump-01
+
+[fdr_infra:children]
+cloud_snitch_sync
+web
+neo4j
+jump

@@ -9,6 +9,12 @@
   environment:
     CLOUD_SNITCH_ENABLED: true
     CLOUD_SNITCH_CONF_FILE: "{{ cloud_snitch_conf_file }}"
+    CLOUD_SNITCH_CRYPT_ENABLED: "{{ cloud_snitch_crypt_enabled }}"
+    CLOUD_SNITCH_CRYPT_KEY: "{{ crypto_aes_key }}"
+    CLOUD_SNITCH_RUN_ID: "{{ run_id }}"
+    CLOUD_SNITCH_ENVIRONMENT_ACCOUNT_NUMBER: "{{ cloud_snitch_environment_account_number }}"
+    CLOUD_SNITCH_ENVIRONMENT_NAME: "{{ cloud_snitch_environment_name }}"
+    CLOUD_SNITCH_ENVIRONMENT_UUID: "{{ cloud_snitch_environment_uuid }}"
   ignore_errors: yes
   args:
     chdir: "{{ cloud_snitch_playbook | dirname }}"
@@ -18,16 +24,18 @@
   async: "{{ cloud_snitch_collection_timeout }}"
   poll: "{{ cloud_snitch_collection_poll }}"
 
-- name: Debug inventories
-  debug:
-    msg: "{{ cloud_snitch_inventory_locations | join(':') }}"
-
 - name: Run snitch collector - Mitaka -
   become: yes
   command: "openstack-ansible snitch.yml --forks {{ cloud_snitch_forks }}"
   environment:
     CLOUD_SNITCH_ENABLED: true
     CLOUD_SNITCH_CONF_FILE: "{{ cloud_snitch_conf_file }}"
+    CLOUD_SNITCH_CRYPT_ENABLED: "{{ cloud_snitch_crypt_enabled }}"
+    CLOUD_SNITCH_CRYPT_KEY: "{{ crypto_aes_key }}"
+    CLOUD_SNITCH_RUN_ID: "{{ run_id }}"
+    CLOUD_SNITCH_ENVIRONMENT_ACCOUNT_NUMBER: "{{ cloud_snitch_environment_account_number }}"
+    CLOUD_SNITCH_ENVIRONMENT_NAME: "{{ cloud_snitch_environment_name }}"
+    CLOUD_SNITCH_ENVIRONMENT_UUID: "{{ cloud_snitch_environment_uuid }}"
     ANSIBLE_INVENTORY: "{{ cloud_snitch_inventory_locations | join(':') }}"
     ANSIBLE_SSH_PIPELINING: "True"
     ANSIBLE_HOST_KEY_CHECKING: "False"
@@ -40,43 +48,31 @@
   async: "{{ cloud_snitch_collection_timeout }}"
   poll: "{{ cloud_snitch_collection_poll }}"
 
-- name: Find all cloud_snitch data sets
-  find:
-    paths: "{{ cloud_snitch_data_dir }}"
-    file_type: directory
-    recurse: no
-  register: datasets
-  tags:
-    - collect
-
-- name: Archive all datasets
+- name: Archive the dataset
   become: yes
   archive:
-    path: "{{ item.path }}"
-    dest: "{{ item.path }}.tar.gz"
+    path: "{{ cloud_snitch_data_dir }}/{{ run_id }}"
+    dest: "{{ cloud_snitch_data_dir }}/{{ run_id }}.tar.gz"
     exclude_path:
       - "{{ cloud_snitch_data_dir }}"
     format: gz
-  loop: "{{ datasets.files }}"
   tags:
     - collect
 
-- name: Fetch archived data sets
+- name: Fetch the dataset
   fetch:
-    src: "{{ item.path }}.tar.gz"
-    dest: "{{ cloud_snitch_data_dir }}/{{ inventory_hostname }}/{{ item.path | basename }}.tar.gz"
+    src: "{{ cloud_snitch_data_dir }}/{{ run_id }}.tar.gz"
+    dest: "{{ cloud_snitch_data_dir }}/{{ run_id }}.tar.gz"
     fail_on_missing: false
     flat: yes
-  loop: "{{ datasets.files }}"
   tags:
     - collect
 
-- name: Empty data directory
-  find:
-    paths: "{{ cloud_snitch_data_dir }}"
-    file_type: any
-    recurse: no
-  register: deletables
+- name: Sync the dataset
+  action: sync
+  args:
+    uuid: "{{ run_id }}"
+    key:  "{{ crypto_aes_key }}"
   tags:
     - collect
 
@@ -84,7 +80,9 @@
   become: yes
   file:
     state: absent
-    path: "{{ item.path }}"
-  loop: "{{ deletables.files }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ cloud_snitch_data_dir }}/{{ run_id }}.tar.gz"
+    - "{{ cloud_snitch_data_dir }}/{{ run_id }}"
   tags:
     - collect

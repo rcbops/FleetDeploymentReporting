@@ -1,0 +1,1 @@
+The files in this directory represent the contents of `zzz_deploymentclient.zip` from SAAC's [sharepoint](https://one.rackspace.com/pages/viewpage.action?pageId=196183520#SplunkPCIPlaybook-ManualInstallInstructions).

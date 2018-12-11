@@ -1,4 +1,3 @@
-import json
 import logging
 
 from .base import BaseSnitcher
@@ -252,30 +251,29 @@ class HostSnitcher(BaseSnitcher):
         :rtype: HostEntity
         """
         hostname, filename = host_tuple
-        with open(filename, 'r') as f:
-            fulldict = json.loads(f.read())
-            fulldict = fulldict.get('data', {})
+        fulldict = self.run.get_object(filename)
+        fulldict = fulldict.get('data', {})
 
-            # Start kwargs for making the host entity
-            hostkwargs = {}
+        # Start kwargs for making the host entity
+        hostkwargs = {}
 
-            # Remove anything not prefixed with 'ansible_'
-            ansibledict = {}
-            for k, v in fulldict.items():
-                if k.startswith('ansible_'):
-                    ansibledict[k] = v
+        # Remove anything not prefixed with 'ansible_'
+        ansibledict = {}
+        for k, v in fulldict.items():
+            if k.startswith('ansible_'):
+                ansibledict[k] = v
 
-            # Create properties that require little intervention
-            for ansible_key, host_key in _EASY_KEY_MAP.items():
-                val = ansibledict.get(ansible_key)
-                if val is not None:
-                    hostkwargs[host_key] = val
+        # Create properties that require little intervention
+        for ansible_key, host_key in _EASY_KEY_MAP.items():
+            val = ansibledict.get(ansible_key)
+            if val is not None:
+                hostkwargs[host_key] = val
 
-            # Create properties that can be found by path
-            for complexkey, host_key in _COMPLEX_KEY_MAP.items():
-                val = complex_get(complexkey, ansibledict)
-                if val is not None:
-                    hostkwargs[host_key] = val
+        # Create properties that can be found by path
+        for complexkey, host_key in _COMPLEX_KEY_MAP.items():
+            val = complex_get(complexkey, ansibledict)
+            if val is not None:
+                hostkwargs[host_key] = val
 
         host = HostEntity(
             hostname=hostname,

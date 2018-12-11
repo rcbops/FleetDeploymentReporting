@@ -1,0 +1,51 @@
+- name: Create zzz_deploymentclient app directories
+  file:
+    path: /opt/splunkforwarder/etc/apps/zzz_deploymentclient/local/
+    owner: splunk
+    group: splunk
+    recurse: yes
+
+# After the initial start, Splunk manages these files, so we should not update
+# them.
+- name: Write initial zzz_deploymentclient configuration
+  template:
+    src: "deploymentclient/{{ item }}"
+    dest: "/opt/splunkforwarder/etc/apps/zzz_deploymentclient/local/{{ item }}"
+    owner: splunk
+    group: splunk
+  with_items:
+    - app.conf
+    - deploymentclient.conf
+
+# After the initial start, Splunk manages these files, so we should not update
+# them.
+- name: Write initial Splunk system configuration
+  template:
+    src: "system/{{ item }}"
+    dest: "/opt/splunkforwarder/etc/system/local/{{ item }}"
+    owner: splunk
+    group: splunk
+  with_items:
+    - inputs.conf
+    - server.conf
+
+- name: Perform initial configuration
+  become: yes
+  become_user: splunk
+  command: ./splunk start --accept-license --answer-yes --no-prompt
+  args:
+    chdir: /opt/splunkforwarder/bin
+
+- name: Perform restart to fully load pushed configs
+  become: yes
+  become_user: splunk
+  command: ./splunk restart
+  args:
+    chdir: /opt/splunkforwarder/bin
+
+- name: Enable starting at boot
+  become: yes
+  command: ./splunk enable boot-start -user splunk
+  args:
+    chdir: /opt/splunkforwarder/bin
+

@@ -1,7 +1,5 @@
 import hashlib
-import json
 import logging
-import os
 
 from .base import BaseSnitcher
 from cloud_snitch.models import EnvironmentEntity
@@ -132,9 +130,7 @@ class GitSnitcher(BaseSnitcher):
         """
         # Load saved git data
         try:
-            filename = os.path.join(self._basedir(), 'gitrepos.json')
-            with open(filename, 'r') as f:
-                gitdata = json.loads(f.read())
+            gitdata = self.run.get_object('gitrepos.json')
         except IOError:
             logger.info('No data for git could be found.')
             return

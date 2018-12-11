@@ -1,3 +1,7 @@
+# General configuration
+ansible_become: yes
+cloud_snitch_version: develop
+
 # Configuration for ansible-hardening role
 security_check_package_checksums: yes
 security_disallow_ip_forwarding: yes

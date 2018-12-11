@@ -1,0 +1,62 @@
+# This playbook attempts to follow the process documented at
+# https://one.rackspace.com/display/gss/Splunk+PCI+Playbook as closely as
+# possible.
+
+---
+- name: Copy SAAC's PCI auditd rules
+  copy:
+    src: SAAC_PCI_auditd.rules
+    dest: /etc/audit/rules.d
+  notify: generate auditd rules
+
+- name: Configure auditd to use adm group for logs
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^log_group ='
+    line: 'log_group = adm'
+  notify: restart auditd
+
+- name: Ensure /var/log/audit*'s group is adm
+  file:
+    path: /var/log/audit
+    group: adm
+    state: directory
+    recurse: yes
+  notify: restart splunk
+
+- name: Download Splunk Universal Forwarder package
+  local_action:
+    module: get_url
+    url: "{{ splunk_deb_url }}"
+    checksum: "md5:{{ splunk_deb_md5 }}"
+    dest: /tmp
+  delegate_to: localhost
+  run_once: true
+  register: splunk_pkg
+
+- name: Copy Splunk Universal Forwarder package to target
+  copy:
+    src: "{{ splunk_pkg.dest }}"
+    dest: "{{ splunk_pkg.dest }}"
+
+- name: Install Splunk Universal Forwarder package
+  apt:
+    deb: "{{ splunk_pkg.dest }}"
+    state: present
+
+- name: Determine if Splunk has been initialized
+  stat:
+    path: /opt/splunkforwarder/var/lib/splunk
+  register: splunk_init
+
+- name: Initialize Splunk
+  import_tasks: bootstrap.yml
+  when: splunk_init.stat.exists == False
+
+- name: Add splunk user to adm group
+  user:
+    name: splunk
+    append: yes
+    groups:
+      - adm
+  notify: restart splunk

@@ -74,11 +74,11 @@
 ![](images/code_change_review_process.png)
 
     Figure 2: Flow for handling code changes via pull requests and reviews (PCI 6.3.2)
-6.3.2 Review code prior to release in order to identify any potential coding vulnerabilities: 
-Code changes reviewed by individuals other than the author. 
-Code reviews ensure code is developed according to secure coding guidelines 
-Appropriate corrections are implemented prior to release 
-Code review results are reviewed and approved by management prior to release 
+6.3.2 Review code prior to release in order to identify any potential coding vulnerabilities:
+Code changes reviewed by individuals other than the author.
+Code reviews ensure code is developed according to secure coding guidelines
+Appropriate corrections are implemented prior to release
+Code review results are reviewed and approved by management prior to release
 
 
 ## SDLC Tools
@@ -104,14 +104,16 @@ Code review results are reviewed and approved by management prior to release
     * Source code management
     * Code review discussions
 - Logging ?
-- Security Testing ?
+- Security Testing
+    * Codescan
+    * Inspec
 - RS Monitoring
 - Slack
 
 ## Secure Coding Guidelines (PCI 6.5, 6.7)
 * Definition: Guidelines by which to develop and review code to ensure security
 * Activities:
-    - Create and agreee upon guidelines for producing code
+    - Create and agree upon guidelines for producing code
     - Research common guidelines and agree upon a subset which will apply to specific project
     - Document means of enforcing guidelines
 * Deliverables:
@@ -130,14 +132,57 @@ Incorporating information security throughout the software-development lifecycle
 
 12.1 Establish, publish, maintain, and disseminate a security policy.
 
+12.3.3 A list of all such devices and personnel with access
+Possibly covered by P-RS-GL-CS-004.S001 Business Requirements of Access Control Standard
+
+12.3.7 List of company-approved products
+Possibly covered by P-RS-GL-CS-007.S001
+
+12.3.8 Automatic disconnect of sessions for remote-access technologies after a specific period of inactivity
+The ansible-hardening role applies security hardening configurations from the Security Technical Implementation Guide (STIG). Specifically, V-72223 sets a 10 minute timeout on remote communications.
+
 ## Roles & Requirements
 * Definition: Define roles of team members and requirements of product
 * Activities:
-    - Determine roles and expectations of managers, developers, operators and users
+    - Determine roles and expectations of managers, developers, operators, and users
     - Define process and requirements for disseminating project information
 * Deliverables:
     - RACI
     - System to require/remind team members to review documentation
+
+### Roles
+
+System management responsibilities are divided into the following roles:
+
+- Manager
+- Developer
+- Operator
+- User
+
+A definition and non-exhaustive list of responsibilities for each role is provided below.
+
+#### Manager
+
+The responsibilities of the manager role include...
+
+#### Developer
+
+The responsibilities of the developer role include...
+
+#### Operator
+
+The responsibilities of the operator role include:
+
+- Monitoring
+- Alert response
+- Troubleshooting
+- Deployment
+- Scaling
+
+#### User
+
+The responsibilities of the user role include...
+
 
 ## Operations & Maintenance
 * Definition: Process and design of system(s) that facilitate secure, reliable and long term deployments
@@ -148,38 +193,52 @@ Incorporating information security throughout the software-development lifecycle
     - Operations Documentation
     - Implement notification and communication paths
 
+### Deployment
+
+### Migration
+
+### Monitoring
+
+### Incident Management Process
+
+In the event of an outage notify the team via Slack and an email to pcdevops@rackspace.com, then engage the Rackspace IM team (link to their process here)
+
 #### RACI
 
 ## Review Plans (PCI 6.7)
 * Definition: Plan to disseminate information and documentation
 * Activities:
-    - Decide how often team members must review documenatation for compliance
+    - Decide how often team members must review documentation for compliance
 * Deliverables:
     - Documentation of team member requirements
 
 All Cloud Snitch operations and developments team members must review documentation and send pull request to that affect once a year.
 (Implement strategy to accomplish this. Comments on changelog PR?)
 
-## Training Plans (PCI 6.5)
-* Defition: Outlines for creating and holding training sessions
-* Activites:
-    - Produce training guide frameworks
-    - Create process to schedule training for operators and users
-* Deliverables:
-    - Training doc frameworks
-    - Training scheduling process
+## Training Plans
 
-- To schedule training contact pcdevops@rackspace.com
+6.5 Train developers at least annually in up-to-date secure coding techniques, including how to avoid common coding vulnerabilities.
+12.6 Implement a formal security awareness program to make all personnel aware of the cardholder data security policy and procedures.
+
+* Defition: Train developers at least annually in up-to-date secure coding techniques, including how to avoid common coding vulnerabilities.
+* Activites:
+    - Attend annual training
+* Deliverables:
+    - Sign-off in mylearn
+
+Fleet deployment developers attend annual training delivered by https://mylearn.rackspace.com titled “Introduction to PCI DSS for Developers” (1 hour at your own pace). Contact the GES GRC team for additional details. (PCI 6.5.a)
+
+Evidence of training is sign-off for all developers in https://mylearn.rackspace.com.
 
 # Inception
 
 ## Concept Proposal
-* Definition: Brief, informal discussion/description of the proposed product, feature or design change
+* Definition: Brief, informal discussion/description of the proposed product, feature, or design change
 * Activities:
     - Discussion/Description of the following
     - Use case discussion
     - Business implication discussions
-    - Externalities to the project i.e. dependencies, affected parties
+    - Externalities to the project i.e. dependencies, affected parties, stakeholders
 
 
 # Planning
@@ -190,26 +249,29 @@ All Cloud Snitch operations and developments team members must review documentat
     - Summarize the update and it's purpose
     - Add priority to summary
     - Set status of update
-    - Discuss relevant research, discoveries or changes to requirements
+    - Discuss relevant research, discoveries, or changes to requirements
 * Deliverables:
     - Kanban card(s)
 
 Each change will have a corresponding Kanban card with description.
 [Cloud Snitch Jira](https://rpc-openstack.atlassian.net/secure/RapidBoard.jspa?rapidView=123)
 
-Each should describe some subset of the following:
-* Goals & Intentions
-* Scope & Feasibility
-* Use cases
-* Resources & Limits
-* Cost/Time to Deliver
-* Risks
-* Additional Benefits
-* Project Plan
-* Milestones
-* Additional Links
+Each Kanban card should describe some subset of the following:
+
+- Goals & Intentions
+- Scope & Feasibility
+- Use cases
+- Resources & Limits
+- Cost/Time to Deliver
+- Risks
+- Additional Benefits
+- Project Plan
+- Milestones
+- Additional Links
 
 # Design
+
+The following sections discuss the design 
 
 ## Design & Tech Specifications
 * Definition: Diagrams and outlines of changes to be made
@@ -219,11 +281,11 @@ Each should describe some subset of the following:
     - Small first pass at code
     - Determine other software or teams to involve
     - Discover required data sources
-    - Consider security implications and solutions
+    - Threat modeling
 * Deliverables:
     - Diagrams/implementation plan or first pass of code
     - Notes/comments or emails for other teams to contact
-
+    - Threat model
 
 Architecture of the FleetDeploymentReporting Tool is as follow:
 
@@ -232,7 +294,7 @@ Architecture of the FleetDeploymentReporting Tool is as follow:
 Tech specifications for new features may be added as bullet points and/or links whiteboard images in the corresponding Kanban card.
 [Cloud Snitch Jira](https://rpc-openstack.atlassian.net/secure/RapidBoard.jspa?rapidView=123)
 
-Consider the following technical sections to be updated with code changes:
+Consider the following technical sections to be updated with code or architectural changes:
 - [Architecture & High Level Design Diagrams](#architecture--high-level-design-diagrams)
     * Diagrams of infrastructure, interfaces and redundancy
 - [Testing](#testing)
@@ -245,7 +307,9 @@ Consider the following technical sections to be updated with code changes:
     * Security technology, processes and due diligence
 - [Networking](#networking)
     * Networking diagrams, connections and devices (firewalls, load balancers etc.)
-
+- [Threat Model](#threatmodel)
+    * Data or process diagram
+    * List of risks and possible mitigation
 
 ## Impact, Capacity & Monitoring
 * Definition: Define monitors to create, how and when to handle capacity based on monitors and impact to end users and operations
@@ -256,17 +320,10 @@ Consider the following technical sections to be updated with code changes:
 * Deliverables:
     - Alert/response documentation
 
-Alerts signalling errors or failures will be set up via (ALERT TECHNOLOGY?) and send messages to the Cloud Snitch development and operations team slack channel. They must be reviewed, communicated and handled according to the RACI documentation.
-
-(INSERT TABLE OF ALERTS, RESPONSES AND SEVERITY)
-
-In order to meet load requirements of end users the capacity should be increased/decreased according to the following chart.
-
-(INSERT TABLE OF METRICS AND REQUIRED CAPACITY)
-
-#### Monitoring
+### Monitoring
 
 We will monitor trends in the following:
+
 - latency in milliseconds of wait time
 - traffic in requests per second
 - errors in requests per second
@@ -274,7 +331,18 @@ We will monitor trends in the following:
 
 We will alert when services are unreachable or the error rate increases. Specific rates and percentiles are yet to be determined.
 
+### Alerting
+
+Alerts signalling errors or failures will be set up via (ALERT TECHNOLOGY?) and send messages to the FleetDeploymentReporting development and operations team slack channel. They must be reviewed, communicated and handled according to the RACI documentation.
+
+(INSERT TABLE OF ALERTS, RESPONSES AND SEVERITY)
+
+In order to meet load requirements of end users the capacity should be increased/decreased according to the following chart.
+
+(INSERT TABLE OF METRICS AND REQUIRED CAPACITY)
+
 ## Release Plan (PCI 6.2)
+
 * Definition: Define plans for upgrades, schedules for releases and patch windows
 * Activities:
     - Define release schedules
@@ -294,14 +362,16 @@ We will alert when services are unreachable or the error rate increases. Specifi
     * d - build (incremented by automation system i.e. Jenkins)
 
 # Development
-6.4 Follow change control processes and procedures for all changes to system components with the following: 
-6.4.1 Separate development/test environments from production with ACLs to enforce separation.  
+
+6.4 Follow change control processes and procedures for all changes to system components with the following:
+6.4.1 Separate development/test environments from production with ACLs to enforce separation.
 6.4.2 A separation of duties between personnel assigned to the development/test environments and those assigned to the production environment.
-6.4.3 Production data is not used for testing or development. 
-6.4.4 Removal of test data and accounts from system components before the system becomes active. 
-6.4.5 Change control procedure must include Documentation of impact, documented change approval by management, Functionality testing, and back out procedures. 
+6.4.3 Production data is not used for testing or development.
+6.4.4 Removal of test data and accounts from system components before the system becomes active.
+6.4.5 Change control procedure must include Documentation of impact, documented change approval by management, Functionality testing, and back out procedures.
 
 ## Create Code & Prototype
+
 * Definition: Produce working prototype that can be demoed.
 * Activities:
     - Update or create code in github
@@ -316,6 +386,7 @@ We will alert when services are unreachable or the error rate increases. Specifi
 - Produce test cases for new code. Document new frameworks, locations and coverage in [testing section](#testing)
 
 ## Submit Code Changes
+
 * Definition: Developers produce code and send off for review
 * Activities:
     - Create and test new code in development environment
@@ -323,24 +394,24 @@ We will alert when services are unreachable or the error rate increases. Specifi
 * Deliverables:
     - Pull Request
 
-
 - Determine versioning changes that need to be made according to versioning schema in [release plan](#release-plan)
 - Reflect any changes made in the [tech specifications](#tech-specifications) section
 - Open a pull request to "develop" branch on central repository
 - Check current pull request here: [FDR Pull Requests](#https://github.com/rcbops/FleetDeploymentReporting/pulls)
 
 ## Unit Test
-* Definition: Automation gets pull request code and runs tests 
+
+* Definition: Automation gets pull request code and runs tests
 * Activities:
     - CI/CD system runs unit test job
 * Deliverables:
     - Passing checks on github
 
-
 - Automation (Jenkins) will take pull request and use python virtual environment to install python dependencies
 - Jenkins runs unit tests against code itself without full deployment
 
 ## Review Failing Test Results
+
 * Definition: Test results should be long lasting and backed up
 * Activities:
     - CI/CD system should saves test logs
@@ -356,7 +427,8 @@ We will alert when services are unreachable or the error rate increases. Specifi
 - Code owner must push bug fix pull request and allow re-run of unit tests 
 
 ## Code Review
-* Definition: Peers review code and approve or requeset changes/discussion
+
+* Definition: Peers review code and approve or request changes/discussion
 * Activities:
     - Team member who is not code author reads through code
     - Ensure clarity and ease of understanding
@@ -370,6 +442,7 @@ We will alert when services are unreachable or the error rate increases. Specifi
 - Code developer must respond to comments and/or requests for changes
 
 ## Incremental Review
+
     * Definition: Loop through development cycle until unit tests pass and peer approval achieved
     * Activities:
         - Continue from start of development cycle
@@ -379,29 +452,32 @@ We will alert when services are unreachable or the error rate increases. Specifi
 - Loop through Development stage until pull request is accepted
 
 # Testing/Integration
-6.4 Follow change control processes and procedures for all changes to system components with the following: 
-6.4.1 Separate development/test environments from production with ACLs to enforce separation.  
+
+6.4 Follow change control processes and procedures for all changes to system components with the following:
+6.4.1 Separate development/test environments from production with ACLs to enforce separation.
 6.4.2 A separation of duties between personnel assigned to the development/test environments and those assigned to the production environment.
-6.4.3 Production data is not used for testing or development. 
-6.4.4 Removal of test data and accounts from system components before the system becomes active. 
-6.4.5 Change control procedure must include Documentation of impact, documented change approval by management, Functionality testing, and back out procedures. 
+6.4.3 Production data is not used for testing or development.
+6.4.4 Removal of test data and accounts from system components before the system becomes active.
+6.4.5 Change control procedure must include Documentation of impact, documented change approval by management, Functionality testing, and back out procedures.
 
 ## Build & Release to Development
-* Definition: Automation retrieves and builds peer approved and unit tested code from development branch 
+
+* Definition: Automation retrieves and builds peer approved and unit tested code from development branch
 * Activities:
     - Create code artifacts and/or images
-    - Install up-to-date dependencies to ensure security and compatability
+    - Install up-to-date dependencies to ensure security and compatibility
 * Deliverables:
     - Code artifacts/Images
 
 - Jenkins gets all code that has been merged into develop branch
 - Jenkins uses provisioning system to create new development environment
-- Jenkins sets up inventory and everything to prepare for ansible run
+- Jenkins sets up inventory and everything to prepare for Ansible run
 - Ansible uses newly created development environment and deploys new code
 - Ansible creates configuration files and dependencies
 - Ansbile starts services, ensure all components have endpoint locations and dynamic data
 
 ## Run Second Round of Tests & Merge to Master
+
 * Definition: Create development environment and install code
 * Activities:
     - Create short-lived environment for second round of testing
@@ -412,7 +488,7 @@ We will alert when services are unreachable or the error rate increases. Specifi
     - Environment of failed deploy/test
 
 - Use new development environment to run tests against
-- Tests shoud include
+- Tests should include
     * Unit tests
     * Functional Tests
     * Component Tests
@@ -434,6 +510,7 @@ We will alert when services are unreachable or the error rate increases. Specifi
     * Integration tests
 
 ## Release to QA
+
 * Notes: Would be great if we could test upgrade paths via old images or just deploying versions and testing upgrades
 * Definition: Send code to environment with more accurate data to run long lived tests and load tests
 * Activities:
@@ -449,6 +526,7 @@ We will alert when services are unreachable or the error rate increases. Specifi
 - Check ansible, application and service logs for immediate errors
 
 ## Execute Long Term Test Plans
+
 * Definition: Run tests and close-to-production workloads against QA environment
 * Activities:
     - test workloads, repeat close-to-production input
@@ -465,16 +543,23 @@ We will alert when services are unreachable or the error rate increases. Specifi
     * Shadowing
     * Config tests
 
-## Training Doc (PCI 6.5)
+## Training Doc
+
+6.5 Train developers at least annually in up-to-date secure coding techniques, including how to avoid common coding vulnerabilities.
+12.6 Implement a formal security awareness program to make all personnel aware of the cardholder data security policy and procedures.
+
 * Definition: Create training documentation for new features or products
 * Activities:
     - Document information necessary for both users and operations based on templates
 * Deliverables:
     - Training documentation
 
-- Update training documentation for any plans
+FleetDeploymentReporting team members attend annual security awareness training delivered by https://mylearn.rackspace.com. Additionally, FleetDeploymentReporting developers attend annual training delivered by https://mylearn.rackspace.com titled “Introduction to PCI DSS for Developers” (1 hour at your own pace). Contact the GES GRC team for additional details. (PCI 6.5.a)
+
+Evidence of training is sign-off can be found in https://mylearn.rackspace.com
 
 ## User Acceptance & Training
+
 * Definition: Provide beta versions to users or demos. Train users on new features/products
 * Activities:
     - Deploy a beta version to get user feedback
@@ -486,17 +571,19 @@ We will alert when services are unreachable or the error rate increases. Specifi
     - Training sessions
 
 # Deployment
-6.3.1 Remove development, test and/or custom application accounts, user IDs and passwords before applications become active. 
-FDR does not utilize production code for test and vice versa. 
-6.4 Follow change control processes and procedures for all changes to system components with the following: 
+
+6.3.1 Remove development, test and/or custom application accounts, user IDs and passwords before applications become active.
+FDR does not utilize production code for test and vice versa.
+6.4 Follow change control processes and procedures for all changes to system components with the following:
 6.4.1 Separate development/test environments from production with ACLs to enforce separation.  
 6.4.2 A separation of duties between personnel assigned to the development/test environments and those assigned to the production environment.
-6.4.3 Production data is not used for testing or development. 
+6.4.3 Production data is not used for testing or development.
 6.4.4 Removal of test data and accounts from system components before the system becomes active. 
-6.4.5 Change control procedure must include Documentation of impact, documented change approval by management, Functionality testing, and back out procedures. 
+6.4.5 Change control procedure must include Documentation of impact, documented change approval by management, Functionality testing, and back out procedures.
 
 ## Release Approval
-* Definition: Allow users, operations and developers to approve new releases. Security patches may bypass users and operations
+
+* Definition: Allow users, operations, and developers to approve new releases. Security patches may bypass users and operations
 * Activities:
     - Schedule release/patch window
     - Talk to everyone affected to gain agreement
@@ -512,14 +599,16 @@ FDR does not utilize production code for test and vice versa.
 - Receive feedback and approval from beta and developer users
 
 ## Deploy to Production
+
 * Definition: Run small deployment in production environment and verify
 * Activities:
     - Deploy code to virtual machines in the production environment
     - Provide beta users optional access to new production environment
-    - Provide developer users mandatory access to new production enviornment
+    - Provide developer users mandatory access to new production environment
 
 ## Release to Production
-* Definition: Upgrade code in environment via rollout or in-place upgrade 
+
+* Definition: Upgrade code in environment via rollout or in-place upgrade
 * Activities:
     - Backup current data and environments
     - During scheduled windows run upgrade scripts
@@ -532,7 +621,8 @@ FDR does not utilize production code for test and vice versa.
 - Provide messages to users
 
 ## Confirm Release
-* Definition: Consider user, operational and monitoring feedback and be ready to rollback 
+
+* Definition: Consider user, operational and monitoring feedback and be ready to rollback
 * Activities:
     - Read all comments, alerts and concerns
     - Rollback if major issues arise
@@ -553,9 +643,10 @@ FDR does not utilize production code for test and vice versa.
 # Maintenance
 
 ## Monitor, Resolve & Mitigate Issues
-* Definition: Monitor and update system to ensure system runs securely and smoothly 
+
+* Definition: Monitor and update system to ensure system runs securely and smoothly
 * Activities:
-    - Respond to monitoring alerts within appropriate timeframes
+    - Respond to monitoring alerts within appropriate an timeframe
     - Start patch/upgrade processes when vulnerabilities discovered
 
 - Deploy each month
@@ -564,7 +655,6 @@ FDR does not utilize production code for test and vice versa.
     * (List of dependencies)
 
 6.2 Ensure that all system components and software are protected from known vulnerabilities by installing application vendor supplied security patches within at least 1 month of release. 
-
 
 10.8 Implement a process for timely detection and reporting of failures of critical security control systems including firewalls, IDS/IPS, FIM, anti-virus, strange login, audit logging mechanisms, and segmentation controls.
 
@@ -582,11 +672,9 @@ TODO: link sdlc doc
 12.10 Implement an incident response plan, and be prepared to respond immediately to a system breach.
 
 
-
-# Tech Specfications
+# Tech Specifications
 
 ## Architecture & High Level Design Diagrams
-
 
 
 ## Environments (PCI 6.4)
@@ -604,6 +692,7 @@ TODO: link sdlc doc
 ## Testing
 
 [Web App Backend Tests](https://github.com/rcbops/FleetDeploymentReporting/tree/develop/cloud_snitch/tests)
+
 - Django testing framework
 - Cover basic models and functionality of the web application
 
@@ -611,19 +700,20 @@ TODO: link sdlc doc
 
 ## Storage
 
-
 - Cardholder data information (None? PCI 7.3)
+
 7.3 Ensure that security policies and operational procedures for restricting access to cardholder data are documented.
 
 
 ## Security (PCI 6.7)
 
-- Codescan (PCI 6.6 [ARE WE PUBLIC FACING??])
 6.6 For public-facing web applications, address new threats and vulnerabilities on an ongoing basis and ensure these applications are protected against known attacks by either code audit tools or IDS devices.
-
 8.8 Ensure that security policies and operational procedures for identification and authentication are documented, in use, and known to all affected parties.
-
 10.9 Ensure that security policies and operational procedures for monitoring all access to network resources and cardholder data are documented, in use, and known to all parties.
 
+- Codescan (PCI 6.6 [ARE WE PUBLIC FACING??])
+- [Inspec](https://www.inspec.io/)
 
 ## Networking
+
+## Threat Model

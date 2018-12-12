@@ -33,6 +33,7 @@
 - name: Neo4j - Set Initial Password
   shell: "neo4j-admin set-initial-password '{{ neo4j_password }}'"
   ignore_errors: True
+  no_log: True
 
 - name: Neo4j - Auth directory permissions
   file:

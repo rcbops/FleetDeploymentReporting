@@ -1,2 +1,0 @@
-neo4j_default_listen_address: "{{ ansible_default_ipv4.address }}"
-neo4j_crypt_backing_device: /dev/vdb

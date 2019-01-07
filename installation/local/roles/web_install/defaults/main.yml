@@ -82,7 +82,7 @@ cloud_snitch_web_pip_pkgs:
   celery: 4.1.1
   django-celery-results: 1.0.1
   redis: 2.10.6
-  PyYAML: '3.12.'
+  PyYAML: 4.2b1
   django-redis: 4.9.0
   requests: 2.20.0
 

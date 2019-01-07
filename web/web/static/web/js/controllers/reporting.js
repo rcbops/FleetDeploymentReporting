@@ -4,8 +4,10 @@
 angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log', 'reportsService', 'cloudSnitchApi', 'messagingService', function($scope, $log, reportsService, cloudSnitchApi, messagingService) {
     $scope.reports = reportsService.reports;
     $scope.serverErrors = null;
-    $scope.rendered = false;
     $scope.showJsonParams = false;
+
+    $scope.data = null;
+
     $scope.controls = {
         reportName: '',
         report: null,
@@ -27,82 +29,24 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
         }
     });
 
+    /**
+     * Update a report control.
+     */
     $scope.update = function(change) {
         $scope.controls.parameters[change.name] = change.value;
     };
 
-    function suggestedFileName(type) {
-        var d = new Date();
-        var name =
-            $scope.controls.reportName + '_' +
-            d.toISOString() + '.' +
-            type;
-        return name;
-    }
-
-    function renderData(data) {
-        $scope.rendered = false;
-        var thead = $('#renderTable thead');
-        var tbody = $('#renderTable tbody');
-
-        // Empty the table
-        thead.html("");
-        tbody.html("");
-        if (data.length < 1) {
-            var empty = $('<tr><td>No Matching Results</td></tr>');
-            tbody.append(empty);
-            return;
-        }
-
-        headers = Object.keys(data[0])
-        var tr = $('<tr></tr>');
-        angular.forEach(headers, function(header) {
-            var th = $('<th></th>').text(header);
-            tr.append(th);
-        });
-        thead.append(tr);
-
-        angular.forEach(data, function(row) {
-            var tr = $('<tr></tr>');
-            angular.forEach(headers, function(header) {
-                var td = $('<td></td>').text(row[header]);
-                tr.append(td);
-            });
-            tbody.append(tr);
-        });
-        $scope.rendered = true;
-    }
-
-    function handleData(type, data) {
-        if (type == 'json' || type == 'csv') {
-            // Create link to blob
-            var url = window.URL.createObjectURL(data);
-            var link = angular.element('<a>Download</a>');
-            link.css('display', 'none');
-            link.attr('href', url);
-            link.attr('download', suggestedFileName(type));
-
-            // Add to document and simulate click
-            angular.element(document.body).append(link);
-            link[0].click();
-
-            // Clean up
-            link.remove();
-            URL.revokeObjectURL(url);
-
-        // Build simple web view
-        } else {
-            renderData(data);
-        }
-        $scope.busy = false;
-    }
-
-    $scope.submit = function(type) {
+    /**
+     * Run the report.
+     */
+    $scope.submit = function() {
+        var type = 'web';
         $scope.busy = true;
         $scope.serverErrors = null;
 
         cloudSnitchApi.runReport($scope.controls.reportName, type, $scope.controls.parameters).then(function(data) {
-            handleData(type, data);
+            $scope.data = data;
+            $scope.busy = false;
         }, function(resp) {
             $scope.serverErrors = resp.data;
             $scope.busy = false;
@@ -112,12 +56,55 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
         });
     };
 
-    $scope.closeRendering = function() {
-        $('#renderTable thead').html("");
-        $('#renderTable tbody').html("");
-        $scope.rendered = false;
+    /**
+     * Suggest a file name for report data to download.
+     */
+    function suggestFileName(type) {
+        return $scope.controls.reportName + '_' + new Date().toISOString() + '.' + type;
+    }
+
+    /**
+     * Download the data as csv or json format.
+     */
+    $scope.download = function(type) {
+
+        var blobType, blobString;
+
+        if (type == 'csv') {
+            mimetype = 'text/csv';
+            blobStr = Papa.unparse($scope.data);
+        } else {
+            mimetype = 'application/json';
+            blobStr = JSON.stringify($scope.data);
+        }
+
+        // Create new blob from data
+        var blob = new Blob([blobStr], {type: blobType});
+
+        // Create url to blob
+        var url = window.URL.createObjectURL(blob);
+
+        // Create a link and simulated click
+        var link = angular.element('<a></a>')
+            .css('display', 'none')
+            .attr('href', url)
+            .attr('download', suggestFileName(type));
+        angular.element('#downloads').append(link);
+        link[0].click();
+
+        // Clean up
+        link.remove();
+        URL.revokeObjectURL(url);
     };
 
+
+    $scope.closeRendering = function() {
+        $scope.data = null;
+    };
+
+    /**
+     * Toggle display of json params use in report api request.
+     */
     $scope.toggleShowJsonParams =  function() {
         $scope.showJsonParams = !$scope.showJsonParams;
     };

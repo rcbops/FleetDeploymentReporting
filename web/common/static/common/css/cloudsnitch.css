@@ -134,6 +134,13 @@ expandable-table-content:last-child .expandable {
   overflow-y: auto;
 }
 
+.report {
+  overflow: auto;
+  height: auto;
+  width: 100%;
+  position: relative;
+}
+
 pane {
   overflow: auto;
   height: auto;
@@ -217,27 +224,32 @@ panetopctrl .pane-ctrls .hxBtnGroup {
 }
 
 panetopctrl .pane-ctrls,
-.diffContainer .diffCtrls {
+.diffContainer .diffCtrls,
+.report .report-ctrls {
   background-color: #ddd;
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-panetopctrl .pane-ctrls .hxBtn {
+panetopctrl .pane-ctrls .hxBtn,
+.report .report-ctrls .hxBtn {
   font-size: 1em;
   line-height: 1em;
   text-transform: uppercase;
-  padding: 12px 14px;
+  padding: 12px 0;
+  font-weight: 600;
 }
 
-panetopctrl .pane-ctrls .hxBtn hx-icon {
+panetopctrl .pane-ctrls .hxBtn hx-icon,
+.report .report-ctrls .hxBtn hx-icon {
   position: relative;
   margin-right: 0.15em;
 }
 
 panetopctrl .pane-ctrls .close hx-icon,
 panetopctrl .pane-ctrls .clone hx-icon,
-panetopctrl .pane-ctrls .back hx-icon {
+panetopctrl .pane-ctrls .back hx-icon,
+.report .report-ctrls .back hx-icon {
   top: 2px;
 }
 

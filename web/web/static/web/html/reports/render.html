@@ -1,6 +1,13 @@
-<div>
-  <table id="renderTable" class="hxTable hxTable--condensed">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
+<div class="hxRow">
+  <div class="hxCol hxSpan-1"><h4>View</h4></div>
+  <div class="hxCol hxSpan-3">
+    <select ng-model="$ctrl.view" class="hxTextCtrl" ng-options="item as item.label for item in $ctrl.views"></select>
+  </div>
+</div>
+<div class="hxRow">
+  <div class="hxCol hxSpan-12" ng-switch="$ctrl.view.id">
+    <reportforcediagramview data="$ctrl.data" ng-switch-when="forceDiagram"></reportforcediagramview>
+    <reportpiechartview data="$ctrl.data" ng-switch-when="pieChart"></reportpiechartview>
+    <reporttableview data="$ctrl.data" ng-switch-default="table"></reporttableview>
+  </div>
 </div>

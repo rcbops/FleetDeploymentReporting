@@ -117,7 +117,6 @@ function PieChartController($element, $timeout) {
     self.changeSlices  = function() { update(); }
 
     self.$onInit = function() {
-        console.log("Inside chart update");
         // Return early if empty data
         if (self.data.length < 1) { return; }
 
@@ -137,7 +136,6 @@ function PieChartController($element, $timeout) {
 
         // Wait till page renders
         $timeout(function() {
-            console.log("inside timeout");
             self.svg = d3.select($element[0]).select('svg');
 
             var svgTitle = self.svg.select('g.title').append('text')

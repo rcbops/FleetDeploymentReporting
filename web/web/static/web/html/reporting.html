@@ -1,149 +1,15 @@
-<div class="hxBox-md hxSpan-12">
+<div class="report">
   <bigbusy busy="busy" text="'Loading...'"></bigbusy>
-  <form name="reportForm" novalidate>
-  <div class="hxRow">
-      <div class="hxCol hxSpan-12"><h2>Reporting</h2></div>
-      <hx-alert type="error" target="'reporting'"></hx-alert>
-  </div>
-
-  <div class="hxRow">
-    <div class="hxCol hxSpan-6">
-      <h4>Select a Report</h4>
-
-      <!-- Only show select box if not rendered -->
-      <select ng-hide="rendered" class="hxTextCtrl" ng-model="controls.reportName">
-        <option value="">Select...</option>
-        <option ng-repeat="report in reports" value="{{report.name}}">{{ report.name }}</option>
-      </select>
-
-      <!-- Display text if report is rendered. -->
-      <p ng-show="rendered">{{ controls.report.name }}</p>
-    </div>
-
-    <div class="hxCol hxSpan-12" ng-if="serverErrors.report_name">
-        <div ng-repeat="e in serverErrors.report_name"><hx-error>{{ e }}</hx-error></div>
-    </div>
-  </div>
-
-  <div ng-if="controls.report" class="hxRow">
-    <div class="hxCol hxSpan-6">
-      <h4>Description:</h4>
-      <p>{{ controls.report.description }}</p>
-    </div>
-  </div>
-
-  <div ng-show="rendered" class="hxRow">
+  <div class="hxRow" ng-include="'/static/web/html/reports/topctrls.html'"></div>
+  <div class="hxRow" style="margin-top: 0;">
     <div class="hxCol hxSpan-12">
-
-      <div class="hxRow">
-        <div class="hxCol hxSpan-12">
-          <h4>JSON Parameters: <button type="button" class="hxBtn hxLink" ng-click="toggleShowJsonParams()"><span ng-if="showJsonParams">Hide</span><span ng-if="!showJsonParams">Show</button></h4>
-          <pre ng-if="showJsonParams">{{ controls.parameters | json }}</pre>
-        </div>
-
-        <div class="hxCol hxSpan-12">
-          <h4>Report results <button type="button" class="hxBtn hxLink" ng-click="closeRendering()">(Go Back)</button></h4>
-          <table id="renderTable" class="hxTable hxTable--condensed">
-            <thead></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div ng-if="controls.report" ng-hide="rendered" class="hxRow">
-    <div class="hxCol hxSpan-6">
-
-      <div class="hxRow">
-        <div class="hxCol hxSpan-12"><h4>Report parameters:</h4></div>
-      </div>
-
-      <div class="hxRow">
-        <div ng-repeat="item in controls.report.form_data" class="hxCol hxSpan-12">
-          <hr />
-
-          <many-input
-            ng-if="item.many"
-            options="item"
-            all="controls.parameters"
-            on-change="update(change)"
-            server-errors="serverErrors[item.name]"
-            class="hxRow"></many-input>
-
-          <div ng-if="!item.many" ng-switch="item.component" class="hxRow">
-
-            <time-input
-              ng-switch-when="Time"
-              options="item"
-              all="controls.parameters"
-              on-change="update(change)"
-              server-errors="serverErrors[item.name]"
-              class="hxCol hxSpan-12"></time-input>
-
-            <model-input
-              ng-switch-when="Model"
-              options="item"
-              all="controls.parameters"
-              on-change="update(change)"
-              server-errors="serverErrors[item.name]"
-              class="hxCol hxSpan-12"></model-input>
-
-            <model-property-input
-              ng-switch-when="ModelProperty"
-              options="item"
-              all="controls.parameters"
-              on-change="update(change)"
-              server-errors="serverErrors[item.name]"
-              class="hxCol hxSpan-12"></model-property-input>
-
-            <select-input
-              ng-switch-when="Select"
-              options="item"
-              all="controls.parameters"
-              on-change="update(change)"
-              server-errors="serverErrors[item.name]"
-              class="hxCol hxSpan-12"></select-input>
-
-            <div ng-switch-default class="hxCol hxSpan-12">
-              <p>item.name: {{ item.name }}</p>
-              <p>item.label: {{ item.label }}</p>
-              <p>item.help_text: {{ item.help_text }}</p>
-              <p>item.default: {{ item.default }}</p>
-              <p>item.component: {{ item.component }}</p>
-              <p>item.required: {{ item.required }}</p>
-              <p>item.type: {{ item.type }}</p>
-              <p>item.many: {{ item.many }}</p>
-              <p>item.min_length: {{ item.min_length }}</p>
-              <p>item.max_length: {{ item.max_length }}</p>
-            </div>
-          </div>
-        </div>
+      <div class="hxBox-md">
+        <h2>Reporting</h2>
+        <hx-alert type="error" target="'reporting'"></hx-alert>
+        <div ng-if="!data" ng-include="'/static/web/html/reports/inputs.html'"></div>
+        <div ng-if="data" ng-include="'/static/web/html/reports/view.html'"></div>
+        <div id="downloads" style="display: none;"></div>
       </div>
     </div>
   </div>
-  <div class="hxRow" ng-if="controls.report" ng-hide="rendered">
-    <div class="hxCol hxSpan-12">
-      <h4>Report Format</h4>
-      <div class="hxBtnGroup">
-        <button
-          class="hxBtn hxPrimary"
-          type="button"
-          ng-disabled="reportForm.$invalid"
-          ng-click="submit('web')">Web</button>
-        <button
-          class="hxBtn hxPrimary"
-          type="button"
-          ng-disabled="reportForm.$invalid"
-          ng-click="submit('csv')">CSV</button>
-        <button
-          class="hxBtn hxPrimary"
-          type="button"
-          ng-disabled="reportForm.$invalid"
-          ng-click="submit('json')">JSON</button>
-      </div>
-    </div>
-  </div>
-  </form>
 </div>

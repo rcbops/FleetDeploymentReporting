@@ -1,0 +1,27 @@
+<div class="hxCol report-ctrls">
+  <div class="hxRow">
+    <div class="hxCol hxSpan-4 left">
+      <div class="hxBtnGroup hxLink">
+        <button
+          ng-if="data"
+          ng-click="closeRendering()"
+          class="hxBtn back"><hx-icon type="angle-left"></hx-icon> Back</button>
+        <button
+          ng-if="!data" class="hxBtn">&nbsp;</button>
+      </div>
+    </div>
+
+    <div class="hxCol hxSpan-8 right">
+      <div class="hxBtnGroup hxLink">
+        <button
+          ng-if="data"
+          ng-click="download('csv')"
+          class="hxBtn"><hx-icon type="export"></hx-icon> CSV</button>
+        <button
+          ng-if="data"
+          ng-click="download('json')"
+          class="hxBtn"><hx-icon type="export"></hx-icon> JSON</button>
+      </div>
+    </div>
+  </div>
+</div>

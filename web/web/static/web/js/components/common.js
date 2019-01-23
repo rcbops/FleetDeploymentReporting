@@ -1,13 +1,11 @@
-function BigBusyController() {
-    var self = this;
-}
+function BigBusyController() {}
 
-angular.module('cloudSnitch').component('bigbusy', {
-    templateUrl: '/static/web/html/bigbusy.html',
+angular.module("cloudSnitch").component("bigbusy", {
+    templateUrl: "/static/web/html/bigbusy.html",
     controller: BigBusyController,
     bindings: {
-        busy: '<',
-        text: '<',
+        busy: "<",
+        text: "<",
     }
 });
 
@@ -22,7 +20,7 @@ function ExpandableTableContentController() {
     var self = this;
 
     self.$onInit = function() {
-        self.placeholder = self.placeholder || 'Filter';
+        self.placeholder = self.placeholder || "Filter";
         self.prevLength = undefined;
 
         // Maintain a string representation of each actual row. Filtering will
@@ -47,7 +45,7 @@ function ExpandableTableContentController() {
                 self.shadowRows.push(self.rows[i].join().toLowerCase());
             }
             self.prevLength = self.rows.length;
-        };
+        }
     };
 
     /**
@@ -56,7 +54,7 @@ function ExpandableTableContentController() {
     self.isIncluded = function(index) {
         if (index < 0 || index >= self.rows.length) {
             return false;
-        };
+        }
         return (!self.filter || self.shadowRows[index].indexOf(self.filter.toLowerCase()) > -1);
     };
 
@@ -75,16 +73,16 @@ function ExpandableTableContentController() {
     };
 }
 
-angular.module('cloudSnitch').component('expandableTableContent', {
-    templateUrl: '/static/web/html/expandabletablecontent.html',
+angular.module("cloudSnitch").component("expandableTableContent", {
+    templateUrl: "/static/web/html/expandabletablecontent.html",
     controller: ExpandableTableContentController,
     bindings: {
-        headers: '<',
-        rows: '<',
-        expanded: '<',
-        title: '<',
-        placeholder: '<',
-        filter: '<',
-        onRowClick: '&'
+        headers: "<",
+        rows: "<",
+        expanded: "<",
+        title: "<",
+        placeholder: "<",
+        filter: "<",
+        onRowClick: "&"
     }
 });

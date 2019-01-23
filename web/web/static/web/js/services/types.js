@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cloudSnitchApi', 'messagingService', function($rootScope, $log, cloudSnitchApi, messagingService) {
+angular.module("cloudSnitch").factory("typesService", ["$rootScope", "$log", "cloudSnitchApi", "messagingService", function($rootScope, $log, cloudSnitchApi, messagingService) {
 
     var service = {};
     service.types = [];
@@ -9,69 +9,69 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
     service.properties = {};
 
     service.glanceViews = {
-        AptPackage: ['name', 'version'],
-        Configfile: ['path'],
-        ConfiguredInterface: ['device'],
-        Device: ['name'],
-        Environment: ['name', 'account_number'],
-        GitRemote: ['name'],
-        GitRepo: ['path'],
-        GitUntrackedFile: ['path'],
-        GitUrl: ['url'],
-        Host: ['hostname'],
-        Interface: ['device'],
-        Mount: ['mount'],
-        NameServer: ['ip'],
-        Partition: ['name'],
-        PythonPackage: ['name', 'version'],
-        Uservar: ['name', 'value'],
-        Virtualenv: ['path'],
-    }
+        AptPackage: ["name", "version"],
+        Configfile: ["path"],
+        ConfiguredInterface: ["device"],
+        Device: ["name"],
+        Environment: ["name", "account_number"],
+        GitRemote: ["name"],
+        GitRepo: ["path"],
+        GitUntrackedFile: ["path"],
+        GitUrl: ["url"],
+        Host: ["hostname"],
+        Interface: ["device"],
+        Mount: ["mount"],
+        NameServer: ["ip"],
+        Partition: ["name"],
+        PythonPackage: ["name", "version"],
+        Uservar: ["name", "value"],
+        Virtualenv: ["path"],
+    };
 
     service.diffLabelView = {
-        AptPackage: 'name',
-        ConfigFile: 'name',
-        ConfiguredInterface: 'device',
-        Device: 'name',
-        Environment: 'name',
-        GitRemote: 'name',
-        GitRepo: 'path',
-        GitUntrackedFile: 'path',
-        GitUrl: 'url',
-        Host: 'hostname',
-        Interface: 'device',
-        Mount: 'mount',
-        NameServer: 'ip',
-        Partition: 'name',
-        PythonPackage: 'name',
-        Uservar: 'name',
-        Virtualenv: 'path'
+        AptPackage: "name",
+        ConfigFile: "name",
+        ConfiguredInterface: "device",
+        Device: "name",
+        Environment: "name",
+        GitRemote: "name",
+        GitRepo: "path",
+        GitUntrackedFile: "path",
+        GitUrl: "url",
+        Host: "hostname",
+        Interface: "device",
+        Mount: "mount",
+        NameServer: "ip",
+        Partition: "name",
+        PythonPackage: "name",
+        Uservar: "name",
+        Virtualenv: "path"
     };
 
     var strOperators = [
-        '=',
-        '<',
-        '<=',
-        '>',
-        '>=',
-        '<>',
-        'CONTAINS',
-        'STARTS WITH',
-        'ENDS WITH'
+        "=",
+        "<",
+        "<=",
+        ">",
+        ">=",
+        "<>",
+        "CONTAINS",
+        "STARTS WITH",
+        "ENDS WITH"
     ];
 
     var numericOperators = [
-        '=',
-        '<',
-        '<=',
-        '>',
-        '>=',
-        '<>'
+        "=",
+        "<",
+        "<=",
+        ">",
+        ">=",
+        "<>"
     ];
 
     var boolOperators = [
-        '=',
-        '<>'
+        "=",
+        "<>"
     ];
 
     service.glanceProperties = function(label) {
@@ -100,12 +100,14 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
             service.paths = result;
             service.pathsLoading = false;
         }, function(resp) {
-            messagingService.error("master_alert",
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                "master_alert",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
             service.paths = {};
         });
-    }
+    };
 
     /**
      * Update types.
@@ -128,12 +130,14 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
             service.typesLoading = false;
 
         }, function(resp) {
-            messagingService.error("master_alert",
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                "master_alert",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
             service.types = [];
         });
-    }
+    };
 
     /**
      * Get path for a label.
@@ -176,15 +180,13 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         }
 
         switch(type) {
-            case 'bool':
-                return boolOperators;
-                break;
-            case 'int':
-            case 'float':
-                return numericOperators;
-                break;
-            default:
-                return strOperators;
+        case "bool":
+            return boolOperators;
+        case "int":
+        case "float":
+            return numericOperators;
+        default:
+            return strOperators;
         }
     };
 
@@ -205,8 +207,8 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
      * Determine if a property is a number property
      */
     service.isNumber = function(label, property) {
-        var type = service.propertyType(lable, property);
-        if (type === 'int' || type === 'float') { return true; }
+        var type = service.propertyType(label, property);
+        if (type === "int" || type === "float") { return true; }
         return false;
     };
 
@@ -219,6 +221,6 @@ angular.module('cloudSnitch').factory('typesService', ['$rootScope', '$log', 'cl
         return service.typesLoading || service.pathsLoading;
     };
 
-    service.update()
+    service.update();
     return service;
 }]);

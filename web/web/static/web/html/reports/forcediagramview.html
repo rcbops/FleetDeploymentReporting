@@ -1,0 +1,59 @@
+<div class="chart-container chart-container-md">
+  <svg id="forcediagram"  class="chart"></svg>
+  <div class="chart-ctrls hxBox-md" ng-show="$ctrl.toggleCtrls">
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><h4>Maximum Nodes</h4></div>
+      <div class="hxCol hxSpan-6">
+        <select
+          class="hxTextCtrl"
+          ng-change="$ctrl.updateData()"
+          ng-model="$ctrl.maxNodes"
+          ng-options="n for n in $ctrl.nodeCounts"></select>
+      </div>
+    </div>
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><h4>Node Size</h4></div>
+      <div class="hxCol hxSpan-6">
+        <input
+          type="range"
+          min="{{ $ctrl.radiusMin }}"
+          max="{{ $ctrl.radiusMax }}"
+          step="{{ $ctrl.radiusStep }}"
+          ng-change="$ctrl.setRadius()"
+          ng-model="$ctrl.radius" />
+      </div>
+    </div>
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><h4>Link Distance</h4></div>
+      <div class="hxCol hxSpan-6">
+        <input
+          type="range"
+          min="{{ $ctrl.linkDistanceMin }}"
+          max="{{ $ctrl.linkDistanceMax }}"
+          step="{{ $ctrl.linkDistanceStep }}"
+          ng-change="$ctrl.setLinkDistance()"
+          ng-model="$ctrl.linkDistance" />
+      </div>
+    </div>
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><h4>Charge</h4></div>
+      <div class="hxCol hxSpan-6">
+        <input
+          type="range"
+          min="{{ $ctrl.chargeMin }}"
+          max="{{ $ctrl.chargeMax }}"
+          step="{{ $ctrl.chargeStep }}"
+          ng-change="$ctrl.setCharge()"
+          ng-model="$ctrl.charge" />
+      </div>
+    </div>
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><button type="button" class="hxBtn" ng-click="$ctrl.toggleControls()">Ok</button></div>
+    </div>
+  </div>
+  <div class="chart-ctx">
+    <div class="hxBtnGroup">
+      <button type="button" class="hxBtn" ng-click="$ctrl.toggleControls()"><hx-icon type="cog"></hx-icon></button>
+    </div>
+  </div>
+</div>

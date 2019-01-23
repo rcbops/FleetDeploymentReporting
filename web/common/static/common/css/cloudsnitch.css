@@ -555,3 +555,39 @@ div.diffNodeDetail hx-panel {
 .fieldmenu .menugroup + .fieldmenu .menugroup {
   margin-top: 0.5rem;
 }
+
+.chart-container {
+  position: relative;
+}
+
+.chart-container .chart-ctx {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.chart-container .chart-ctx hx-icon {
+  font-size: 2em;
+}
+
+.chart-container .chart-ctrls {
+  position: absolute;
+  top: 20px;
+  right: 80px;
+  width: 300px;
+  border: 1px solid #0c7c84;
+  background-color: #fff;
+}
+
+.chart-container .chart {
+  width: 100%;
+  border: 1px solid #bdbdbd;
+}
+
+.chart-container-md .chart {
+  height: 600px;
+}
+
+.chart-container-sm .chart {
+  height: 300px;
+}

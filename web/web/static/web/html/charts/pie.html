@@ -1,0 +1,47 @@
+<div ng-class="{'chart-container': true, 'chart-container-sm': $ctrl.size == 'sm'}">
+  <svg class="chart">
+    <g class="title"></g>
+    <g class="all"></g>
+  </svg>
+  <div class="chart-ctrls hxBox-md" ng-show="$ctrl.ctrlsVisible">
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><h4>Max Slices: ({{ $ctrl.maxSlices }})</h4></div>
+      <div class="hxCol hxSpan-6">
+        <input
+          type="range"
+          min="{{ $ctrl.maxSlicesMin }}"
+          max="{{ $ctrl.maxSlicesMax }}"
+          step="1"
+          ng-change="$ctrl.changeSlices()"
+          ng-model="$ctrl.maxSlices"
+          ng-disabled="$ctrl.data.length < 2 || $ctrl.showAll" />
+      </div>
+    </div>
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6"><h4>Show All</h4></div>
+      <div class="hxCol hxSpan-6">
+        <input
+          type="checkbox"
+          ng-model="$ctrl.showAll"
+          ng-change="$ctrl.toggleShowAll()"
+          ng-disabled="$ctrl.data.length < 2" />
+      </div>
+    </div>
+    <div class="hxRow">
+      <div class="hxCol hxSpan-6">
+        <button
+          type="button"
+          class="hxBtn"
+          ng-click="$ctrl.toggleCtrls()">Ok</button>
+      </div>
+    </div>
+  </div>
+  <div class="chart-ctx">
+    <div class="hxBtnGroup">
+      <button
+        type="button"
+        class="hxBtn"
+        ng-click="$ctrl.toggleCtrls()"><hx-icon type="cog"></hx-icon></button>
+    </div>
+  </div>
+</div>

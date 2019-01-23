@@ -6,7 +6,7 @@
       <div class="hxBox-md">
         <h2>Reporting</h2>
         <hx-alert type="error" target="'reporting'"></hx-alert>
-        <div ng-if="!data" ng-include="'/static/web/html/reports/inputs.html'"></div>
+        <div ng-hide="data" ng-include="'/static/web/html/reports/inputs.html'"></div>
         <div ng-if="data" ng-include="'/static/web/html/reports/view.html'"></div>
         <div id="downloads" style="display: none;"></div>
       </div>

@@ -1,15 +1,13 @@
-"use strict";
-
 function ReportTableViewController() {
     var self = this;
 
-    var emptyRow = '<tr></tr>';
-    var emptyHead = '<th></th>';
-    var emptyCell = '<td></td>';
-    var emptyTable = '<tr><td>No Matching Results</td></tr>';
+    var emptyRow = "<tr></tr>";
+    var emptyHead = "<th></th>";
+    var emptyCell = "<td></td>";
+    var emptyTable = "<tr><td>No Matching Results</td></tr>";
 
-    var thead = $('#renderTable thead');
-    var tbody = $('#renderTable tbody');
+    var thead = $("#renderTable thead");
+    var tbody = $("#renderTable tbody");
 
     self.$onInit = function() {
         self.render();
@@ -29,7 +27,7 @@ function ReportTableViewController() {
         }
 
         // Build column headers row
-        var headers = Object.keys(self.data[0])
+        var headers = Object.keys(self.data[0]);
         var tr = $(emptyRow);
         angular.forEach(headers, function(header) {
             var th = $(emptyHead).text(header);
@@ -49,11 +47,11 @@ function ReportTableViewController() {
     };
 }
 
-angular.module('cloudSnitch').component('reporttableview', {
-    templateUrl: '/static/web/html/reports/tableview.html',
+angular.module("cloudSnitch").component("reporttableview", {
+    templateUrl: "/static/web/html/reports/tableview.html",
     controller: [ReportTableViewController],
     bindings: {
-        data: '<'
+        data: "<"
     }
 });
 
@@ -110,7 +108,7 @@ function ReportForceDiagramViewController() {
                         id: nodeId,
                         color: colorScale(field),
                         count: 1
-                    }
+                    };
                     prepared.nodes.push(newNode);
                     nodeMap[nodeId] = newNode;
                 }
@@ -160,16 +158,16 @@ function ReportForceDiagramViewController() {
         return d3.drag()
             .on("start", dragStarted)
             .on("drag", dragged)
-            .on("end", dragEnded)
+            .on("end", dragEnded);
     }
 
     /**
      * Adjust center force. Should be done on start and on resize.
      */
     function updateCenter() {
-        const width = parseInt(self.svg.style('width'));
-        const height = parseInt(self.svg.style('height'));
-        self.simulation.force('center', d3.forceCenter(width / 2, height / 2));
+        const width = parseInt(self.svg.style("width"));
+        const height = parseInt(self.svg.style("height"));
+        self.simulation.force("center", d3.forceCenter(width / 2, height / 2));
         self.simulation.alpha(1).restart();
     }
 
@@ -179,7 +177,7 @@ function ReportForceDiagramViewController() {
     function zoom() {
         self.svg
             .select("g.all")
-            .attr('transform', d3.event.transform);
+            .attr("transform", d3.event.transform);
     }
 
     /**
@@ -194,7 +192,7 @@ function ReportForceDiagramViewController() {
      * Adjust the link distance between nodes.
      */
     self.setLinkDistance = function() {
-        self.simulation.force('link').distance(self.linkDistance);
+        self.simulation.force("link").distance(self.linkDistance);
         self.simulation.alpha(1).restart();
     };
 
@@ -202,7 +200,7 @@ function ReportForceDiagramViewController() {
      * Adjust the charge between nodes.
      */
     self.setCharge = function() {
-        self.simulation.force('charge').strength(-self.charge);
+        self.simulation.force("charge").strength(-self.charge);
         self.simulation.alpha(1).restart();
     };
 
@@ -220,21 +218,21 @@ function ReportForceDiagramViewController() {
     self.updateData = function() {
         self.prepared = prepareData(self.data, self.maxNodes);
         self.simulation.nodes(self.prepared.nodes);
-        self.simulation.force('link', d3.forceLink(self.prepared.links).id(d => d.id).distance(self.linkDistance));
+        self.simulation.force("link", d3.forceLink(self.prepared.links).id(d => d.id).distance(self.linkDistance));
 
         self.svg.selectAll(".links line").remove();
         var linkData = self.svg.select("g.links").selectAll("line").data(self.prepared.links);
         linkData.enter()
-            .append('line')
+            .append("line");
 
         self.svg.selectAll(".nodes circle").remove();
-        var nodeData = self.svg.select("g.nodes").selectAll("circle").data(self.prepared.nodes)
+        var nodeData = self.svg.select("g.nodes").selectAll("circle").data(self.prepared.nodes);
         nodeData.enter()
             .append("circle")
-                .attr("r", self.radius)
-                .attr("fill", d => d.color)
-                .call(drag(self.simulation))
-                .append('title').text(d => d.id)
+            .attr("r", self.radius)
+            .attr("fill", d => d.color)
+            .call(drag(self.simulation))
+            .append("title").text(d => d.id);
 
         // Restart the simulation
         self.simulation.alpha(1).restart();
@@ -248,47 +246,47 @@ function ReportForceDiagramViewController() {
         self.charge = self.charge || 70;
         self.toggleCtrls = false;
 
-        self.svg = d3.select('svg#forcediagram');
+        self.svg = d3.select("svg#forcediagram");
 
         self.simulation = d3.forceSimulation();
         updateCenter();
 
         //self.updateCharge();
-        self.simulation.force('charge', d3.forceManyBody().strength(-self.charge));
+        self.simulation.force("charge", d3.forceManyBody().strength(-self.charge));
 
         // Append container for everything for zoom
-        var g = self.svg.append('g').attr('class', 'all');
+        var g = self.svg.append("g").attr("class", "all");
 
         // Add zoom behaviour
-        d3.zoom().on('zoom', zoom)(self.svg);
+        d3.zoom().on("zoom", zoom)(self.svg);
 
         // Append container for links
-        g.append('g')
-            .attr('class', 'links')
-            .attr('stroke', '#999')
-            .attr('stroke-opacity', 0.6)
-            .attr('stroke-width', 3);
+        g.append("g")
+            .attr("class", "links")
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+            .attr("stroke-width", 3);
 
         // Append container for nodes
-        g.append('g')
-            .attr('class', 'nodes')
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1.5)
+        g.append("g")
+            .attr("class", "nodes")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 1.5);
 
         // Add behaviour to adjust positions of lines and circles on each tick
         self.simulation.on("tick", () => {
-            d3.selectAll('g.links line')
+            d3.selectAll("g.links line")
                 .attr("x1", d => d.source.x)
                 .attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x)
                 .attr("y2", d => d.target.y);
 
-            d3.selectAll('g.nodes circle')
+            d3.selectAll("g.nodes circle")
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
         });
 
-        window.addEventListener('resize', updateCenter);
+        window.addEventListener("resize", updateCenter);
         self.updateData();
     };
 
@@ -296,15 +294,15 @@ function ReportForceDiagramViewController() {
      * Remove window listeners created during $onInit
      */
     self.$onDestroy = function() {
-        window.removeEventListener('resize', updateCenter);
+        window.removeEventListener("resize", updateCenter);
     };
 }
 
-angular.module('cloudSnitch').component('reportforcediagramview', {
-    templateUrl: '/static/web/html/reports/forcediagramview.html',
+angular.module("cloudSnitch").component("reportforcediagramview", {
+    templateUrl: "/static/web/html/reports/forcediagramview.html",
     controller: [ReportForceDiagramViewController],
     bindings: {
-        data: '<'
+        data: "<"
     }
 });
 
@@ -355,11 +353,11 @@ function ReportPieChartViewController() {
     };
 }
 
-angular.module('cloudSnitch').component('reportpiechartview', {
-    templateUrl: '/static/web/html/reports/piechartview.html',
+angular.module("cloudSnitch").component("reportpiechartview", {
+    templateUrl: "/static/web/html/reports/piechartview.html",
     controller: [ReportPieChartViewController],
     bindings: {
-        data: '<'
+        data: "<"
     }
 });
 
@@ -387,10 +385,10 @@ function ReportRenderController() {
 }
 
 
-angular.module('cloudSnitch').component('reportrender', {
-    templateUrl: '/static/web/html/reports/render.html',
+angular.module("cloudSnitch").component("reportrender", {
+    templateUrl: "/static/web/html/reports/render.html",
     controller: [ReportRenderController],
     bindings: {
-        data: '<'
+        data: "<"
     }
 });

@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Controller for pie chart component.
  * Data should be passed as an array of
@@ -43,7 +41,7 @@ function PieChartController($element, $timeout) {
                 s += self.data[i].value;
             }
             prepared.push({
-                label: 'Other',
+                label: "Other",
                 value: s
             });
         } else {
@@ -57,9 +55,9 @@ function PieChartController($element, $timeout) {
      */
     function dimensions() {
         return {
-            width: parseInt(self.svg.style('width')),
-            height: parseInt(self.svg.style('height'))
-        }
+            width: parseInt(self.svg.style("width")),
+            height: parseInt(self.svg.style("height"))
+        };
     }
 
     /**
@@ -67,7 +65,7 @@ function PieChartController($element, $timeout) {
      */
     function updateCenter() {
         const d = dimensions();
-        self.svg.select('g.all').attr("transform", `translate(${d.width / 2}, ${d.height / 2})`);
+        self.svg.select("g.all").attr("transform", `translate(${d.width / 2}, ${d.height / 2})`);
     }
 
     /**
@@ -98,23 +96,23 @@ function PieChartController($element, $timeout) {
 
         updateCenter();
 
-        var g = self.svg.select('g.all');
+        var g = self.svg.select("g.all");
         // Remove old paths
-        g.selectAll('path').remove();
+        g.selectAll("path").remove();
         // Add new paths
-        g.selectAll('path')
+        g.selectAll("path")
             .data(arcs)
-            .enter().append('path')
-                .attr('fill', d => color(d.data.label))
-                .attr('stroke', '#fff')
-                .attr('d', arc)
-            .append('title')
-                .text(d => d.data.label);
+            .enter().append("path")
+            .attr("fill", d => color(d.data.label))
+            .attr("stroke", "#fff")
+            .attr("d", arc)
+            .append("title")
+            .text(d => d.data.label);
     }
 
     self.toggleCtrls   = function() { self.ctrlsVisible = !self.ctrlsVisible; };
-    self.toggleShowAll = function() { update(); }
-    self.changeSlices  = function() { update(); }
+    self.toggleShowAll = function() { update(); };
+    self.changeSlices  = function() { update(); };
 
     self.$onInit = function() {
         // Return early if empty data
@@ -132,39 +130,39 @@ function PieChartController($element, $timeout) {
         }
 
         // Only sm is supported right now
-        self.size = self.size || 'sm';
+        self.size = self.size || "sm";
 
         // Wait till page renders
         $timeout(function() {
-            self.svg = d3.select($element[0]).select('svg');
+            self.svg = d3.select($element[0]).select("svg");
 
-            var svgTitle = self.svg.select('g.title').append('text')
-                .attr('font', '16px sans-serif')
-                .attr('x', sizing[self.size].title.x)
-                .attr('y', sizing[self.size].title.y)
-                .attr('stroke', '#444')
+            self.svg.select("g.title").append("text")
+                .attr("font", "16px sans-serif")
+                .attr("x", sizing[self.size].title.x)
+                .attr("y", sizing[self.size].title.y)
+                .attr("stroke", "#444")
                 .text(self.title);
 
             self.svg.append("g")
-                .attr('class', 'all');
+                .attr("class", "all");
             update();
         });
 
-        window.addEventListener('resize', update);
+        window.addEventListener("resize", update);
     };
 
     /**
      * Remove window event listeners created during $onInit
      */
-    self.$onDestroy = function() { window.removeEventListener('resize', update); };
+    self.$onDestroy = function() { window.removeEventListener("resize", update); };
 }
 
-angular.module('cloudSnitch').component('piechart', {
-    templateUrl: '/static/web/html/charts/pie.html',
-    controller: ['$element', '$timeout', PieChartController],
+angular.module("cloudSnitch").component("piechart", {
+    templateUrl: "/static/web/html/charts/pie.html",
+    controller: ["$element", "$timeout", PieChartController],
     bindings: {
-        data: '<',
-        size: '<',
-        title: '<'
+        data: "<",
+        size: "<",
+        title: "<"
     }
 });

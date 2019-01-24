@@ -18,21 +18,21 @@ function PagedTableController() {
                 sortColumnIndex: index
             });
         }
-    }
+    };
 }
 
-angular.module('cloudSnitch').component('pagedtable', {
-    templateUrl: '/static/web/html/pagedtable.html',
+angular.module("cloudSnitch").component("pagedtable", {
+    templateUrl: "/static/web/html/pagedtable.html",
     controller: PagedTableController,
     bindings: {
-        sortable: '<',
-        sortColumn: '<',
-        sortDirection: '<',
-        titles: '<',
-        records: '<',
-        total: '<',
-        onRowClick: '&',
-        onSortChange: '&'
+        sortable: "<",
+        sortColumn: "<",
+        sortDirection: "<",
+        titles: "<",
+        records: "<",
+        total: "<",
+        onRowClick: "&",
+        onSortChange: "&"
     }
 });
 
@@ -58,14 +58,15 @@ function PagesController() {
     };
 
     self.totalPages = function() {
-        return totalPages = Math.ceil(self.total / self.pagesize);
+        return Math.ceil(self.total / self.pagesize);
     };
 
     self.isCurrent = function(index) {
         return self.current == index + 1;
-    }
+    };
 
     self.pageList = function() {
+        var distance;
         var pages = [];
         var totalPages = self.totalPages();
         var length = Math.min(self.nPages, totalPages);
@@ -73,13 +74,13 @@ function PagesController() {
         var stop = start + length - 1;
 
         if (start < 1) {
-            var distance = 1 - start
+            distance = 1 - start;
             start += distance;
             stop += distance;
         }
 
         if (stop > totalPages) {
-            var distance = stop - totalPages;
+            distance = stop - totalPages;
             start -= distance;
             stop -= distance;
         }
@@ -101,16 +102,16 @@ function PagesController() {
 
 }
 
-angular.module('cloudSnitch').component('pages', {
-    templateUrl: '/static/web/html/pages.html',
+angular.module("cloudSnitch").component("pages", {
+    templateUrl: "/static/web/html/pages.html",
     controller: PagesController,
     bindings: {
-        total: '<',
-        pagesize: '<',
-        current: '<',
-        nPages: '<',
-        first: '<',
-        last: '<',
-        onPageChange: '&'
+        total: "<",
+        pagesize: "<",
+        current: "<",
+        nPages: "<",
+        first: "<",
+        last: "<",
+        onPageChange: "&"
     }
 });

@@ -9,11 +9,11 @@ function ManyController() {
      */
     self.$onInit = function() {
         self.values     = self.values             || self.options.default || [];
-        self.label      = self.options.label      || '';
+        self.label      = self.options.label      || "";
         self.help_text  = self.options.help_text  || null;
         self.min_length = self.options.min_length || null;
         self.max_length = self.options.max_length || null;
-        self.name       = self.options.name       || '';
+        self.name       = self.options.name       || "";
 
         if (self.min_length > 0) {
             for (var i = 0; i < self.min_length; i++) {
@@ -43,7 +43,7 @@ function ManyController() {
         if (self.canRemove()) {
             self.values.splice(index, 1);
         }
-    }
+    };
 
     /**
      * Can a new item be added?
@@ -56,7 +56,7 @@ function ManyController() {
             return true;
         }
         return self.max_length > self.values.length;
-    }
+    };
 
     /**
      * Add a new item with a null value.
@@ -65,7 +65,7 @@ function ManyController() {
         if (self.canAdd()) {
             self.values.push(null);
         }
-    }
+    };
 
     /**
      * Called when a child element fires a onChange
@@ -86,15 +86,15 @@ function ManyController() {
     };
 }
 
-angular.module('cloudSnitch').component('manyInput', {
-    templateUrl: '/static/web/html/inputs/manyinput.html',
+angular.module("cloudSnitch").component("manyInput", {
+    templateUrl: "/static/web/html/inputs/manyinput.html",
     controller: [ManyController],
     bindings: {
-        all: '<',
-        values: '<',
-        options: '<',
-        serverErrors: '<',
-        onChange: '&',
+        all: "<",
+        values: "<",
+        options: "<",
+        serverErrors: "<",
+        onChange: "&",
     }
 });
 
@@ -110,7 +110,7 @@ function TimeController(timeService) {
      */
     self.$onInit = function() {
         self.valueMS   = self.valueMS           || self.options.default    || timeService.milliseconds(timeService.now());
-        self.valueSTR  = timeService.str(timeService.fromMilliseconds(self.valueMS))
+        self.valueSTR  = timeService.str(timeService.fromMilliseconds(self.valueMS));
 
         self.required  = self.options.required  || true;
         self.help_text = self.options.help_text || "Please select a time.";
@@ -122,10 +122,10 @@ function TimeController(timeService) {
 
     self.$doCheck = function() {
         if (!angular.equals(self.prevValue, self.value)) {
-                self.prevValue = self.value;
-                self.change();
+            self.prevValue = self.value;
+            self.change();
         }
-    }
+    };
 
     /**
      * Trigger the on change method.
@@ -143,15 +143,15 @@ function TimeController(timeService) {
 
 }
 
-angular.module('cloudSnitch').component('timeInput', {
-    templateUrl: '/static/web/html/inputs/timeinput.html',
-    controller: ['timeService', TimeController],
+angular.module("cloudSnitch").component("timeInput", {
+    templateUrl: "/static/web/html/inputs/timeinput.html",
+    controller: ["timeService", TimeController],
     bindings: {
-        all: '<',
-        value: '<',
-        options: '<',
-        serverErrors: '<',
-        onChange: '&'
+        all: "<",
+        value: "<",
+        options: "<",
+        serverErrors: "<",
+        onChange: "&"
     }
 });
 
@@ -166,7 +166,7 @@ function ModelController(typesService) {
      * Init the controller with sane defaults.
      */
     self.$onInit = function() {
-        self.value     = self.value             || self.options.default     || 'Environment';
+        self.value     = self.value             || self.options.default     || "Environment";
         self.required  = self.options.required  || true;
         self.help_text = self.options.help_text || "Please select a Model.";
         self.label     = self.options.label     || "Model";
@@ -192,15 +192,15 @@ function ModelController(typesService) {
     };
 }
 
-angular.module('cloudSnitch').component('modelInput', {
-    templateUrl: '/static/web/html/inputs/modelinput.html',
-    controller: ['typesService', ModelController],
+angular.module("cloudSnitch").component("modelInput", {
+    templateUrl: "/static/web/html/inputs/modelinput.html",
+    controller: ["typesService", ModelController],
     bindings: {
-        all: '<',
-        value: '<',
-        options: '<',
-        serverErrors: '<',
-        onChange: '&'
+        all: "<",
+        value: "<",
+        options: "<",
+        serverErrors: "<",
+        onChange: "&"
     }
 });
 
@@ -236,15 +236,15 @@ function SelectController() {
     };
 }
 
-angular.module('cloudSnitch').component('selectInput', {
-    templateUrl: '/static/web/html/inputs/selectinput.html',
-    controller: ['typesService', SelectController],
+angular.module("cloudSnitch").component("selectInput", {
+    templateUrl: "/static/web/html/inputs/selectinput.html",
+    controller: ["typesService", SelectController],
     bindings: {
-        all: '<',
-        value: '<',
-        options: '<',
-        serverErrors: '<',
-        onChange: '&'
+        all: "<",
+        value: "<",
+        options: "<",
+        serverErrors: "<",
+        onChange: "&"
     }
 });
 
@@ -261,8 +261,8 @@ function ModelPropertyController(typesService) {
     self.$onInit = function() {
         self.value = self.value || self.options.default || {model: null, prop: null};
 
-        self.value.model    = self.value.model    || 'Environment';
-        self.value.prop     = self.value.prop     || 'account_number_name';
+        self.value.model    = self.value.model    || "Environment";
+        self.value.prop     = self.value.prop     || "account_number_name";
 
         self.required  = self.options.required    || true;
         self.help_text = self.options.help_text   || "Please select a model and a property belonging to that model.";
@@ -305,7 +305,7 @@ function ModelPropertyController(typesService) {
 
         // Check for watched model
         if (self.watches) {
-            available = typesService.path(self.all[self.watches])
+            available = typesService.path(self.all[self.watches]);
 
         // Default to all models.
         } else {
@@ -365,15 +365,15 @@ function ModelPropertyController(typesService) {
     };
 }
 
-angular.module('cloudSnitch').component('modelPropertyInput', {
-    templateUrl: '/static/web/html/inputs/modelpropertyinput.html',
-    controller: ['typesService', ModelPropertyController],
+angular.module("cloudSnitch").component("modelPropertyInput", {
+    templateUrl: "/static/web/html/inputs/modelpropertyinput.html",
+    controller: ["typesService", ModelPropertyController],
     bindings: {
-        all: '<',
-        value: '<',
-        options: '<',
-        serverErrors: '<',
-        onChange: '&'
+        all: "<",
+        value: "<",
+        options: "<",
+        serverErrors: "<",
+        onChange: "&"
     }
 });
 
@@ -420,7 +420,7 @@ function FieldInputController(typesService) {
      */
     self.isSelected = function(field) {
         return (self.value.type == field.type && self.value.property == field.property);
-    }
+    };
 
     /**
      * Hide the drop down menu.
@@ -452,13 +452,13 @@ function FieldInputController(typesService) {
     };
 }
 
-angular.module('cloudSnitch').component('fieldInput', {
-    templateUrl: '/static/web/html/inputs/fieldinput.html',
-    controller: ['typesService', FieldInputController],
+angular.module("cloudSnitch").component("fieldInput", {
+    templateUrl: "/static/web/html/inputs/fieldinput.html",
+    controller: ["typesService", FieldInputController],
     bindings: {
-        value: '<',
-        types: '<',
-        onChange: '&',
-        onDelete: '&'
+        value: "<",
+        types: "<",
+        onChange: "&",
+        onDelete: "&"
     }
 });

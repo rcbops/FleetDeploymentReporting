@@ -35,17 +35,17 @@ function PaneTopCtrlController() {
     };
 }
 
-angular.module('cloudSnitch').component('panetopctrl', {
-    templateUrl: '/static/web/html/panes/panetopctrl.html',
+angular.module("cloudSnitch").component("panetopctrl", {
+    templateUrl: "/static/web/html/panes/panetopctrl.html",
     controller: [PaneTopCtrlController],
     bindings: {
-        backable: '<',
-        cloneable: '<',
-        diffable: '<',
-        onClose: '&',
-        onClone: '&',
-        onDiff: '&',
-        onBack: '&'
+        backable: "<",
+        cloneable: "<",
+        diffable: "<",
+        onClose: "&",
+        onClone: "&",
+        onDiff: "&",
+        onBack: "&"
     }
 });
 
@@ -53,7 +53,7 @@ angular.module('cloudSnitch').component('panetopctrl', {
  * Controller for the panes component.
  *  Handles multiple panes and directs pane to pane communication.
  */
-function PanesController(typesService, timeService) {
+function PanesController(typesService) {
     var self = this;
 
     self.$onInit = function() {
@@ -122,7 +122,7 @@ function PanesController(typesService, timeService) {
                 return false;
             }
 
-            if (a.state != 'details' || b.state != 'details') {
+            if (a.state != "details" || b.state != "details") {
                 return false;
             }
 
@@ -159,14 +159,14 @@ function PanesController(typesService, timeService) {
      */
     self.closeDiff = function() {
         self.diff = undefined;
-    }
+    };
 }
 
-angular.module('cloudSnitch').component('panes', {
-    templateUrl: '/static/web/html/panes/panes.html',
-    controller: ['typesService', 'timeService', PanesController],
+angular.module("cloudSnitch").component("panes", {
+    templateUrl: "/static/web/html/panes/panes.html",
+    controller: ["typesService", PanesController],
     bindings: {
-        maxPanes: '<',
+        maxPanes: "<",
     }
 });
 
@@ -186,7 +186,7 @@ function PaneController(typesService, timeService) {
     function paneChange() {
         self.onPaneChange({
             frame: angular.copy(self.frames[self.frames.length - 1])
-        })
+        });
     }
 
     self.$onInit = function() {
@@ -197,8 +197,8 @@ function PaneController(typesService, timeService) {
 
         // Add initial frame if None
         if (self.frames.length == 0) {
-            self.frames.push({state: 'search'});
-        };
+            self.frames.push({state: "search"});
+        }
         paneChange();
     };
 
@@ -260,7 +260,7 @@ function PaneController(typesService, timeService) {
      */
     self.results = function(type, time, filters) {
         self.frames.push({
-            state: 'results',
+            state: "results",
             type: type,
             time: time,
             filters: filters
@@ -274,7 +274,7 @@ function PaneController(typesService, timeService) {
      */
     self.details = function(record, time, type) {
         self.frames.push({
-            state: 'details',
+            state: "details",
             record: record,
             time: time,
             type: type
@@ -292,35 +292,34 @@ function PaneController(typesService, timeService) {
     };
 }
 
-angular.module('cloudSnitch').component('pane', {
-    templateUrl: '/static/web/html/panes/pane.html',
-    controller: ['typesService', 'timeService', PaneController],
+angular.module("cloudSnitch").component("pane", {
+    templateUrl: "/static/web/html/panes/pane.html",
+    controller: ["typesService", "timeService", PaneController],
     bindings: {
-        cloneable: '<',
-        diffable: '<',
-        index: '<',
-        frames: '<',
-        onClone: '&',
-        onClose: '&',
-        onDiff: '&',
-        onPaneChange: '&'
+        cloneable: "<",
+        diffable: "<",
+        index: "<",
+        frames: "<",
+        onClone: "&",
+        onClose: "&",
+        onDiff: "&",
+        onPaneChange: "&"
     }
 });
 
 /**
  * Controller for the frame that presents search controls.
  */
-function SearchFrameController(typesService, timeService, cloudSnitchApi) {
+function SearchFrameController(typesService, timeService) {
     var self = this;
 
     self.typesService = typesService;
 
     self.$onInit = function() {
         self.path = undefined;
-        self.type = self.type || 'Environment';
+        self.type = self.type || "Environment";
         self.filters = self.filters || [];
 
-        self.time = self.time;
         if (self.time === undefined) {
             self.setToNow();
         }
@@ -334,7 +333,7 @@ function SearchFrameController(typesService, timeService, cloudSnitchApi) {
         return {
             model: self.type,
             property: null,
-            operator: '=',
+            operator: "=",
             value: null
         };
     };
@@ -399,16 +398,16 @@ function SearchFrameController(typesService, timeService, cloudSnitchApi) {
     };
 }
 
-angular.module('cloudSnitch').component('searchFrame', {
-    templateUrl: '/static/web/html/panes/search.html',
-    controller: ['typesService', 'timeService', 'cloudSnitchApi', SearchFrameController],
+angular.module("cloudSnitch").component("searchFrame", {
+    templateUrl: "/static/web/html/panes/search.html",
+    controller: ["typesService", "timeService", SearchFrameController],
     bindings: {
-        filters: '<',
-        focused: '<',
-        time: '<',
-        type: '<',
-        onSearch: '&',
-        onSyncFrame: '&'
+        filters: "<",
+        focused: "<",
+        time: "<",
+        type: "<",
+        onSearch: "&",
+        onSyncFrame: "&"
     }
 });
 
@@ -427,7 +426,7 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
         self.records = [];
         self.rows = [];
         self.count = 0;
-        self.frameId = 'results_' + Date.now();
+        self.frameId = "results_" + Date.now();
         self.headers = [];
         self.showOptions = false;
 
@@ -447,7 +446,7 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
         self.sortField = self.fields[self.sortFieldIndex];
 
         // Default sort direction
-        self.sortDirection =  self.sortDirection || 'asc';
+        self.sortDirection =  self.sortDirection || "asc";
 
         self.setHeaders();
 
@@ -515,7 +514,7 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
      * for use with the paginated table component.
      */
     self.setRecords = function(records) {
-        self.records = records
+        self.records = records;
         self.updateRows();
     };
 
@@ -546,14 +545,15 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
         }
 
         // Build a set of field representations
+        var i;
         var field;
         var fieldSet = new Set([]);
-        for(var i = 0; i < self.fields.length; i++) {
+        for(i = 0; i < self.fields.length; i++) {
             fieldSet.add(fieldToStr(self.fields[i]));
         }
 
         // Loop over reversed path types and stop at first field not in set.
-        for (var i = 0; i < self.path.length && !field; i++) {
+        for (i = 0; i < self.path.length && !field; i++) {
             var type = self.path[i];
             var props = typesService.properties[type];
             for (var j = 0; j < props.length && !field; j++) {
@@ -567,7 +567,7 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
         if (!field) {
             // If an unsed property was not found, use the last property of the last type
             var lastType = self.path[self.path.length - 1];
-            var lastProps = typesService.properties[lastType]
+            var lastProps = typesService.properties[lastType];
             field = {
                 type: lastType,
                 property: lastProps[lastProps.length - 1]
@@ -728,21 +728,21 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
     };
 }
 
-angular.module('cloudSnitch').component('resultsFrame', {
-    templateUrl: '/static/web/html/panes/results.html',
-    controller: ['typesService', 'messagingService', 'cloudSnitchApi', ResultsFrameController],
+angular.module("cloudSnitch").component("resultsFrame", {
+    templateUrl: "/static/web/html/panes/results.html",
+    controller: ["typesService", "messagingService", "cloudSnitchApi", ResultsFrameController],
     bindings: {
-        fields: '<',
-        filters: '<',
-        focused: '<',
-        page: '<',
-        pageSize: '<',
-        sortFieldIndex: '<',
-        sortDirection: '<',
-        time: '<',
-        type: '<',
-        onDetails: '&',
-        onSyncFrame: '&'
+        fields: "<",
+        filters: "<",
+        focused: "<",
+        page: "<",
+        pageSize: "<",
+        sortFieldIndex: "<",
+        sortDirection: "<",
+        time: "<",
+        type: "<",
+        onDetails: "&",
+        onSyncFrame: "&"
     }
 });
 
@@ -774,7 +774,7 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
     }
 
     self.$onInit = function() {
-        self.frameId = 'details_' + Date.now();
+        self.frameId = "details_" + Date.now();
         self.timeBusy = false;
         self.objectBusy = false;
 
@@ -809,7 +809,7 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
         var busy = false;
         if (self.timeBusy) { return true; }
         if (self.objBusy) { return true; }
-        angular.forEach(self.children, function(obj, ref) {
+        angular.forEach(self.children, function(obj) {
             if (obj.busy) { busy = true; }
         });
         return busy;
@@ -840,9 +840,11 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
                 self.timeBusy = false;
             }
         }, function(resp) {
-            messagingService.error(self.frameId,
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                self.frameId,
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
             self.timeBusy = false;
         });
     };
@@ -865,12 +867,12 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
                     self.properties = objKeys();
                 }
             }
-        ).then(function(result) {
+        ).then(function() {
             self.objectBusy = false;
         }, function(resp) {
             messagingService.error(self.frameId,
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+                "API ERROR",
+                resp.status + " " + resp.statusText);
             self.objectBusy = false;
         });
     };
@@ -888,7 +890,7 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
             [{
                 model: self.type,
                 property: typesService.identityProperty(self.type),
-                operator: '=',
+                operator: "=",
                 value: self.identity
             }],
             function(data) {
@@ -899,12 +901,14 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
                     );
                 });
             }
-        ).then(function(result) {
+        ).then(function() {
             self.children[ref].busy = false;
         }, function(resp) {
-            messagingService.error(self.frameId,
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                self.frameId,
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
             self.children[ref].busy = false;
         });
     }
@@ -927,7 +931,7 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
             values.push(obj[props[i]]);
         }
         return values;
-    };
+    }
 
     /**
      * Update children.
@@ -997,16 +1001,16 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
     };
 }
 
-angular.module('cloudSnitch').component('detailsFrame', {
-    templateUrl: '/static/web/html/panes/details.html',
-    controller: ['timeService', 'typesService', 'messagingService', 'cloudSnitchApi', DetailsFrameController],
+angular.module("cloudSnitch").component("detailsFrame", {
+    templateUrl: "/static/web/html/panes/details.html",
+    controller: ["timeService", "typesService", "messagingService", "cloudSnitchApi", DetailsFrameController],
     bindings: {
-        focused: '<',
-        record: '<',
-        time: '<',
-        type: '<',
-        onDetails: '&',
-        onSyncFrame: '&'
+        focused: "<",
+        record: "<",
+        time: "<",
+        type: "<",
+        onDetails: "&",
+        onSyncFrame: "&"
     }
 });
 
@@ -1019,15 +1023,10 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     var self = this;
 
     var frame = undefined;
-    var details = null;
     var pollStructure;
     var pollInterval = 3000;
 
-    var totalNodes = 0;
     var maxLabelLength = 0;
-    var panSpeed = 200;
-    var panBoundary = 20;
-    var panTimer = null;
     var viewerHeight = null;
     var viewerWidth = null;
     var duration = 750;
@@ -1038,7 +1037,7 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
         bottom: 20,
         right: 250,
         left: 250
-    }
+    };
 
     var tree = undefined;
     var nodeRadius = 10;
@@ -1046,51 +1045,17 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     var svg = undefined;
     var g = undefined;
 
-    var i = 0;
-
     self.$onInit = function() {
-        self.state = 'loadingStructure';
+        self.state = "loadingStructure";
         // self.diff Comes from data binding.
         self.prevDiff = undefined;
         self.update();
     };
 
     function zoom() {
-        g.attr('transform', d3.event.transform);
+        g.attr("transform", d3.event.transform);
     }
     var zoomListener = d3.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
-
-     // Define the drag listeners for drag/drop behaviour of nodes.
-    var dragListener = d3.drag()
-        .on("drag", function(d) {
-            // get coords of mouseEvent relative to svg container to allow for panning
-            relCoords = d3.mouse($('svg#diff').get(0));
-            if (relCoords[0] < panBoundary) {
-                panTimer = true;
-                pan(this, 'left');
-            } else if (relCoords[0] > ($('svg#diff').width() - panBoundary)) {
-
-                panTimer = true;
-                pan(this, 'right');
-            } else if (relCoords[1] < panBoundary) {
-                panTimer = true;
-                pan(this, 'up');
-            } else if (relCoords[1] > ($('svg#diff').height() - panBoundary)) {
-                panTimer = true;
-                pan(this, 'down');
-            } else {
-                try {
-                    clearTimeout(panTimer);
-                } catch (e) {
-
-                }
-            }
-
-            d.x0 += d3.event.dy;
-            d.y0 += d3.event.dx;
-            var node = d3.select(this);
-            node.attr("transform", "translate(" + d.y0 + "," + d.x0 + ")");
-        });
 
     function visit(parent, visitFn) {
         if (!parent) return;
@@ -1133,21 +1098,21 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
         var p = svg.select(function() {
             return this.parentNode;
         });
-        svg.attr('width', 1);
-        svg.attr('height', 1);
+        svg.attr("width", 1);
+        svg.attr("height", 1);
 
         var pNode = p.node();
         var rect = pNode.getBoundingClientRect();
         var style = window.getComputedStyle(pNode);
-        var paddingLeft = parseInt(style.getPropertyValue('padding-left'));
-        var paddingRight = parseInt(style.getPropertyValue('padding-right'));
-        var paddingTop = parseInt(style.getPropertyValue('padding-top'));
-        var paddingBottom = parseInt(style.getPropertyValue('padding-bottom'));
+        var paddingLeft = parseInt(style.getPropertyValue("padding-left"));
+        var paddingRight = parseInt(style.getPropertyValue("padding-right"));
+        var paddingTop = parseInt(style.getPropertyValue("padding-top"));
+        var paddingBottom = parseInt(style.getPropertyValue("padding-bottom"));
 
         var svgHeight = rect.height - paddingTop - paddingBottom;
         var svgWidth = rect.width - paddingLeft - paddingRight;
-        svg.attr('height', svgHeight);
-        svg.attr('width', svgWidth);
+        svg.attr("height", svgHeight);
+        svg.attr("width", svgWidth);
 
         var sizeX = svgWidth - margin.right - margin.left;
         var sizeY = svgHeight - margin.bottom - margin.top;
@@ -1158,19 +1123,18 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
      * Offset the tree containing "g" element by margin.
      */
     function translateTree() {
-        g.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        g.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     }
 
     /**
      * Center view port on a node
      */
     function centerNode(source) {
-        t = d3.zoomTransform(svg.node());
-        x = -source.y0;
-        y = -source.x0;
+        var t = d3.zoomTransform(svg.node());
+        var x = -source.y0;
+        var y = -source.x0;
         x = x * t.k + viewerWidth / 2;
         y = y * t.k + viewerHeight / 2;
-        //d3.select('svg').transition()
         svg.transition()
             .duration(duration)
             .call(zoomListener.transform, d3.zoomIdentity.translate(x,y).scale(t.k));
@@ -1199,17 +1163,6 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
             d._children.forEach(collapse);
             d.children = null;
         }
-    };
-
-    /**
-     * Expand helper function
-     */
-    function expand(d) {
-        if (d._children) {
-            d.children = d._children;
-            d.children.forEach(expand);
-            d._children = null;
-        }
     }
 
     /**
@@ -1217,7 +1170,7 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
      */
     function click(d) {
         if (d3.event.defaultPrevented) {
-             return; // click suppressed
+            return; // click suppressed
         }
         d = toggleChildren(d);
         update(d);
@@ -1228,54 +1181,28 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
      * Creates a curved (diagonal) path from parent to the child nodes
      */
     function diagonal(s, d) {
-        path = `M ${s.y} ${s.x}
-                C ${(s.y + d.y) / 2} ${s.x},
-                  ${(s.y + d.y) / 2} ${d.x},
-                  ${d.y} ${d.x}`
+        var path = `M ${s.y} ${s.x}
+                    C ${(s.y + d.y) / 2} ${s.x},
+                      ${(s.y + d.y) / 2} ${d.x},
+                      ${d.y} ${d.x}`;
 
-        return path
-    }
-
-    /**
-     * Pan the Tree
-     */
-    function pan(domNode, direction) {
-        var speed = panSpeed;
-        if (panTimer) {
-            clearTimeout(panTimer);
-            translateCorrds = d3.transform(g.attr('transform'));
-            if (direction == 'left' || direction == 'right') {
-                translateX = direction == 'left' ? translateCoords.translate[0] + speed : translateCoords.translate[0] - speed;
-                translateY = translateCoords.translate[1];
-            } else if (direction == 'up' || direction == 'down') {
-                translateX = translateCoords.translate[0];
-                translateY = direction == 'up' ? translateCoords.translate[1] + speed : translateCoords.translate[1] - speed;
-            }
-            scaleX = translateCoords.scale[0];
-            scaleY = translateCoords.scale[1];
-            scale = zoomListener.scale();
-            g.transition().attr('transform', 'translate(' + translateX + ',' + translateY + ')scale(' + scale + ')');
-            d3.select(domNode).select('g.node').attr('transform', 'translate(' + translateX + ',' + translateY + ')');
-            zoomListener.scale(zoomListener.scale());
-            zoomListener.translate([translateX, translateY]);
-            panTimer = setTimeout(function() { pan(domNode, speed, direction); }, 50);
-        }
+        return path;
     }
 
     function render() {
         // Get the svg element
         if (!angular.isDefined(svg)) {
-            svg = d3.select('svg#diff');
+            svg = d3.select("svg#diff");
         }
         svg.call(zoomListener);
 
         // Make a svg g element if not defined.
         if (!angular.isDefined(g)) {
-            g = svg.append('g');
+            g = svg.append("g");
         }
-        g.html('');
+        g.html("");
 
-        s = sizeTree();
+        var s = sizeTree();
         viewerHeight = s.y;
         viewerWidth = s.x;
 
@@ -1325,12 +1252,11 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
 
         // Visit nodes for count and max label length.
         visit(frame, function(d) {
-            totalNodes++;
             maxLabelLength = Math.max(label(d).length, maxLabelLength);
         });
 
         childCount(0, root);
-        var newHeight = d3.max(levelWidth) * 25 // 25 pixels per line
+        var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line
         // Calculate size svg should be.
         // Calcule size tree should be including margin.
         tree.size([newHeight, viewerWidth]);
@@ -1354,44 +1280,44 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
 
         var nodeEnter = node.enter()
             .append("g")
-                .attr("class", function(d) {
-                    var classes = 'node';
-                    if (d.children)
-                        classes += ' node--internal';
-                    else
-                        classes += ' node--leaf';
+            .attr("class", function(d) {
+                var classes = "node";
+                if (d.children)
+                    classes += " node--internal";
+                else
+                    classes += " node--leaf";
 
-                    switch(d.data.flags.length) {
-                        case 1:
-                            if (d.data.flags[0] == 't1') {
-                                classes += ' removed';
-                            } else if (d.data.flags[0] == 't2') {
-                                classes += ' added';
-                            }
-                            break;
-                        case 2:
-                            classes += ' both';
-                            break;
-                        default:
-                            classes += ' unchanged';
-
+                switch(d.data.flags.length) {
+                case 1:
+                    if (d.data.flags[0] == "t1") {
+                        classes += " removed";
+                    } else if (d.data.flags[0] == "t2") {
+                        classes += " added";
                     }
-                    return classes;
-                })
-                .attr("transform", function(d) {
-                    return "translate(" + source.y0 + "," + source.x0 + ")";
-                })
-                .on('click', click)
-                .on('contextmenu', nodeClickHandler);
+                    break;
+                case 2:
+                    classes += " both";
+                    break;
+                default:
+                    classes += " unchanged";
+
+                }
+                return classes;
+            })
+            .attr("transform", function() {
+                return "translate(" + source.y0 + "," + source.x0 + ")";
+            })
+            .on("click", click)
+            .on("contextmenu", nodeClickHandler);
 
         nodeEnter.append("circle")
-            .attr("r", nodeRadius)
+            .attr("r", nodeRadius);
 
         nodeEnter.append("text")
             .attr("dy", 3)
-            .attr("x", function(d) { return d.children ? -15: 15})
+            .attr("x", function(d) { return d.children ? -15: 15;})
             .style("text-anchor", function(d) { return d.children ? "end": "start"; })
-            .style('fill-opacity', 0)
+            .style("fill-opacity", 0)
             .text(label);
 
         // Transition nodes to their new position.
@@ -1413,7 +1339,7 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
 
         var nodeExit = node.exit().transition()
             .duration(duration)
-            .attr("transform", function(d) {
+            .attr("transform", function() {
                 return "translate(" + source.y + "," + source.x + ")";
             })
             .remove();
@@ -1428,23 +1354,23 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
             .data(links);
 
         var linkEnter = link.enter()
-            .insert('path', 'g')
-                .attr('class', 'link')
-                .attr('d', function(d) {
-                    var o = {x: source.x0, y: source.y0 };
-                    return diagonal(o, o);
-                });
+            .insert("path", "g")
+            .attr("class", "link")
+            .attr("d", function() {
+                var o = {x: source.x0, y: source.y0 };
+                return diagonal(o, o);
+            });
 
         var linkUpdate = linkEnter.merge(link);
         linkUpdate.transition()
             .duration(duration)
-            .attr('d', function(d) {
+            .attr("d", function(d) {
                 return diagonal(d, d.parent);
             });
 
-        var linkExit = link.exit().transition()
+        link.exit().transition()
             .duration(duration)
-            .attr('d', function(d) {
+            .attr("d", function() {
                 var o = {x: source.x, y: source.y};
                 return diagonal(o, o);
             })
@@ -1477,23 +1403,23 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
             $interval.cancel(pollStructure);
             pollStructure = undefined;
         }
-    };
+    }
 
     /**
      * Compute human friendly state.
      */
     self.humanState = function() {
         switch (self.state) {
-            case 'empty':
-                return 'No meaningful differences.';
-            case 'error':
-                return 'Error loading diff';
-            case 'loadingStructure':
-                return 'Loading Structure';
-            case 'done':
-                return 'Done';
-            default:
-                return 'Unknown';
+        case "empty":
+            return "No meaningful differences.";
+        case "error":
+            return "Error loading diff";
+        case "loadingStructure":
+            return "Loading Structure";
+        case "done":
+            return "Done";
+        default:
+            return "Unknown";
         }
     };
 
@@ -1502,38 +1428,38 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
      */
     self.closeDetails = function () {
         self.details = undefined;
-    }
+    };
 
     /**
      * Grab the structure of the diff.
      */
     function getStructure() {
         cloudSnitchApi.diffStructure(self.diff.type, self.diff.id, self.diff.leftTime, self.diff.rightTime)
-        .then(function(result) {
+            .then(function(result) {
 
-            if (!angular.isDefined(result.frame)) {
-                return;
-            }
+                if (!angular.isDefined(result.frame)) {
+                    return;
+                }
 
-            stopPolling();
+                stopPolling();
 
-            if (Object.keys(result.frame).length !== 0 && result.frame.constructor === Object) {
-                frame = result.frame;
-                render();
-                self.state = 'done';
-            } else {
-                self.state = 'empty'
-                frame = null;
-            }
-        }, function(resp) {
-            stopPolling();
-            self.state = 'error'
-            messagingService.error(
-                "diff",
-                "API ERROR",
-                resp.status + " " + resp.statusText
-            );
-        });
+                if (Object.keys(result.frame).length !== 0 && result.frame.constructor === Object) {
+                    frame = result.frame;
+                    render();
+                    self.state = "done";
+                } else {
+                    self.state = "empty";
+                    frame = null;
+                }
+            }, function(resp) {
+                stopPolling();
+                self.state = "error";
+                messagingService.error(
+                    "diff",
+                    "API ERROR",
+                    resp.status + " " + resp.statusText
+                );
+            });
     }
 
     /**
@@ -1541,7 +1467,7 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
      */
     self.update = function() {
         frame = undefined;
-        self.state = 'loadingStructure';
+        self.state = "loadingStructure";
         pollStructure = $interval(getStructure, pollInterval);
     };
 
@@ -1555,8 +1481,8 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     /**
      * Rerender the graph if window size changes.
      */
-    angular.element($window).bind('resize', function() {
-        if (self.state != 'loadingStructure') {
+    angular.element($window).bind("resize", function() {
+        if (self.state != "loadingStructure") {
             render();
         }
     });
@@ -1569,21 +1495,21 @@ function DiffViewController($scope, $interval, $window, cloudSnitchApi, typesSer
     };
 }
 
-angular.module('cloudSnitch').component('diffView', {
-    templateUrl: '/static/web/html/panes/diff.html',
+angular.module("cloudSnitch").component("diffView", {
+    templateUrl: "/static/web/html/panes/diff.html",
     controller: [
-        '$scope',
-        '$interval',
-        '$window',
-        'cloudSnitchApi',
-        'typesService',
-        'timeService',
-        'messagingService',
+        "$scope",
+        "$interval",
+        "$window",
+        "cloudSnitchApi",
+        "typesService",
+        "timeService",
+        "messagingService",
         DiffViewController
     ],
     bindings: {
-        diff: '<',
-        onClose: '&'
+        diff: "<",
+        onClose: "&"
     }
 });
 
@@ -1629,17 +1555,17 @@ function DiffDetailsController(cloudSnitchApi, messagingService) {
         self.properties = [];
         self.busy = true;
         cloudSnitchApi.diffNodes(self.type, self.identity, self.leftTime, self.rightTime)
-        .then(function(result) {
-            self.properties = result.properties;
-            self.busy = false;
-        }, function(resp) {
-            self.busy = false;
-            messagingService.error(
-                "diffdetails",
-                "API ERROR",
-                resp.status + " " + resp.statusText
-            );
-        });
+            .then(function(result) {
+                self.properties = result.properties;
+                self.busy = false;
+            }, function(resp) {
+                self.busy = false;
+                messagingService.error(
+                    "diffdetails",
+                    "API ERROR",
+                    resp.status + " " + resp.statusText
+                );
+            });
     };
 
     /**
@@ -1650,14 +1576,14 @@ function DiffDetailsController(cloudSnitchApi, messagingService) {
     };
 }
 
-angular.module('cloudSnitch').component('diffDetails', {
-    templateUrl: '/static/web/html/panes/diffdetails.html',
-    controller: ['cloudSnitchApi', 'messagingService', DiffDetailsController],
+angular.module("cloudSnitch").component("diffDetails", {
+    templateUrl: "/static/web/html/panes/diffdetails.html",
+    controller: ["cloudSnitchApi", "messagingService", DiffDetailsController],
     bindings: {
-        type: '<',
-        identity: '<',
-        leftTime: '<',
-        rightTime: '<',
-        onClose: '&'
+        type: "<",
+        identity: "<",
+        leftTime: "<",
+        rightTime: "<",
+        onClose: "&"
     }
 });

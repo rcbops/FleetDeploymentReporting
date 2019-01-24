@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('reportsService', ['$rootScope', '$log', 'cloudSnitchApi', 'messagingService', function($rootScope, $log, cloudSnitchApi, messagingService) {
+angular.module("cloudSnitch").factory("reportsService", ["$rootScope", "$log", "cloudSnitchApi", "messagingService", function($rootScope, $log, cloudSnitchApi, messagingService) {
 
     var service = {};
 
@@ -11,7 +11,7 @@ angular.module('cloudSnitch').factory('reportsService', ['$rootScope', '$log', '
      */
     service.updateReports = function() {
         service.reports = [];
-        service.reportsMap = {}
+        service.reportsMap = {};
         service.reportsLoading = true;
 
         cloudSnitchApi.reports().then(function(result) {
@@ -20,14 +20,16 @@ angular.module('cloudSnitch').factory('reportsService', ['$rootScope', '$log', '
             for (var i = 0; i < service.reports.length; i++) {
                 service.reportsMap[service.reports[i].name] = service.reports[i];
             }
-            $rootScope.$broadcast('reports:update');
+            $rootScope.$broadcast("reports:update");
         }, function(resp) {
-            messagingService.error("master_alert",
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                "master_alert",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
             service.reports = [];
         });
-    }
+    };
 
     /**
      * Get a specific report from local reports.
@@ -54,6 +56,6 @@ angular.module('cloudSnitch').factory('reportsService', ['$rootScope', '$log', '
         return service.reportsLoading;
     };
 
-    service.update()
+    service.update();
     return service;
 }]);

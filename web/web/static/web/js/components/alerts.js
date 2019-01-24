@@ -1,4 +1,4 @@
-function AlertsController($scope, $filter, $log) {
+function AlertsController($scope) {
     var self = this;
 
     self.$onInit = function() {
@@ -6,13 +6,13 @@ function AlertsController($scope, $filter, $log) {
     };
 
     self.removeAlert = function(index) {
-        self.alerts.splice(index, 1)
+        self.alerts.splice(index, 1);
         if (self.alerts.length == 0) {
             self.onNoAlerts({});
         }
     };
 
-    $scope.$on('notify', function(notification, args) {
+    $scope.$on("notify", function(notification, args) {
         if (args.target == self.target) {
             self.alerts.push(args);
             if (self.alerts.length == 1) {
@@ -22,12 +22,12 @@ function AlertsController($scope, $filter, $log) {
     });
 }
 
-angular.module('cloudSnitch').component('hxAlert', {
-    templateUrl: '/static/web/html/alert.html',
-    controller: ['$scope', '$filter', '$log', AlertsController],
+angular.module("cloudSnitch").component("hxAlert", {
+    templateUrl: "/static/web/html/alert.html",
+    controller: ["$scope", AlertsController],
     bindings: {
-        target: '<',
-        onHasAlerts: '&',
-        onNoAlerts: '&'
+        target: "<",
+        onHasAlerts: "&",
+        onNoAlerts: "&"
     }
 });

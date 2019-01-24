@@ -1,16 +1,16 @@
-angular.module('cloudSnitch').factory('csrfService', [function() {
+angular.module("cloudSnitch").factory("csrfService", [function() {
     var service = {};
-    var name = '_cloud_snitch_csrf_cookie_';
+    var name = "_cloud_snitch_csrf_cookie_";
     var cookieValue = null;
 
     service.getCookie = function() {
         if (cookieValue === null) {
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
+            if (document.cookie && document.cookie !== "") {
+                var cookies = document.cookie.split(";");
                 for (var i = 0; i < cookies.length; i++) {
                     var cookie = jQuery.trim(cookies[i]);
                     // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;
                     }
@@ -24,10 +24,10 @@ angular.module('cloudSnitch').factory('csrfService', [function() {
 }]);
 
 
-angular.module('cloudSnitch').factory('authInterceptor', ['$q', '$window', function($q, $window) {
+angular.module("cloudSnitch").factory("authInterceptor", ["$q", "$window", function($q, $window) {
 
     function logout() {
-        $window.location.href = '/web/logout';
+        $window.location.href = "/web/logout";
     }
 
     return {
@@ -38,24 +38,24 @@ angular.module('cloudSnitch').factory('authInterceptor', ['$q', '$window', funct
 
             if (rejection.status === 403) {
                 var detail = ((rejection || {}).data || {}).detail;
-                if (angular.isDefined(detail) && detail == 'Authentication credentials were not provided.') {
+                if (angular.isDefined(detail) && detail == "Authentication credentials were not provided.") {
                     logout();
                 }
             }
 
             return $q.reject(rejection);
         }
-    }
+    };
 }]);
 
 
 // Add interceptor to http provider
-angular.module('cloudSnitch').config(['$httpProvider', function($httpProvider) {
-    $httpProvider.interceptors.push('authInterceptor');
+angular.module("cloudSnitch").config(["$httpProvider", function($httpProvider) {
+    $httpProvider.interceptors.push("authInterceptor");
 }]);
 
 
-angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeService', 'csrfService', function($http, $q, timeService, csrfService) {
+angular.module("cloudSnitch").factory("cloudSnitchApi", ["$http", "$q", "timeService", "csrfService", function($http, $q, timeService, csrfService) {
 
     var typesDeferred = $q.defer();
     var service = {};
@@ -63,22 +63,22 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
     function convertTime(str) {
         var t = timeService.fromstr(str);
         t = timeService.milliseconds(t);
-        return t
+        return t;
     }
 
     function makeHeaders() {
         var headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-CSRFToken': csrfService.getCookie()
-        }
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-CSRFToken": csrfService.getCookie()
+        };
         return headers;
     }
 
     service.types = function() {
         return $http({
-            method: 'GET',
-            url: '/api/models'
+            method: "GET",
+            url: "/api/models"
         }).then(function(resp) {
             // Success
             typesDeferred.resolve(resp.data);
@@ -93,8 +93,8 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
     service.reports = function() {
         var defer = $q.defer();
         return $http({
-            method: 'GET',
-            url: '/api/reports/'
+            method: "GET",
+            url: "/api/reports/"
         }).then(function(resp) {
             // Success
             defer.resolve(resp.data);
@@ -116,24 +116,24 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
         var responseType;
 
         switch (type) {
-            case 'csv':
-                headers['Accept'] = 'text/csv';
-                responseType = 'blob';
-                break;
-            case 'json':
-                headers['Accept'] = 'application/json';
-                responseType = 'blob';
-                break;
-            case 'web':
-            default:
-                headers['Accept'] = 'application/json';
-                responseType = 'json';
-                break;
+        case "csv":
+            headers["Accept"] = "text/csv";
+            responseType = "blob";
+            break;
+        case "json":
+            headers["Accept"] = "application/json";
+            responseType = "blob";
+            break;
+        case "web":
+        default:
+            headers["Accept"] = "application/json";
+            responseType = "json";
+            break;
         }
 
         return $http({
-            method: 'POST',
-            url: '/api/reports/run/',
+            method: "POST",
+            url: "/api/reports/run/",
             headers: headers,
             data: req,
             responseType: responseType
@@ -150,8 +150,8 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
     service.paths = function() {
         var defer = $q.defer();
         return $http({
-            method: 'GET',
-            url: '/api/paths'
+            method: "GET",
+            url: "/api/paths"
         }).then(function(resp) {
             // Success
             defer.resolve(resp.data);
@@ -177,8 +177,8 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
             }
         }
         return $http({
-            method: 'POST',
-            url: '/api/objects/times/',
+            method: "POST",
+            url: "/api/objects/times/",
             headers: makeHeaders(),
             data: req
         }).then(function(resp) {
@@ -250,23 +250,23 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
                     model: item.model,
                     prop: item.property,
                     direction: item.direction
-                })
+                });
             });
             req.orders = orders;
         }
 
         return $http({
-            method: 'POST',
-            url: '/api/objects/search/',
+            method: "POST",
+            url: "/api/objects/search/",
             data: req,
             headers: makeHeaders(),
-            }).then(function(resp) {
-                defer.resolve(resp.data);
-                return defer.promise;
-            }, function(resp) {
-                // @TODO - handle errors
-                defer.reject(resp);
-                return defer.promise;
+        }).then(function(resp) {
+            defer.resolve(resp.data);
+            return defer.promise;
+        }, function(resp) {
+            // @TODO - handle errors
+            defer.reject(resp);
+            return defer.promise;
         });
     };
 
@@ -305,17 +305,17 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
         }
 
         function more(page) {
-            req.page = page
+            req.page = page;
             return $http({
-                method: 'POST',
+                method: "POST",
                 headers: makeHeaders(),
-                url: '/api/objects/search/',
+                url: "/api/objects/search/",
                 data: req
             }).then(function(resp) {
                 sink(resp.data);
                 if (req.page * req.pagesize >= resp.data.count) {
                     defer.resolve({});
-                    return defer.promise
+                    return defer.promise;
                 }
                 else {
                     return more(page + 1);
@@ -337,11 +337,11 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
             left_time: convertTime(leftTime),
             right_time: convertTime(rightTime)
         };
-        var defer = $q.defer()
+        var defer = $q.defer();
         return $http({
-            method: 'POST',
+            method: "POST",
             headers: makeHeaders(),
-            url: '/api/objectdiffs/structure/',
+            url: "/api/objectdiffs/structure/",
             data: req
         }).then(function(resp) {
             // Success
@@ -361,11 +361,11 @@ angular.module('cloudSnitch').factory('cloudSnitchApi', ['$http', '$q', 'timeSer
             left_time: convertTime(leftTime),
             right_time: convertTime(rightTime)
         };
-        var defer = $q.defer()
+        var defer = $q.defer();
         return $http({
-            method: 'POST',
+            method: "POST",
             headers: makeHeaders(),
-            url: '/api/objectdiffs/details/',
+            url: "/api/objectdiffs/details/",
             data: req
         }).then(function(resp) {
             // Success

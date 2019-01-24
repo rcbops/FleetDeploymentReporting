@@ -1,4 +1,4 @@
-angular.module('cloudSnitch').factory('timeService', ['$interval', function($interval) {
+angular.module("cloudSnitch").factory("timeService", ["$interval", function($interval) {
 
     var utcOffset;
     var format = "YYYY-MM-DD HH:mm:ss";
@@ -12,7 +12,7 @@ angular.module('cloudSnitch').factory('timeService', ['$interval', function($int
     $interval(updateOffset, 60 * 1000);
 
 
-    service = {};
+    var service = {};
     service.now = function() {
         return moment();
     };
@@ -31,14 +31,14 @@ angular.module('cloudSnitch').factory('timeService', ['$interval', function($int
 
     service.local = function(m) {
         return moment(m.valueOf() + (utcOffset * 60000));
-    }
+    };
 
     service.milliseconds = function(m) {
         return m.valueOf();
     };
 
     service.fromMilliseconds = function(milliseconds) {
-        return moment(milliseconds)
+        return moment(milliseconds);
     };
 
     return service;

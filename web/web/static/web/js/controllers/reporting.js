@@ -1,7 +1,7 @@
 /**
  * Main controller. Holds various app wide things.
  */
-angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log', 'reportsService', 'cloudSnitchApi', 'messagingService', function($scope, $log, reportsService, cloudSnitchApi, messagingService) {
+angular.module("cloudSnitch").controller("ReportingController", ["$scope", "$log", "reportsService", "cloudSnitchApi", "messagingService", function($scope, $log, reportsService, cloudSnitchApi, messagingService) {
     $scope.reports = reportsService.reports;
     $scope.serverErrors = null;
     $scope.showJsonParams = false;
@@ -9,18 +9,18 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
     $scope.data = null;
 
     $scope.controls = {
-        reportName: '',
+        reportName: "",
         report: null,
         parameters: {}
     };
 
     $scope.busy = false;
 
-    $scope.$on('reports:update', function(event) {
+    $scope.$on("reports:update", function() {
         $scope.reports = reportsService.reports;
     });
 
-    $scope.$watch('controls.reportName', function(newValue) {
+    $scope.$watch("controls.reportName", function(newValue) {
         if (newValue) {
             $scope.controls.report = reportsService.get(newValue);
             $scope.controls.parameters = {};
@@ -40,7 +40,7 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
      * Run the report.
      */
     $scope.submit = function() {
-        var type = 'web';
+        var type = "web";
         $scope.busy = true;
         $scope.serverErrors = null;
 
@@ -50,9 +50,11 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
         }, function(resp) {
             $scope.serverErrors = resp.data;
             $scope.busy = false;
-            messagingService.error("reporting",
-                                   "API ERROR",
-                                   resp.status + " " + resp.statusText);
+            messagingService.error(
+                "reporting",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
         });
     };
 
@@ -60,7 +62,7 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
      * Suggest a file name for report data to download.
      */
     function suggestFileName(type) {
-        return $scope.controls.reportName + '_' + new Date().toISOString() + '.' + type;
+        return $scope.controls.reportName + "_" + new Date().toISOString() + "." + type;
     }
 
     /**
@@ -68,13 +70,13 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
      */
     $scope.download = function(type) {
 
-        var blobType, blobString;
+        var blobType, blobStr;
 
-        if (type == 'csv') {
-            mimetype = 'text/csv';
+        if (type == "csv") {
+            blobType = "text/csv";
             blobStr = Papa.unparse($scope.data);
         } else {
-            mimetype = 'application/json';
+            blobType = "application/json";
             blobStr = JSON.stringify($scope.data);
         }
 
@@ -85,11 +87,11 @@ angular.module('cloudSnitch').controller('ReportingController', ['$scope', '$log
         var url = window.URL.createObjectURL(blob);
 
         // Create a link and simulated click
-        var link = angular.element('<a></a>')
-            .css('display', 'none')
-            .attr('href', url)
-            .attr('download', suggestFileName(type));
-        angular.element('#downloads').append(link);
+        var link = angular.element("<a></a>")
+            .css("display", "none")
+            .attr("href", url)
+            .attr("download", suggestFileName(type));
+        angular.element("#downloads").append(link);
         link[0].click();
 
         // Clean up

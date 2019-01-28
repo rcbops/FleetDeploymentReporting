@@ -392,3 +392,201 @@ angular.module("cloudSnitch").component("reportrender", {
         data: "<"
     }
 });
+
+
+function ReportingController($scope, $location, reportsService, cloudSnitchApi, messagingService, paramService) {
+
+    var self = this;
+
+    const generic = "Generic";
+    const queryParams = {
+        name: "name",
+        parameters: "parameters"
+    };
+
+    /**
+     * Set selected report on report list change.
+     *
+     * If a report has not been selected, select the report indicated by
+     *     query params.
+     * If not indicated by query params, select the
+     *     generic report.
+     * If the generic report cannot be found, default to the first report.
+     */
+    function handleReportsChange() {
+        var i;
+        var newReport;
+        var target = self.name || generic;
+        // Default to the generic report
+        if (self.report === null) {
+            for (i = 0; i < self.reports.length; i++) {
+                if (self.reports[i].name == target) {
+                    newReport = self.reports[i];
+                    break;
+                }
+            }
+            // Default to the first report if generic not found.
+            self.report = newReport || self.reports[0];
+            self.changeReport();
+        }
+    }
+
+    /**
+     * Make the query params in address bar match.
+     */
+    function syncLocation() {
+        self.name = self.report.name;
+        $location.search(queryParams.name, self.name);
+        paramService.search(queryParams.parameters, self.parameters);
+    }
+
+    /**
+     * Init state
+     */
+    self.$onInit = function() {
+        self.serverErrors = null;
+        self.showJsonParams = false;
+        self.data = null;
+
+        self.report = null;
+
+        // Check location for report name
+        self.name = $location.search()[queryParams.name] || null;
+
+        // Check location for parameters
+        self.parameters = paramService.search(queryParams.parameters) || {};
+
+        self.busy = false;
+
+        self.reports = reportsService.reports;
+        if (self.reports.length > 0) {
+            handleReportsChange();
+        }
+
+        // Set loading if reports not loaded yet
+        self.reportsLoading = (self.reports.length == 0);
+    };
+
+    /**
+     * Scrub report query params from $location
+     */
+    self.$onDestroy = function() {
+        angular.forEach(queryParams, function(v) {
+            paramService.search(v, null);
+        });
+    };
+
+    /**
+     * Filter out inputs that are no longer necessary
+     */
+    self.changeReport = function() {
+        var key;
+        var newItems = self.report.form_data.map(function(item) {
+            return item.name;
+        });
+        for (key in self.parameters) {
+            if (!newItems.includes(key)) {
+                delete self.parameters[key];
+            }
+        }
+        // Sync existing parameters with report form data
+        syncLocation();
+    };
+
+    /**
+     * Listen for list change events.
+     */
+    $scope.$on("reports:update", function() {
+        self.reports = reportsService.reports;
+        handleReportsChange();
+        self.reportsLoading = false;
+    });
+
+    /**
+     * Update a report control.
+     */
+    self.updateControl = function(change) {
+        self.parameters[change.name] = change.value;
+        syncLocation();
+    };
+
+    /**
+     * Run the report.
+     */
+    self.submit = function() {
+        var type = "web";
+        self.busy = true;
+        self.serverErrors = null;
+
+        cloudSnitchApi.runReport(self.report.name, type, self.parameters).then(function(data) {
+            self.data = data;
+            self.busy = false;
+        }, function(resp) {
+            self.serverErrors = resp.data;
+            self.busy = false;
+            messagingService.error(
+                "reporting",
+                "API ERROR",
+                resp.status + " " + resp.statusText
+            );
+        });
+    };
+
+    /**
+     * Suggest a file name for report data to download.
+     */
+    function suggestFileName(type) {
+        return self.report.name + "_" + new Date().toISOString() + "." + type;
+    }
+
+    /**
+     * Download the data as csv or json format.
+     */
+    self.download = function(type) {
+
+        var blobType, blobStr;
+
+        if (type == "csv") {
+            blobType = "text/csv";
+            blobStr = Papa.unparse(self.data);
+        } else {
+            blobType = "application/json";
+            blobStr = JSON.stringify(self.data);
+        }
+
+        // Create new blob from data
+        var blob = new Blob([blobStr], {type: blobType});
+
+        // Create url to blob
+        var url = window.URL.createObjectURL(blob);
+
+        // Create a link and simulated click
+        var link = angular.element("<a></a>")
+            .css("display", "none")
+            .attr("href", url)
+            .attr("download", suggestFileName(type));
+        angular.element("#downloads").append(link);
+        link[0].click();
+
+        // Clean up
+        link.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    self.closeRendering = function() {
+        self.data = null;
+    };
+
+    /**
+     * Toggle display of json params use in report api request.
+     */
+    self.toggleShowJsonParams =  function() {
+        self.showJsonParams = !self.showJsonParams;
+    };
+}
+
+angular.module("cloudSnitch").component("reporting", {
+    templateUrl: "/static/web/html/reports/index.html",
+    controller: ["$scope", "$location", "reportsService", "cloudSnitchApi", "messagingService", "paramService", ReportingController],
+    bindings: {}
+});

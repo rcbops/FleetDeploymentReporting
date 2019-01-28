@@ -1,24 +1,32 @@
 <div class="hxRow">
   <div class="hxCol hxSpan-6">
     <h4>Select a Report</h4>
-    <p ng-show="data">{{ controls.report.name }}</p>
+    <p ng-show="data">{{ $ctrl.report.name }}</p>
   </div>
 </div>
 <div class="hxRow">
   <div class="hxCol hxSpan-6">
     <h4>Description:</h4>
-    <p>{{ controls.report.description }}</p>
+    <p>{{ $ctrl.report.description }}</p>
   </div>
 </div>
 <div class="hxRow">
   <div class="hxCol hxSpan-12">
     <div class="hxRow">
       <div class="hxCol hxSpan-12">
-        <h4>JSON Parameters: <button type="button" class="hxBtn hxLink" ng-click="toggleShowJsonParams()"><span ng-if="showJsonParams">Hide</span><span ng-if="!showJsonParams">Show</button></h4>
-        <pre ng-if="showJsonParams">{{ controls.parameters | json }}</pre>
+        <h4>JSON Parameters:
+          <button
+            type="button"
+            class="hxBtn hxLink"
+            ng-click="$ctrl.toggleShowJsonParams()">
+              <span ng-if="$ctrl.showJsonParams">Hide</span>
+              <span ng-if="!$ctrl.showJsonParams">Show</span>
+          </button>
+        </h4>
+        <pre ng-if="$ctrl.showJsonParams">{{ $ctrl.parameters | json }}</pre>
       </div>
       <div class="hxCol hxSpan-12">
-        <reportrender data="data"></reportrender>
+        <reportrender data="$ctrl.data"></reportrender>
       </div>
     </div>
   </div>

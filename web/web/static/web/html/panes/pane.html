@@ -39,16 +39,16 @@
           type="frame.type"
           ng-show="$last"
           ng-switch-when="results"
-          on-details="$ctrl.details(record, time, type)"
+          on-details="$ctrl.details(identity, time, type)"
           on-sync-frame="$ctrl.syncFrame(data)"></results-frame>
         <details-frame
           focused="$last"
-          record="frame.record"
+          identity="frame.identity"
           time="frame.time"
           type="frame.type"
           ng-show="$last"
           ng-switch-when="details"
-          on-details="$ctrl.details(record, time, type)"
+          on-details="$ctrl.details(identity, time, type)"
           on-sync-frame="$ctrl.syncFrame(data)"></details-frame>
       </div>
     </div>

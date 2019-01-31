@@ -6,6 +6,7 @@ from .base import VersionedEntity
 from .base import VersionedProperty
 from .apt import AptPackageEntity
 from .configfile import ConfigfileEntity
+from .kernelmodule import KernelModuleEntity
 from .virtualenv import VirtualenvEntity
 
 logger = logging.getLogger(__name__)
@@ -178,6 +179,7 @@ class HostEntity(VersionedEntity):
         'configfiles': ('HAS_CONFIG_FILE', ConfigfileEntity),
         'nameservers': ('HAS_NAMESERVER', NameServerEntity),
         'interfaces': ('HAS_INTERFACE', InterfaceEntity),
+        'kernelmodules': ('HAS_KERNEL_MODULE', KernelModuleEntity),
         'mounts': ('HAS_MOUNT', MountEntity),
         'devices': ('HAS_DEVICE', DeviceEntity),
         'configuredinterfaces': ('HAS_CONFIGURED_INTERFACE',

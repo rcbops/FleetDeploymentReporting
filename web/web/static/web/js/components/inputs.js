@@ -15,8 +15,8 @@ function ManyController() {
         self.max_length = self.options.max_length || null;
         self.name       = self.options.name       || "";
 
-        if (self.min_length > 0) {
-            for (var i = 0; i < self.min_length; i++) {
+        if (self.min_length) {
+            while(self.values.length < self.min_length) {
                 self.values.push(null);
             }
         }
@@ -42,6 +42,7 @@ function ManyController() {
     self.remove = function(index) {
         if (self.canRemove()) {
             self.values.splice(index, 1);
+            self.change();
         }
     };
 
@@ -109,8 +110,8 @@ function TimeController(timeService) {
      * Init controller with sane defaults.
      */
     self.$onInit = function() {
-        self.valueMS   = self.valueMS           || self.options.default    || timeService.milliseconds(timeService.now());
-        self.valueSTR  = timeService.str(timeService.fromMilliseconds(self.valueMS));
+        self.value     = self.value             || self.options.default    || timeService.milliseconds(timeService.now());
+        self.valueSTR  = timeService.str(timeService.fromMilliseconds(self.value));
 
         self.required  = self.options.required  || true;
         self.help_text = self.options.help_text || "Please select a time.";
@@ -132,15 +133,14 @@ function TimeController(timeService) {
      */
     self.change = function() {
         var m = timeService.fromstr(self.valueSTR);
-        self.valueMS = timeService.milliseconds(m);
+        self.value = timeService.milliseconds(m);
         self.onChange({
             change: {
                 name: self.name,
-                value: self.valueMS
+                value: self.value
             }
         });
     };
-
 }
 
 angular.module("cloudSnitch").component("timeInput", {

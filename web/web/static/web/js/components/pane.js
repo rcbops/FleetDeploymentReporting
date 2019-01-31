@@ -53,16 +53,42 @@ angular.module("cloudSnitch").component("panetopctrl", {
  * Controller for the panes component.
  *  Handles multiple panes and directs pane to pane communication.
  */
-function PanesController(typesService) {
+function PanesController(typesService, paramService) {
     var self = this;
 
-    self.$onInit = function() {
-        self.maxPanes = self.maxPanes || 2;
-        self.panes = [];
-        self.diff = undefined;
+    const queryParams = {
+        diff: "diff",
+        panes: "panes"
+    };
 
-        // Start with one pane.
-        self.add();
+    // Sync url query string with current state
+    function syncLocation() {
+        paramService.search(queryParams.diff, self.diff || null);
+        paramService.search(queryParams.panes, self.panes || []);
+    }
+
+    self.$onInit = function() {
+        var i;
+        self.maxPanes = self.maxPanes || 2;
+
+        // Check query string for diff
+        self.diff = paramService.search(queryParams.diff) || undefined;
+
+        // Check query string for params. Add an empty pane if not provided.
+        self.panes = paramService.search(queryParams.panes) || [];
+        for (i = 0; i < self.panes.length; i++) {
+            self.panes[i].frames = [self.panes[i].topFrame];
+        }
+
+        // Start with one pane if none provided from params.
+        if (self.panes.length < 1) { self.add();}
+    };
+
+    self.$onDestroy = function() {
+        // Scrub query params
+        angular.forEach(queryParams, function(v) {
+            paramService.search(v, null);
+        });
     };
 
     /**
@@ -99,6 +125,7 @@ function PanesController(typesService) {
      */
     self.paneChange = function(index, frame) {
         self.panes[index].topFrame = frame;
+        syncLocation();
     };
 
     /**
@@ -122,17 +149,18 @@ function PanesController(typesService) {
                 return false;
             }
 
+            // Both panes must be on details to be diffable
             if (a.state != "details" || b.state != "details") {
                 return false;
             }
 
+            // Both panes must be on the same type
             if (a.type != b.type) {
                 return false;
             }
 
-            var aId = a.record[a.type][typesService.identityProperty(a.type)];
-            var bId = b.record[b.type][typesService.identityProperty(b.type)];
-            if (aId != bId) {
+            // Both panes must have the same identity
+            if (a.identity != b.identity) {
                 return false;
             }
             return true;
@@ -148,10 +176,11 @@ function PanesController(typesService) {
         var b = self.panes[1].topFrame;
         self.diff = {
             type: a.type,
-            id: a.record[a.type][typesService.identityProperty(a.type)],
+            id: a.identity,
             leftTime: a.time,
             rightTime: b.time
         };
+        syncLocation();
     };
 
     /**
@@ -159,12 +188,13 @@ function PanesController(typesService) {
      */
     self.closeDiff = function() {
         self.diff = undefined;
+        syncLocation();
     };
 }
 
 angular.module("cloudSnitch").component("panes", {
     templateUrl: "/static/web/html/panes/panes.html",
-    controller: ["typesService", PanesController],
+    controller: ["typesService", "paramService", PanesController],
     bindings: {
         maxPanes: "<",
     }
@@ -206,9 +236,7 @@ function PaneController(typesService, timeService) {
      * Get the identity value of a frame.
      */
     self.identity = function(index) {
-        var frame = self.frames[index];
-        var prop = typesService.identityProperty(frame.type);
-        return frame.record[frame.type][prop];
+        return self.frames[index].identity;
     };
 
     /**
@@ -272,10 +300,10 @@ function PaneController(typesService, timeService) {
      * Add a details frame.
      *   Typically from a row click in results or a child on details.
      */
-    self.details = function(record, time, type) {
+    self.details = function(identity, time, type) {
         self.frames.push({
             state: "details",
-            record: record,
+            identity: identity,
             time: time,
             type: type
         });
@@ -647,8 +675,9 @@ function ResultsFrameController(typesService, messagingService, cloudSnitchApi) 
      * Emit details event with object of the index'th row.
      */
     self.rowClick = function(index) {
+        var idProp = typesService.identityProperty(self.type);
         self.onDetails({
-            record: self.records[index],
+            identity: self.records[index][self.type][idProp],
             time: self.time,
             type: self.type
         });
@@ -782,11 +811,8 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
         // self.time - from bindings
         self.searchTime = self.time;
 
-        // self.record - from bindings
-
-        // Extract identity property from record
-        self.obj = self.record[self.type];
-        self.identity = self.obj[typesService.identityProperty(self.type)];
+        // Update object later from id
+        self.obj = {};
 
         // Times the subgraph was updated
         self.times = [];
@@ -978,8 +1004,9 @@ function DetailsFrameController(timeService, typesService, messagingService, clo
      * Fires the on-details event. Adds another details frame
      */
     self.rowClick = function(obj, index) {
+        var idProp = typesService.identityProperty(obj.label);
         self.onDetails({
-            record: obj.records[index],
+            identity: obj.records[index][obj.label][idProp],
             time: self.searchTime,
             type: obj.label
         });
@@ -1006,7 +1033,7 @@ angular.module("cloudSnitch").component("detailsFrame", {
     controller: ["timeService", "typesService", "messagingService", "cloudSnitchApi", DetailsFrameController],
     bindings: {
         focused: "<",
-        record: "<",
+        identity: "<",
         time: "<",
         type: "<",
         onDetails: "&",

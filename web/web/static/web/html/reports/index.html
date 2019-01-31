@@ -1,13 +1,14 @@
 <div class="report">
-  <bigbusy busy="busy" text="'Loading...'"></bigbusy>
+  <bigbusy busy="$ctrl.reportsLoading" text="'Loading Reports...'"></bigbusy>
+  <bigbusy busy="$ctrl.busy" text="'Loading...'"></bigbusy>
   <div class="hxRow" ng-include="'/static/web/html/reports/topctrls.html'"></div>
   <div class="hxRow" style="margin-top: 0;">
     <div class="hxCol hxSpan-12">
       <div class="hxBox-md">
         <h2>Reporting</h2>
         <hx-alert type="error" target="'reporting'"></hx-alert>
-        <div ng-hide="data" ng-include="'/static/web/html/reports/inputs.html'"></div>
-        <div ng-if="data" ng-include="'/static/web/html/reports/view.html'"></div>
+        <div ng-hide="$ctrl.data" ng-include="'/static/web/html/reports/inputs.html'"></div>
+        <div ng-if="$ctrl.data" ng-include="'/static/web/html/reports/view.html'"></div>
         <div id="downloads" style="display: none;"></div>
       </div>
     </div>

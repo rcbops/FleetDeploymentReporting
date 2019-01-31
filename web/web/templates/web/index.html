@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}Cloud Snitch{% endblock %}
+{% block base %}<base href="/web/" />{% endblock %}
 
 {% block extra_css %}
 <link href="{% static 'web/css/angularjs-datetime-picker.css' %}" type="text/css" rel="stylesheet" />
@@ -12,19 +13,12 @@
 {% block content %}
 <div id="stage" ng-controller="MainController">
   <nav id="nav" class="hxNav">
-    <a ng-class="{current: subApp == 'browse'}" ng-click="changeSubApp('browse');">Browse</a>
-    <a ng-class="{current: subApp == 'reporting'}" ng-click="changeSubApp('reporting');">Reporting</a>
+    <a ng-class="{current: subApp == 'browse'}" href="browse">Browse</a>
+    <a ng-class="{current: subApp == 'reporting'}" href="reporting">Reporting</a>
   </nav>
   <main id="content" class="">
-    <div
-      ng-if="ready && subApp == 'reporting'"
-      ng-controller="ReportingController"
-      ng-include="'/static/web/html/reporting.html'"
-      class="reportingContainer">
-    </div>
-    <panes
-      ng-if="ready && subApp == 'browse'"
-      max-panes="2"></panes>
+    <reporting ng-if="ready && subApp == 'reporting'" class="reportingContainer"></reporting>
+    <panes ng-if="ready && subApp == 'browse'" max-panes="2"></panes>
     <hx-alert class="hxSpan-4" id="master_alert" target="'master_alert'"></hx-alert>
   </main>
 </div>
@@ -32,9 +26,17 @@
 
 {% block js %}
 <script src="{% static 'web/js/angular.js' %}" type="text/javascript"></script>
+<script src="{% static 'web/js/angular-route.min.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/angularjs-datetime-picker.min.js' %}" type="text/javascript"></script>
 <script type="text/javascript">
-  angular.module('cloudSnitch', ['angularjs-datetime-picker']);
+  var app = angular.module("cloudSnitch", ["ngRoute", "angularjs-datetime-picker"]);
+  app.config(["$routeProvider", "$locationProvider", function configured($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
+    $routeProvider
+      .when("/browse", { action: "browse" })
+      .when("/reporting", { action: "reporting"})
+      .otherwise({ redirectTo: "/browse" });
+  }]);
 </script>
 <script src="{% static 'web/js/papaparse.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/services/api.js' %}" type="text/javascript"></script>
@@ -42,6 +44,7 @@
 <script src="{% static 'web/js/services/time.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/services/types.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/services/reports.js' %}" type="text/javascript"></script>
+<script src="{% static 'web/js/services/params.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/directives/datetime.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/components/alerts.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/components/charts.js' %}" type="text/javascript"></script>
@@ -51,7 +54,6 @@
 <script src="{% static 'web/js/components/pagedtable.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/components/reporting.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/controllers/main.js' %}" type="text/javascript"></script>
-<script src="{% static 'web/js/controllers/reporting.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/filters/localtime.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/filters/truncate.js' %}" type="text/javascript"></script>
 {% endblock %}

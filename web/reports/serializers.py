@@ -121,8 +121,9 @@ class ModelPropertySerializer(Serializer):
             )
 
         if data['prop'] not in registry.properties(data['model']):
-            raise ValidationError(
+            msg = (
                 '{} is not a valid property of model {}'
                 .format(data['prop'], data['model'])
             )
+            raise ValidationError({'prop': msg})
         return data

@@ -3,23 +3,23 @@
     <div class="hxCol hxSpan-4 left">
       <div class="hxBtnGroup hxLink">
         <button
-          ng-if="data"
-          ng-click="closeRendering()"
+          ng-if="$ctrl.data"
+          ng-click="$ctrl.closeRendering()"
           class="hxBtn back"><hx-icon type="angle-left"></hx-icon> Back</button>
         <button
-          ng-if="!data" class="hxBtn">&nbsp;</button>
+          ng-if="!$ctrl.data" class="hxBtn">&nbsp;</button>
       </div>
     </div>
 
     <div class="hxCol hxSpan-8 right">
       <div class="hxBtnGroup hxLink">
         <button
-          ng-if="data"
-          ng-click="download('csv')"
+          ng-if="$ctrl.data"
+          ng-click="$ctrl.download('csv')"
           class="hxBtn"><hx-icon type="export"></hx-icon> CSV</button>
         <button
-          ng-if="data"
-          ng-click="download('json')"
+          ng-if="$ctrl.data"
+          ng-click="$ctrl.download('json')"
           class="hxBtn"><hx-icon type="export"></hx-icon> JSON</button>
       </div>
     </div>

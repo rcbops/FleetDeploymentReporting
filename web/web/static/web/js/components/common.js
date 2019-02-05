@@ -86,3 +86,22 @@ angular.module("cloudSnitch").component("expandableTableContent", {
         onRowClick: "&"
     }
 });
+
+function CSFieldController(typesService) {
+    var self = this;
+
+    self.$onInit = function() {
+        self.displayType = typesService.displayType(self.label, self.property) || "text";
+    };
+}
+
+angular.module("cloudSnitch").component("csField", {
+    templateUrl: "/static/web/html/csfield.html",
+    controller: ["typesService", CSFieldController],
+    bindings: {
+        label: "<",
+        property: "<",
+        value: "<"
+    }
+});
+

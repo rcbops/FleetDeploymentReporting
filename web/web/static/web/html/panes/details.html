@@ -27,17 +27,14 @@
         </tr>
         <tr ng-if="$ctrl.obj.created_at">
           <td>discovered on</td>
-          <td>{{ $ctrl.obj.created_at | localtime }}</td>
+          <td><cs-field label="$ctrl.type" property="'created_at'" value="$ctrl.obj.created_at"></cs-field></td>
         </tr>
         <tr>
           <td colspan="2">&nbsp;</td>
         </tr>
         <tr ng-repeat="key in $ctrl.properties">
             <td>{{ key }}</td>
-            <td>
-                <pre class="configContents" ng-if="$ctrl.type == 'Configfile' && key == 'contents'"><code>{{ $ctrl.obj[key] }}</code></pre>
-                <span ng-if="!($ctrl.type == 'Configfile' && key == 'contents')">{{ $ctrl.obj[key] }}</span>
-            </td>
+            <td><cs-field label="$ctrl.type" property="key" value="$ctrl.obj[key]"></cs-field></td>
         </tr>
       </tbody>
     </table>

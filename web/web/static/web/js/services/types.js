@@ -1,5 +1,11 @@
 angular.module("cloudSnitch").factory("typesService", ["$rootScope", "$log", "cloudSnitchApi", "messagingService", function($rootScope, $log, cloudSnitchApi, messagingService) {
 
+    const fieldTypes = {
+        datetime: "datetime",
+        file: "file",
+        text: "text"
+    };
+
     var service = {};
     service.types = [];
     service.typeMap = {};
@@ -32,7 +38,7 @@ angular.module("cloudSnitch").factory("typesService", ["$rootScope", "$log", "cl
 
     service.diffLabelView = {
         AptPackage: "name",
-        ConfigFile: "name",
+        Configfile: "name",
         ConfiguredInterface: "device",
         Device: "name",
         Environment: "name",
@@ -50,6 +56,28 @@ angular.module("cloudSnitch").factory("typesService", ["$rootScope", "$log", "cl
         PythonPackage: "name",
         Uservar: "name",
         Virtualenv: "path"
+    };
+
+    var displayTypes = {
+        AptPackage:            { created_at: fieldTypes.datetime },
+        Configfile:            { created_at: fieldTypes.datetime, contents: fieldTypes.file },
+        ConfiguredInterface:   { created_at: fieldTypes.datetime },
+        Device:                { created_at: fieldTypes.datetime },
+        Environment:           { created_at: fieldTypes.datetime, last_sync: fieldTypes.datetime },
+        GitRemote:             { created_at: fieldTypes.datetime },
+        GitRepo:               { created_at: fieldTypes.datetime },
+        GitUntrackedFile:      { created_at: fieldTypes.datetime },
+        GitUrl:                { created_at: fieldTypes.datetime },
+        Host:                  { created_at: fieldTypes.datetime },
+        Interface:             { created_at: fieldTypes.datetime },
+        KernelModule:          { created_at: fieldTypes.datetime },
+        KernelModuleParameter: { created_at: fieldTypes.datetime },
+        Mount:                 { created_at: fieldTypes.datetime },
+        NameServer:            { created_at: fieldTypes.datetime },
+        Partition:             { created_at: fieldTypes.datetime },
+        PythonPackage:         { created_at: fieldTypes.datetime },
+        Uservar:               { created_at: fieldTypes.datetime },
+        Virtualenv:            { created_at: fieldTypes.datetime }
     };
 
     var strOperators = [
@@ -205,6 +233,21 @@ angular.module("cloudSnitch").factory("typesService", ["$rootScope", "$log", "cl
             type = "str";
         }
         return type;
+    };
+
+    /**
+     * Get the display type of a label and property.
+     */
+    service.displayType = function(label, property) {
+        var t = fieldTypes.text;
+        try {
+            // DisplayTypes[label] may be defined with missing property.
+            t = displayTypes[label][property] || fieldTypes.text;
+        }
+        catch(e) {
+            // Empty
+        }
+        return t;
     };
 
     /**

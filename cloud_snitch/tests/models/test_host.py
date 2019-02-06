@@ -6,6 +6,7 @@ from cloud_snitch.models import ConfigfileEntity
 from cloud_snitch.models import ConfiguredInterfaceEntity
 from cloud_snitch.models import HostEntity
 from cloud_snitch.models import InterfaceEntity
+from cloud_snitch.models import KernelModuleEntity
 from cloud_snitch.models import MountEntity
 from cloud_snitch.models import NameServerEntity
 from cloud_snitch.models import PartitionEntity
@@ -224,6 +225,7 @@ class TestHostDefinition(DefinitionTestCase):
         ('interfaces', ('HAS_INTERFACE', InterfaceEntity)),
         ('mounts', ('HAS_MOUNT', MountEntity)),
         ('devices', ('HAS_DEVICE', DeviceEntity)),
+        ('kernelmodules', ('HAS_KERNEL_MODULE', KernelModuleEntity)),
         (
             'configuredinterfaces', (
                 'HAS_CONFIGURED_INTERFACE',

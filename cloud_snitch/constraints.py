@@ -22,6 +22,8 @@ _models = [
     models.GitUrlEntity,
     models.HostEntity,
     models.InterfaceEntity,
+    models.KernelModuleEntity,
+    models.KernelModuleParameterEntity,
     models.MountEntity,
     models.NameServerEntity,
     models.PartitionEntity,

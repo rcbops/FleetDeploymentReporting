@@ -47,3 +47,10 @@
       action: uservars_snitch
       tags:
         - uservars
+
+- hosts: all
+  tasks:
+    - name: Get kernel module information
+      kernel_module_snitch:
+      tags:
+        - kernel_module_snitch

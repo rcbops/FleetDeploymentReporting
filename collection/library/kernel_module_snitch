@@ -1,0 +1,118 @@
+#!/usr/bin/python
+import os
+
+DOCUMENTATION = '''
+---
+module: kernel_module_snitch
+
+short_description: Gathers kernel module parameters.
+
+version_added: "1.9.2"
+
+description:
+    - "Gathers all parameters from all kernel modules unless a
+      whitelist of module names is provided."
+
+options:
+    module_list:
+        description:
+            - "Limit kernel module parameter collection to this list."
+        required: false
+
+extends_documentation_fragment:
+    - azure
+
+author:
+    - James Absalon
+'''
+
+EXAMPLES = '''
+- name: Get kernel parameters
+  kernel_module_snitch:
+'''
+
+RETURN = '''
+payload:
+    description: |
+        Dict keyed by kernel module name. The value of each keypair will be
+        another dict keyed by parameter name.
+    type: dict
+doctype:
+    description: Type of document. Will always be 'kernelmodules'
+    type: str
+'''
+
+PARAM_PATH = '/sys/module/{}/parameters'
+MODULE_INFO_PATH = '/proc/modules'
+MAX_MODULE_NAME_LENGTH = 128
+MAX_PARAM_LENGTH = 1024
+
+
+def run_module():
+    module_args = dict(
+        module_list=dict(required=False, type='list')
+    )
+
+    result = dict(
+        changed=False,
+        payload={},
+        doctype='kernelmodules'
+    )
+
+    module = AnsibleModule(  # noqa F405
+        argument_spec=module_args,
+        supports_check_mode=True
+    )
+
+    module_list = module.params.get('module_list') or []
+
+    # Set find everything to true if module list is empty.
+    find_all = len(module_list) == 0
+
+    try:
+        # Iterate over list of modules in MODULE_INFO_PATH
+        # The line format in MODULE_INFO_PATH is:
+        #   <module_name> <module_size> <num dependencies> <dependencies>
+        with open(MODULE_INFO_PATH, 'r') as f:
+            for l in f.readlines():
+                module_name = l.split()[0][:MAX_MODULE_NAME_LENGTH]
+                if find_all or module_name in module_list:
+                    result['payload'].setdefault(
+                        module_name,
+                        dict(parameters=dict())
+                    )
+    except OSError:
+        module.fail_json(msg='Unable to read \'{}\''.format(MODULE_INFO_PATH))
+
+    # Iterate over modules to find parameters
+    for module_name, module_dict in result['payload'].items():
+        param_dir = PARAM_PATH.format(module_name)
+        if not os.path.isdir(param_dir):
+            continue
+
+        for item in os.listdir(param_dir):
+            param_file = os.path.join(param_dir, item)
+            if not os.path.isfile(param_file):
+                continue
+            try:
+                with open(param_file, 'r') as f:
+                    val = f.read().strip()[:MAX_PARAM_LENGTH]
+                    module_dict['parameters'][item] = val
+            except OSError:
+                pass
+
+    try:
+        pass
+    except Exception:
+        module.fail_json(msg="Unable to gather kernel module information.")
+
+    module.exit_json(**result)
+
+
+def main():
+    run_module()
+
+
+from ansible.module_utils.basic import *  # noqa E402
+
+main()

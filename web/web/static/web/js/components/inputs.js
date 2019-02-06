@@ -271,6 +271,7 @@ function ModelPropertyController(typesService) {
         self.watches   = self.options.watches     || null;
 
         self.previousWatchedValue = null;
+        self.previousModel = self.value.model;
 
         self.modelChoices = [];
         self.propertyChoices = [];
@@ -291,6 +292,12 @@ function ModelPropertyController(typesService) {
                 self.previousWatchedValue = angular.copy(self.all[self.watches]);
                 self.updateModelChoices();
             }
+        }
+
+        // Catch model changes from upstream
+        if (self.previousModel != self.value.model ) {
+            self.modelChange();
+            self.previousModel = self.value.model;
         }
     };
 

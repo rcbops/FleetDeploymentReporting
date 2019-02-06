@@ -262,23 +262,25 @@ class UservarsHandler(SingleFileHandler):
 
 
 TARGET_DOCTYPES = [
+    'configuredinterface',
     'dpkg_list',
     'facts',
-    'pip_list',
     'file_dict',
     'gitrepos',
-    'uservars',
-    'configuredinterface'
+    'kernelmodules',
+    'pip_list',
+    'uservars'
 ]
 
 DOCTYPE_HANDLERS = {
+    'configuredinterface': FileHandler,
     'dpkg_list': FileHandler,
     'facts': FileHandler,
-    'pip_list': FileHandler,
-    'gitrepos': GitFileHandler,
-    'uservars': UservarsHandler,
     'file_dict': FileHandler,
-    'configuredinterface': FileHandler
+    'gitrepos': GitFileHandler,
+    'kernelmodules': FileHandler,
+    'pip_list': FileHandler,
+    'uservars': UservarsHandler,
 }
 
 

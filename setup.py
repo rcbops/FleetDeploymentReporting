@@ -6,6 +6,7 @@ entry_points = """
     [cloud_snitch_models]
     AptPackage=cloud_snitch.models:AptPackageEntity
     Configfile=cloud_snitch.models:ConfigfileEntity
+    ConfiguredInterface=cloud_snitch.models:ConfiguredInterfaceEntity
     Device=cloud_snitch.models:DeviceEntity
     Environment=cloud_snitch.models:EnvironmentEntity
     GitRemote=cloud_snitch.models:GitRemoteEntity
@@ -14,7 +15,8 @@ entry_points = """
     GitUrl=cloud_snitch.models:GitUrlEntity
     Host=cloud_snitch.models:HostEntity
     Interface=cloud_snitch.models:InterfaceEntity
-    ConfiguredInterface=cloud_snitch.models:ConfiguredInterfaceEntity
+    KernelModule=cloud_snitch.models:KernelModuleEntity
+    KernelModuleParameter=cloud_snitch.models:KernelModuleParameterEntity
     Mount=cloud_snitch.models:MountEntity
     NameServer=cloud_snitch.models:NameServerEntity
     Partition=cloud_snitch.models:PartitionEntity

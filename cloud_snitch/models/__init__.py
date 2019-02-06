@@ -13,6 +13,8 @@ from .host import InterfaceEntity  # noqa F401
 from .host import HostEntity  # noqa F401
 from .host import MountEntity  # noqa F401
 from .host import ConfiguredInterfaceEntity  # noqa F401
+from .kernelmodule import KernelModuleEntity  # noqa F401
+from .kernelmodule import KernelModuleParameterEntity  # noqa F401
 from .uservar import UservarEntity  # noqa F401
 from .virtualenv import VirtualenvEntity  # noqa F401
 from .virtualenv import PythonPackageEntity  # noqa F401

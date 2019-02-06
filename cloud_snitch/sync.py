@@ -11,6 +11,7 @@ from cloud_snitch.snitchers.configfile import ConfigfileSnitcher
 from cloud_snitch.snitchers.environment import EnvironmentSnitcher
 from cloud_snitch.snitchers.git import GitSnitcher
 from cloud_snitch.snitchers.host import HostSnitcher
+from cloud_snitch.snitchers.kernelmodule import KernelModuleSnitcher
 from cloud_snitch.snitchers.pip import PipSnitcher
 from cloud_snitch.snitchers.uservars import UservarsSnitcher
 from cloud_snitch.snitchers.configuredinterface import \
@@ -75,6 +76,7 @@ def consume(driver, run):
         GitSnitcher(driver, run),
         HostSnitcher(driver, run),
         ConfigfileSnitcher(driver, run),
+        KernelModuleSnitcher(driver, run),
         PipSnitcher(driver, run),
         AptSnitcher(driver, run),
         UservarsSnitcher(driver, run),

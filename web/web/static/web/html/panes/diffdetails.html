@@ -16,8 +16,12 @@
         <tbody>
           <tr ng-repeat="prop in $ctrl.properties">
             <td>{{ prop.name }}</td>
-            <td ng-class="{diffLeft: $ctrl.isDifferent($index)}">{{ prop.t1 }}</td>
-            <td ng-class="{diffRight: $ctrl.isDifferent($index)}">{{ prop.t2 }}</td>
+            <td ng-class="{diffLeft: $ctrl.isDifferent($index)}">
+              <cs-field label="$ctrl.type" property="prop.name" value="prop.t1"></cs-field>
+            </td>
+            <td ng-class="{diffRight: $ctrl.isDifferent($index)}">
+              <cs-field label="$ctrl.type" property="prop.name" value="prop.t2"></cs-field>
+            </td>
           </tr>
         </tbody>
       </table>

@@ -1,0 +1,7 @@
+<ng-switch on="$ctrl.displayType">
+  <pre ng-switch-when="file" class="cs-file">
+    <code>{{ $ctrl.value }}</code>
+  </pre>
+  <span ng-switch-when="datetime" class="cs-datetime">{{ $ctrl.value | localtime }}</span>
+  <span ng-switch-default class="cs-text">{{ $ctrl.value }}</span>
+</ng-switch>

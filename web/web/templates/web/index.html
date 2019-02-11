@@ -25,20 +25,13 @@
 {% endblock %}
 
 {% block js %}
+<script src="{% static 'web/js/papaparse.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/angular.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/angular-route.min.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/angularjs-datetime-picker.min.js' %}" type="text/javascript"></script>
 <script type="text/javascript">
   var app = angular.module("cloudSnitch", ["ngRoute", "angularjs-datetime-picker"]);
-  app.config(["$routeProvider", "$locationProvider", function configured($routeProvider, $locationProvider) {
-    $locationProvider.html5Mode(true);
-    $routeProvider
-      .when("/browse", { action: "browse" })
-      .when("/reporting", { action: "reporting"})
-      .otherwise({ redirectTo: "/browse" });
-  }]);
 </script>
-<script src="{% static 'web/js/papaparse.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/services/api.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/services/messages.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/services/time.js' %}" type="text/javascript"></script>
@@ -56,4 +49,14 @@
 <script src="{% static 'web/js/controllers/main.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/filters/localtime.js' %}" type="text/javascript"></script>
 <script src="{% static 'web/js/filters/truncate.js' %}" type="text/javascript"></script>
+<script type="text/javascript">
+  app.config(["$routeProvider", "$locationProvider", function configured($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
+    $routeProvider
+      .when("/browse/details/:type/:id", { action: "browse" })
+      .when("/browse",                   { action: "browse" })
+      .when("/reporting",                { action: "reporting"})
+      .otherwise({ redirectTo: "/browse" });
+  }]);
+</script>
 {% endblock %}

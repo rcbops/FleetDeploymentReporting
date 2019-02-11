@@ -11,6 +11,11 @@ urlpatterns = [
         name='login'
     ),
     path('logout/', auth_views.logout_then_login, name='logout'),
+    path(
+        'browse/details/<str:obj_model>/<str:obj_id>',
+        views.index,
+        name='browse'
+    ),
     path('browse', views.index, name='browse'),
     path('reporting', views.index, name='reporting'),
     path('', views.index, name='index')

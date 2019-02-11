@@ -6,6 +6,12 @@
  */
 angular.module("cloudSnitch").factory("paramService", ["$location", function($location) {
     var service = {};
+
+    /**
+     * Set or unset a query string value.
+     *
+     * Used to convert complex objects into base64 encode json strings.
+     */
     service.search = function(paramName, obj) {
         var val;
         // Set the value
@@ -30,5 +36,15 @@ angular.module("cloudSnitch").factory("paramService", ["$location", function($lo
             return val;
         }
     };
+
+    /**
+     * Use when creating complex query string arguments manually.
+     *
+     * Example: when building links
+     */
+    service.manualEncode = function(obj) {
+        return window.encodeURIComponent(btoa(angular.toJson(obj)));
+    };
+
     return service;
 }]);

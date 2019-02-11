@@ -53,13 +53,47 @@ angular.module("cloudSnitch").component("panetopctrl", {
  * Controller for the panes component.
  *  Handles multiple panes and directs pane to pane communication.
  */
-function PanesController(typesService, paramService) {
+function PanesController($route, $location, timeService, typesService, paramService) {
     var self = this;
 
     const queryParams = {
         diff: "diff",
         panes: "panes"
     };
+
+    // Handle initial state from $location. Check routeParams and query params.
+    function handleLocation() {
+        var i;
+
+        // Check for :type and :id params from current route
+        if (angular.isDefined($route.current.pathParams.type) && angular.isDefined($route.current.pathParams.id)) {
+            self.panes.push({
+                topFrame: {
+                    state: "details",
+                    type: $route.current.pathParams.type,
+                    identity: $route.current.pathParams.id,
+                    time: timeService.str(timeService.now())
+                }
+            });
+        }
+
+        // Scrub location
+        $location.path("/browse");
+
+        // Check query string for diff
+        self.diff = paramService.search(queryParams.diff) || undefined;
+
+        // Check query string for panes.
+        self.panes = self.panes.concat(paramService.search(queryParams.panes) || []);
+
+        // Limit panes to first maxPanes
+        self.panes = self.panes.slice(0, self.maxPanes);
+
+        // Build frames from top frames for each pane
+        for (i = 0; i < self.panes.length; i++) {
+            self.panes[i].frames = [self.panes[i].topFrame];
+        }
+    }
 
     // Sync url query string with current state
     function syncLocation() {
@@ -68,17 +102,11 @@ function PanesController(typesService, paramService) {
     }
 
     self.$onInit = function() {
-        var i;
         self.maxPanes = self.maxPanes || 2;
+        self.panes = [];
+        self.diff = undefined;
 
-        // Check query string for diff
-        self.diff = paramService.search(queryParams.diff) || undefined;
-
-        // Check query string for params. Add an empty pane if not provided.
-        self.panes = paramService.search(queryParams.panes) || [];
-        for (i = 0; i < self.panes.length; i++) {
-            self.panes[i].frames = [self.panes[i].topFrame];
-        }
+        handleLocation();
 
         // Start with one pane if none provided from params.
         if (self.panes.length < 1) { self.add();}
@@ -194,7 +222,7 @@ function PanesController(typesService, paramService) {
 
 angular.module("cloudSnitch").component("panes", {
     templateUrl: "/static/web/html/panes/panes.html",
-    controller: ["typesService", "paramService", PanesController],
+    controller: ["$route", "$location", "timeService", "typesService", "paramService", PanesController],
     bindings: {
         maxPanes: "<",
     }

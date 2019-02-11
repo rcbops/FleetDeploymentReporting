@@ -136,12 +136,14 @@ function PieChartController($element, $timeout) {
         $timeout(function() {
             self.svg = d3.select($element[0]).select("svg");
 
-            self.svg.select("g.title").append("text")
-                .attr("font", "16px sans-serif")
-                .attr("x", sizing[self.size].title.x)
-                .attr("y", sizing[self.size].title.y)
-                .attr("stroke", "#444")
-                .text(self.title);
+            if (self.chartTitle) {
+                self.svg.select("g.title").append("text")
+                    .attr("font", "16px sans-serif")
+                    .attr("x", sizing[self.size].title.x)
+                    .attr("y", sizing[self.size].title.y)
+                    .attr("stroke", "#444")
+                    .text(self.chartTitle);
+            }
 
             self.svg.append("g")
                 .attr("class", "all");
@@ -163,6 +165,6 @@ angular.module("cloudSnitch").component("piechart", {
     bindings: {
         data: "<",
         size: "<",
-        title: "<"
+        chartTitle: "<"
     }
 });

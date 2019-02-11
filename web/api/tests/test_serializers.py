@@ -7,7 +7,6 @@ from api.serializers import DiffSerializer
 from api.serializers import FilterSerializer
 from api.serializers import GenericSerializer
 from api.serializers import ModelSerializer
-from api.serializers import OrderSerializer
 from api.serializers import PropertySerializer
 from api.serializers import SearchSerializer
 from api.serializers import TimesChangedSerializer
@@ -15,6 +14,8 @@ from api.serializers import TimesChangedSerializer
 from cloud_snitch.models.base import VersionedEntity
 from cloud_snitch.models.base import VersionedProperty
 from cloud_snitch.models.base import versioned_properties
+
+from common.tests.base import SerializerCase
 
 logging.getLogger('api').setLevel(logging.ERROR)
 
@@ -114,21 +115,6 @@ class TestPropertySerializer(TestCase):
         self.assertTrue(props is data['properties'])
 
 
-class SerializerCase(TestCase):
-    """Base Class for testing deserialization."""
-
-    def deserialize(self):
-        self.serializer = self.serializer_class(data=self.data)
-
-    def assertValid(self):
-        self.deserialize()
-        self.assertTrue(self.serializer.is_valid())
-
-    def assertInvalid(self):
-        self.deserialize()
-        self.assertFalse(self.serializer.is_valid())
-
-
 class TestFilterSerializer(SerializerCase):
 
     serializer_class = FilterSerializer
@@ -183,52 +169,6 @@ class TestFilterSerializer(SerializerCase):
     @tag('unit')
     def test_missing_value(self):
         del self.data['value']
-        self.assertInvalid()
-
-
-class TestOrderSerializer(SerializerCase):
-
-    serializer_class = OrderSerializer
-
-    def setUp(self):
-        self.data = {
-            'model': 'Environment',
-            'prop': 'account_number',
-            'direction': 'asc'
-        }
-
-    @tag('unit')
-    def test_valid(self):
-        self.assertValid()
-
-    @tag('unit')
-    def test_invalid_model(self):
-        self.data['model'] = 'somerandommodel'
-        self.assertInvalid()
-
-    @tag('unit')
-    def test_missing_model(self):
-        del self.data['model']
-        self.assertInvalid()
-
-    @tag('unit')
-    def test_invalid_prop(self):
-        self.data['prop'] = '    a      b '
-        self.assertInvalid()
-
-    @tag('unit')
-    def test_missing_prop(self):
-        del self.data['prop']
-        self.assertInvalid()
-
-    @tag('unit')
-    def test_invalid_direction(self):
-        self.data['direction'] = 'dasc'
-        self.assertInvalid()
-
-    @tag('unit')
-    def test_missing_direction(self):
-        del self.data['direction']
         self.assertInvalid()
 
 

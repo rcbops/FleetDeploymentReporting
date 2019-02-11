@@ -1,8 +1,11 @@
+from collections import OrderedDict
 from cloud_snitch.models import registry
+from common.serializers import FilterSerializer
 from rest_framework.serializers import ChoiceField
 from rest_framework.serializers import IntegerField
 from rest_framework.serializers import ListField
 from rest_framework.serializers import Serializer
+from rest_framework.serializers import ValidationError
 
 from neo4jdriver.query import ColumnQuery
 
@@ -38,6 +41,51 @@ class GenericSerializer(Serializer):
         help_text='Please choose each column to be listed in the report.'
     )
 
+    filters = ListField(
+        child=FilterSerializer(),
+        label="Filters",
+        help_text="Additional filter criteria.",
+        required=False
+    )
+
+    def validate(self, data):
+        """Custom validation.
+
+        Ensure that all columns are properties to models in the path
+        to the chosen model.
+
+        Ensure that all filters are on properties to models in the path
+        to the chosen model.
+
+        :param data: Data to validate
+        :type data: dict
+        """
+        model_set = set([t[0] for t in registry.path(data['model'])])
+        model_set.add(data['model'])
+
+        column_errors = OrderedDict()
+        for i, c in enumerate(data.get('columns', [])):
+            if c['model'] not in model_set:
+                column_errors[i] = (
+                    'Model {} is not in path of {}'
+                    .format(c['model'], data['model'])
+                )
+        if column_errors:
+            raise ValidationError({'columns': column_errors})
+
+        filter_errors = OrderedDict()
+        for i, f in enumerate(data.get('filters', [])):
+            if f['model'] not in model_set:
+                filter_errors[i] = (
+                    'Model {} not in path of {}'
+                    .format(f['model'], data['model'])
+                )
+
+        if filter_errors:
+            raise ValidationError({'filters': filter_errors})
+
+        return data
+
     def form_data(self):
         """Describes web client form associated with this serializer.
 
@@ -69,6 +117,14 @@ class GenericSerializer(Serializer):
                 'component': 'ModelProperty',
                 'many': True,
                 'watches': 'model'
+            },
+            {
+                'name': 'filters',
+                'label': self.fields['filters'].label,
+                'help_text': self.fields['filters'].help_text,
+                'component': 'Filter',
+                'many': True,
+                'watches': 'model'
             }
         ]
 
@@ -81,14 +137,28 @@ class GenericReport(BaseReport):
 
     serializer_class = GenericSerializer
 
-    def run(self):
+    def build_query(self):
+        """Builds and returns query for the report without paging.
 
+        :returns: Query object
+        :rtype: ColumnQuery
+        """
         q = ColumnQuery(self.data['model'])
         q.time(self.data['time'])
         for column in self.data['columns']:
             q.add_column(column['model'], column['prop'])
             q.orderby(column['prop'], 'ASC', label=column['model'])
+        for f in self.data.get('filters', []):
+            q.filter(f['prop'], f['operator'], f['value'], label=f['model'])
+        return q
 
+    def run(self):
+        """Run the report and return results.
+
+        :returns: The report data
+        :rtype: list
+        """
+        q = self.build_query()
         rows = []
         pagesize = 5000
         page = 1
@@ -106,7 +176,6 @@ class GenericReport(BaseReport):
         :returns: Compute list of columns
         :rtype: list
         """
-
         cols = []
         for c in self.data['columns']:
             cols.append('{}.{}'.format(c['model'], c['prop']))

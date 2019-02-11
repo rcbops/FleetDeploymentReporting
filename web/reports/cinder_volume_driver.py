@@ -2,14 +2,19 @@ import configparser
 import logging
 
 from collections import OrderedDict
+from common.serializers import FilterSerializer
 from rest_framework.serializers import IntegerField
+from rest_framework.serializers import ListField
 from rest_framework.serializers import Serializer
+from rest_framework.serializers import ValidationError
 
 from neo4jdriver.query import ColumnQuery
 
 from .base import BaseReport
 
 logger = logging.getLogger(__name__)
+
+FILTERABLE_MODELS = ['Environment', 'Host', 'Configfile']
 
 
 def parse_contents(contents):
@@ -40,6 +45,35 @@ class VolumeDriverSerializer(Serializer):
         help_text='Point of time to run report.'
     )
 
+    filters = ListField(
+        child=FilterSerializer(),
+        label="Filters",
+        help_text="Additional filter criteria.",
+        required=False
+    )
+
+    def validate(self, data):
+        """Custom validation.
+
+        Ensure filters are acting upon a filterable model.
+
+        :param data: Data to validate
+        :type data: dict
+        :returns: Validated data
+        :rtype: dict
+        """
+        model_set = set(FILTERABLE_MODELS)
+        filter_errors = OrderedDict()
+        for i, f in enumerate(data.get('filters', [])):
+            if f['model'] not in model_set:
+                filter_errors[i] = (
+                    'Model {} is not one of [{}].'
+                    .format(f['model'], ', '.join(FILTERABLE_MODELS))
+                )
+        if filter_errors:
+            raise ValidationError({'filters': filter_errors})
+        return data
+
     def form_data(self):
         """Describes web client form associated with this serializer.
 
@@ -54,6 +88,14 @@ class VolumeDriverSerializer(Serializer):
                 'required': self.fields['time'].required,
                 'component': 'Time',
                 'many': False
+            },
+            {
+                'name': 'filters',
+                'label': self.fields['filters'].label,
+                'help_text': self.fields['filters'].help_text,
+                'component': 'Filter',
+                'many': True,
+                'models': FILTERABLE_MODELS
             }
         ]
 
@@ -92,11 +134,11 @@ class CinderVolumeDriverReport(BaseReport):
         d['driver'] = driver
         return d
 
-    def run(self):
-        """Run the report.
+    def build_query(self):
+        """Build query for the report.
 
-        :returns: List of report rows
-        :rtype: List of ordereddicts
+        :returns: Query object
+        :rtype: ColumnQuery
         """
         q = ColumnQuery('Configfile')
         q.time(self.data['time'])
@@ -104,7 +146,17 @@ class CinderVolumeDriverReport(BaseReport):
             q.add_column(column['model'], column['prop'])
             q.orderby(column['prop'], 'ASC', label=column['model'])
         q.filter('name', '=', 'cinder.conf', label='Configfile')
+        for f in self.data.get('filters', []):
+            q.filter(f['prop'], f['operator'], f['value'], label=f['model'])
+        return q
 
+    def run(self):
+        """Run the report.
+
+        :returns: List of report rows
+        :rtype: List of ordereddicts
+        """
+        q = self.build_query()
         records = []
         pagesize = 500
         page = 1
@@ -115,7 +167,6 @@ class CinderVolumeDriverReport(BaseReport):
                     records.append(self._record_from_row(row, s, d))
             page += 1
             page_rows = q.page(page, pagesize)
-
         return records
 
     def columns(self):

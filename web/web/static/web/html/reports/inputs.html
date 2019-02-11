@@ -81,6 +81,15 @@
               server-errors="$ctrl.serverErrors[item.name]"
               class="hxCol hxSpan-12"></select-input>
 
+            <filter-input
+              ng-switch-when="Filter"
+              options="item"
+              on-change="$ctrl.updateControl(change)"
+              all="$ctrl.parameters"
+              server-errors="$ctrl.serverErrors[item.name]"
+              value="$ctrl.parameters[item.name]"
+              class="hxCol hxSpan-11"></filter-input>
+
             <div ng-switch-default class="hxCol hxSpan-12">
               <p>item.name: {{ item.name }}</p>
               <p>item.label: {{ item.label }}</p>

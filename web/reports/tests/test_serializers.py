@@ -7,7 +7,7 @@ from reports.serializers import time_field
 from reports.serializers import ModelPropertySerializer
 from reports.serializers import TimeRangeSerializer
 
-from .base import SerializerCase
+from common.tests.base import SerializerCase
 
 
 class TestTimeField(SimpleTestCase):

@@ -6,7 +6,7 @@ from django.test import SimpleTestCase
 from reports.git import GitReport
 from reports.git import GitSerializer
 
-from .base import SerializerCase
+from common.tests.base import SerializerCase
 
 
 class TestGitSerializer(SerializerCase):
@@ -18,7 +18,15 @@ class TestGitSerializer(SerializerCase):
         """Patch urls returned from neo4j query."""
         self.data = {
             'time': 1,
-            'url': 'https://git.openstack.org/openstack/openstack-ansible'
+            'url': 'https://git.openstack.org/openstack/openstack-ansible',
+            'filters': [
+                {
+                    'model': 'Environment',
+                    'prop': 'name',
+                    'operator': 'CONTAINS',
+                    'value': 'james'
+                }
+            ]
         }
         self.patcher = mock.patch('reports.git.GitSerializer.git_urls')
         self.mock_git_urls = self.patcher.start()
@@ -68,6 +76,25 @@ class TestGitSerializer(SerializerCase):
         self.data['url'] = 'notarepo'
         self.assertInvalid()
 
+    @tag('unit')
+    def test_filter_invalid_model(self):
+        """Test that filtering a model not in filterable list fails."""
+        self.data['filters'][0]['model'] = 'PythonPackage'
+        self.data['filters'][0]['prop'] = 'name'
+        self.assertInvalid()
+
+    @tag('unit')
+    def test_filter_invalid_property(self):
+        """Test that invalid property on valid model filter fails."""
+        self.data['filters'][0]['prop'] = 'notaprop'
+        self.assertInvalid()
+
+    @tag('unit')
+    def test_filter_invalid_operator(self):
+        """Test that filter with invalid operator fails."""
+        self.data['filters'][0]['operator'] = 'notanop'
+        self.assertInvalid()
+
 
 class TestGitReport(SimpleTestCase):
     """Test the git report.
@@ -80,6 +107,14 @@ class TestGitReport(SimpleTestCase):
         self.params = {
             'time': 1534172356 * 1000,
             'url': 'https://git.openstack.org/openstack/openstack-ansible',
+            'filters': [
+                {
+                    'model': 'Environment',
+                    'prop': 'name',
+                    'operator': 'CONTAINS',
+                    'value': 'james'
+                }
+            ]
         }
         self.patcher = mock.patch('reports.git.GitSerializer.git_urls')
         self.mock_git_urls = self.patcher.start()
@@ -106,3 +141,11 @@ class TestGitReport(SimpleTestCase):
         r = GitReport(self.params)
         for i, col in enumerate(r.columns()):
             self.assertEquals(expected[i], col)
+
+    @tag('unit')
+    def test_filter_in_query(self):
+        """Test that adding a filter affects query."""
+        r = GitReport(self.params)
+        q = r.build_query()
+        self.assertTrue('environment.name CONTAINS $filterval1' in str(q))
+        self.assertEqual(q.params['filterval1'], 'james')

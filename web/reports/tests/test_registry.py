@@ -4,7 +4,7 @@ from django.test import SimpleTestCase
 from reports.registry import Registry
 from reports.registry import ReportNameSerializer
 
-from .base import SerializerCase
+from common.tests.base import SerializerCase
 
 
 def fake_report_class(**kwargs):

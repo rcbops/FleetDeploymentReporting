@@ -1,10 +1,8 @@
+from common.tests.base import SerializerCase
 from django.test import tag
 from django.test import SimpleTestCase
-
 from reports.generic import GenericReport
 from reports.generic import GenericSerializer
-
-from .base import SerializerCase
 
 
 class TestGenericSerializer(SerializerCase):
@@ -24,6 +22,14 @@ class TestGenericSerializer(SerializerCase):
                 {
                     'model': 'Environment',
                     'prop': 'account_number'
+                }
+            ],
+            'filters': [
+                {
+                    'model': 'Environment',
+                    'prop': 'name',
+                    'operator': 'CONTAINS',
+                    'value': 'james'
                 }
             ]
         }
@@ -94,6 +100,35 @@ class TestGenericSerializer(SerializerCase):
         }
         self.assertInvalid()
 
+    @tag('unit')
+    def test_column_model_not_in_path(self):
+        self.data['columns'][0] = {
+            'model': 'Host',
+            'prop': 'hostname'
+        }
+        self.assertInvalid()
+
+    @tag('unit')
+    def test_no_filters(self):
+        self.data['filters'] = []
+        self.assertValid()
+
+    @tag('unit')
+    def test_invalid_filter_operator(self):
+        self.data['filters'][0]['operator'] = 'notanop'
+        self.assertInvalid()
+
+    @tag('unit')
+    def test_invalid_filter_property(self):
+        self.data['filters'][0]['prop'] = 'notaprop'
+        self.assertInvalid()
+
+    @tag('unit')
+    def test_filter_model_not_in_path(self):
+        self.data['filters'][0]['model'] = 'PythonPackage'
+        self.data['filters'][0]['prop'] = 'name'
+        self.assertInvalid()
+
 
 class TestGenericReport(SimpleTestCase):
     """Test the generic report
@@ -115,6 +150,14 @@ class TestGenericReport(SimpleTestCase):
                     'model': 'Environment',
                     'prop': 'account_number',
                 }
+            ],
+            'filters': [
+                {
+                    'model': 'Environment',
+                    'prop': 'name',
+                    'operator': 'CONTAINS',
+                    'value': 'james'
+                }
             ]
         }
 
@@ -125,3 +168,10 @@ class TestGenericReport(SimpleTestCase):
         cols = r.columns()
         self.assertEquals(cols[0], 'Environment.name')
         self.assertEquals(cols[1], 'Environment.account_number')
+
+    @tag('unit')
+    def test_filters(self):
+        """Test that filters affect query."""
+        r = GenericReport(self.params)
+        q_str = str(r.build_query())
+        self.assertTrue('environment.name CONTAINS $filterval0' in q_str)

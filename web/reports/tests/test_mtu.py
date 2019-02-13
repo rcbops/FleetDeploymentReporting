@@ -4,7 +4,7 @@ from django.test import SimpleTestCase
 from reports.mtu import MTUSerializer
 from reports.mtu import MTUReport
 
-from .base import SerializerCase
+from common.tests.base import SerializerCase
 
 
 class TestMTUSerializer(SerializerCase):

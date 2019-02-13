@@ -44,6 +44,15 @@
       value="$ctrl.values[$index]"
       class="hxCol hxSpan-11"></select-input>
 
+    <filter-input
+      ng-switch-when="Filter"
+      options="$ctrl.options"
+      on-change="$ctrl.update($index, change)"
+      all="$ctrl.all"
+      server-errors="$ctrl.serverErrors[$index]"
+      value="$ctrl.values[$index]"
+      class="hxCol hxSpan-11"></filter-input>
+
     <div class="hxCol hxSpan-1" ng-if="$ctrl.canRemove()">
       <button type="button" class="hxBtn" ng-click="$ctrl.remove($index)"><hx-icon type="minus"</hx-icon></button>
     </div>

@@ -1,30 +1,17 @@
 import logging
 
 from cloud_snitch.models import registry
+from common.serializers import FilterSerializer
+from common.serializers import OrderSerializer
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import ChoiceField
 from rest_framework.serializers import CharField
 from rest_framework.serializers import IntegerField
 from rest_framework.serializers import ListField
-from rest_framework.serializers import SlugField
-
 from rest_framework.serializers import ValidationError
 
-
 logger = logging.getLogger(__name__)
-
-_operators = [
-    '=',
-    '<>',
-    '>',
-    '>=',
-    '<',
-    '<=',
-    'CONTAINS',
-    'STARTS WITH',
-    'ENDS WITH'
-]
 
 
 class ModelSerializer(BaseSerializer):
@@ -87,21 +74,6 @@ class PropertySerializer(BaseSerializer):
         return dict(properties=obj)
 
 
-class FilterSerializer(Serializer):
-    """Serializer for filters on a query"""
-    model = ChoiceField([m.label for m in registry.models.values()])
-    prop = SlugField(max_length=256, required=True)
-    operator = ChoiceField(_operators, required=True)
-    value = CharField(max_length=256, required=True)
-
-
-class OrderSerializer(Serializer):
-    """Serializer for order by on a query."""
-    model = ChoiceField([m.label for m in registry.models.values()])
-    prop = SlugField(max_length=256, required=True)
-    direction = ChoiceField(['asc', 'desc'])
-
-
 class SearchSerializer(Serializer):
     """Serializer for search queries."""
     model = ChoiceField([m.label for m in registry.models.values()])
@@ -126,30 +98,12 @@ class SearchSerializer(Serializer):
                     .format(f['model'], data['model'])
                 )
 
-            # Make sure filter property is property of filter model
-            if f['prop'] not in registry.properties(f['model']):
-                raise ValidationError(
-                    'Model {} does not have property {}'.format(
-                        f['model'],
-                        f['prop']
-                    )
-                )
-
         for o in data.get('orders', []):
             # Make sure order model is in path of search model
             if o['model'] not in model_set:
                 raise ValidationError(
                     'Model {} not in path of {}'
                     .format(o['model'], data['model'])
-                )
-
-            # Make sure order property is property of order model
-            if o['prop'] not in registry.properties(o['model']):
-                raise ValidationError(
-                    'Model {} does not have property {}'.format(
-                        o['model'],
-                        o['prop']
-                    )
                 )
 
         return data

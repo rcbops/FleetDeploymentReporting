@@ -469,3 +469,163 @@ angular.module("cloudSnitch").component("fieldInput", {
         onDelete: "&"
     }
 });
+
+function FilterController(typesService) {
+
+    var self = this;
+
+    const defaultHelpText = "Please select a model, property, operator and provide a value.";
+    const watchKeys = ["model", "prop", "operator"];
+
+    /**
+     * Init the controller with sane defaults
+     */
+    self.$onInit = function() {
+        self.value = self.value || self.options.default || {
+            model: null,
+            prop: null,
+            operator: null,
+            value: null
+        };
+
+        self.required  = self.options.required    || true;
+        self.help_text = self.options.help_text   || defaultHelpText;
+        self.label     = self.options.label       || "Filter";
+        self.name      = self.options.name        || "pathfilter";
+        self.watches   = self.options.watches     || null;
+
+        self.previous = {
+            watched: null,
+            model: self.value.model,
+            prop: self.value.prop,
+            operator: self.value.operator
+        };
+
+        self.valueType = typesService.propertyType(self.value.model, self.value.prop);
+
+        self.previousModel = self.value.model;
+
+        self.modelChoices = [];
+        self.propertyChoices = [];
+        self.operatorChoices = [];
+
+        self.update();
+        self.change();
+    };
+
+    /**
+     * Check for a change in a watched model input.
+     *
+     * If changed, update model choices.
+     */
+    self.$doCheck = function() {
+        if (self.watches) {
+            if (!angular.equals(self.previous.watched, self.all[self.watches])) {
+                self.previous.watched = angular.copy(self.all[self.watches]);
+                self.update();
+            }
+        }
+
+        // Catch changes from upstream:
+        angular.forEach(watchKeys, function(key) {
+            if (self.previous[key] != self.value[key]) {
+                self.update();
+                self.previous[key] = self.value[key];
+            }
+        });
+    };
+
+    self.update = function() {
+        self.updateModelChoices();
+        self.updatePropertyChoices();
+        self.updateOperatorChoices();
+        self.valueType = typesService.propertyType(self.value.model, self.value.prop);
+        self.change();
+    };
+
+    /**
+     * Update model choices.
+     *
+     * If watching a model input, new choices are the path of that model
+     * Otherwise use all models.
+     */
+    self.updateModelChoices = function() {
+        var available;
+
+        // Check for watched model
+        if (self.watches) {
+            available = typesService.path(self.all[self.watches]);
+
+        // Check to see if filter is permitted a list of models.
+        } else if (self.options.models) {
+            available = self.options.models;
+
+        // Default to all models.
+        } else {
+            available = [];
+            for (var i = 0; i < typesService.types.length; i++) {
+                available.push(typesService.types[i].label);
+            }
+        }
+
+        self.modelChoices = available;
+
+        // If current model selection is not in new choices, set to null
+        if (self.value && !self.modelChoices.includes(self.value.model)) {
+            self.value.model = null;
+        }
+    };
+
+    /**
+     * Update property choices.
+     *
+     * New choices will be properties of current model selection.
+     */
+    self.updatePropertyChoices = function() {
+        if (!self.value.model) {
+            self.propertyChoices = [];
+        } else {
+            self.propertyChoices = typesService.properties[self.value.model];
+        }
+        if (!self.propertyChoices.includes(self.value.prop)) {
+            self.value.prop = null;
+        }
+
+    };
+
+    /**
+     * Update operator choices.
+     *
+     * New choices will be a function of chosen model and property.
+     */
+    self.updateOperatorChoices = function() {
+        self.operatorChoices = typesService.operators(self.value.model, self.value.prop);
+        if (!self.operatorChoices.includes(self.value.operator)) {
+            self.value.operator = null;
+        }
+    };
+
+    /**
+     * Trigger this component's on change method.
+     */
+    self.change = function() {
+        self.onChange({
+            change: {
+                name: self.name,
+                value: self.value
+            }
+        });
+    };
+}
+
+angular.module("cloudSnitch").component("filterInput", {
+    templateUrl: "/static/web/html/inputs/filterinput.html",
+    controller: ["typesService", FilterController],
+    bindings: {
+        all: "<",
+        value: "<",
+        options: "<",
+        serverErrors: "<",
+        onChange: "&"
+    }
+});

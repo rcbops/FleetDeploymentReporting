@@ -1,0 +1,83 @@
+<div class="hxRow" ng-form="pathFilterForm">
+  <div class="hxCol hxSpan-3">
+    <select
+      class="hxTextCtrl"
+      name="model"
+      ng-model="$ctrl.value.model"
+      ng-required="true"
+      ng-change="$ctrl.update()"
+      ng-options="model for model in $ctrl.modelChoices"></select>
+    </select>
+  </div>
+  <div class="hxCol hxSpan-3">
+    <select
+      class="hxTextCtrl"
+      name="prop"
+      ng-model="$ctrl.value.prop"
+      ng-required="true"
+      ng-change="$ctrl.update()"
+      ng-options="prop for prop in $ctrl.propertyChoices"></select>
+  </div>
+  <div class="hxCol hxSpan-3">
+    <select
+      class="hxTextCtrl"
+      name="operator"
+      ng-model="$ctrl.value.operator"
+      ng-required="true"
+      ng-change="$ctrl.update()"
+      ng-options="op for op in $ctrl.operatorChoices"></select>
+    </select>
+  </div>
+  <div class="hxCol hxSpan-3" ng-switch="$ctrl.valueType">
+    <select
+      ng-switch-when="bool"
+      class="hxTextCtrl"
+      name="value"
+      ng-model="$ctrl.value.value"
+      ng-change="$ctrl.update()"
+      ng-required="true">
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+    <input
+      ng-switch-when="int|float"
+      ng-switch-when-separator="|"
+      type="number"
+      class="hxTextCtrl"
+      name="value"
+      ng-model="$ctrl.value.value"
+      ng-required="true"
+      ng-change="$ctrl.update()"
+      ng-maxlength="16" />
+    <input
+      ng-switch-default
+      class="hxTextCtrl"
+      type="text"
+      name="value"
+      ng-model="$ctrl.value.value"
+      ng-required="true"
+      ng-change="$ctrl.update()"
+      ng-maxlength="256" />
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="pathFilterForm.$invalid">
+    <div ng-if="pathFilterForm.model.$error.required"><hx-error>Please select a model.</hx-error></div>
+    <div ng-if="pathFilterForm.prop.$error.required"><hx-error>Please select a property.</hx-error></div>
+    <div ng-if="pathFilterForm.operator.$error.required"><hx-error>Please select an operator.</hx-error></div>
+    <div ng-if="pathFilterForm.value.$error.required"><hx-error>Please provide a value.</hx-error></div>
+    <div ng-if="pathFilterForm.value.$error.maxlength"><hx-error>Value must be less than 256 characters.</hx-error></div>
+  </div>
+  <div class="hxCol hxSpan-12" ng-if="$ctrl.serverErrors">
+    <div
+      ng-if="$ctrl.serverErrors.model"
+      ng-repeat="e in $ctrl.serverErrors.model"><hx-error>Model: {{ e }}</hx-error></div>
+    <div
+      ng-if="$ctrl.serverErrors.prop"
+      ng-repeat="e in $ctrl.serverErrors.prop"><hx-error>Property: {{ e }}</hx-error></div>
+    <div
+      ng-if="$ctrl.serverErrors.operator"
+      ng-repeat="e in $ctrl.serverErrors.operator"><hx-error>Operator: {{ e }}</hx-error></div>
+    <div
+      ng-if="$ctrl.serverErrors.value"
+      ng-repeat="e in $ctrl.serverErrors.value"><hx-error>Value: {{ e }}</hx-error></div>
+  </div>
+</div>

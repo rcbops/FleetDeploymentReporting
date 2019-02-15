@@ -18,5 +18,6 @@ urlpatterns = [
     ),
     path('browse', views.index, name='browse'),
     path('reporting', views.index, name='reporting'),
+    path('status', views.index, name='status'),
     path('', views.index, name='index')
 ]

@@ -1,0 +1,42 @@
+<div class="status hxBox-md">
+  <h2>Status</h2>
+  <bigbusy busy="$ctrl.bust" text="'Loading status...'"></bigbusy>
+  <hx-alert type="error" target="'status'"></hx-alert>
+  <table class="hxTable hxTable--condensed hxHoverable" ng-if="$ctrl.data">
+      <tr>
+        <th colspan="2">Cache</th>
+        <th class="right">
+          <hx-icon class="healthy" type="checkmark" ng-if="$ctrl.data.status.cache.status"></hx-icon>
+          <hx-icon class="unhealthy" type="times" ng-if="!$ctrl.data.status.cache.status"></hx-icon>
+        </th>
+      </tr>
+      <tr>
+        <th colspan="2">Database</th>
+        <th class="right">
+          <hx-icon class="healthy" type="checkmark" ng-if="$ctrl.data.status.neo4j.status"></hx-icon>
+          <hx-icon class="unhealthy" type="times" ng-if="!$ctrl.data.status.neo4j.status"></hx-icon>
+        </th>
+      </tr>
+      <tr ng-repeat-start="(section, sectionObj) in $ctrl.data.status.neo4j.stats">
+        <td>&nbsp;</td>
+        <th colspan="2">{{ section }}</th>
+      </tr>
+      <tr ng-repeat="(key, val) in sectionObj" ng-repeat-end>
+        <td></td>
+        <td>{{ key }}</td>
+        <td class="right">
+            <span ng-if="section == 'store_size'">{{ val | prettyStorageUnits }}</span>
+            <span ng-if="section != 'store_size'">{{ val }}</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button type="button" class="hxBtn" ng-click="$ctrl.toggleJson()">
+            <span ng-if="$ctrl.showJson">Hide JSON</span>
+            <span ng-if="!$ctrl.showJson">Show JSON</span>
+          </button>
+        </td>
+        <td colspan="2"><pre ng-if="$ctrl.showJson">{{ $ctrl.data | json }}</pre></td>
+      </tr>
+  </table>
+</div>

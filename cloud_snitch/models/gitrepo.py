@@ -64,8 +64,8 @@ class GitRepoEntity(VersionedEntity):
         'environment': VersionedProperty(is_static=True),
         'active_branch_name': VersionedProperty(is_state=True),
         'head_sha': VersionedProperty(is_state=True),
-        'is_detached': VersionedProperty(is_state=True),
-        'working_tree_dirty': VersionedProperty(is_state=True),
+        'is_detached': VersionedProperty(is_state=True, type=bool),
+        'working_tree_dirty': VersionedProperty(is_state=True, type=bool),
         'working_tree_diff_md5': VersionedProperty(is_state=True),
         'merge_base_name': VersionedProperty(is_state=True),
         'merge_base_diff_md5': VersionedProperty(is_state=True)

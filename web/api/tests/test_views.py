@@ -31,6 +31,40 @@ class BaseApiTestCase(APITestCase):
         self.client.logout()
 
 
+class TestStatusViewSetList(BaseApiTestCase):
+    """Tests the status viewset."""
+
+    @tag('unit')
+    def test_without_auth(self):
+        resp = self.client.get('/api/status/')
+        self.assertEquals(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    @tag('unit')
+    @mock.patch('api.views.combined_status')
+    def test_healthy_with_auth(self, m_combined):
+        m_combined.return_value = (True, 'good')
+        self.client.login(**self.credentials)
+        resp = self.client.get('/api/status/')
+        self.assertEquals(resp.status_code, status.HTTP_200_OK)
+        data = resp.json()
+        self.assertTrue(data.get('healthy'))
+        self.assertEqual(data.get('status'), 'good')
+
+    @tag('unit')
+    @mock.patch('api.views.combined_status')
+    def test_not_healthy_with_auth(self, m_combined):
+        m_combined.return_value = (False, 'notgood')
+        self.client.login(**self.credentials)
+        resp = self.client.get('/api/status/')
+        self.assertEquals(
+            resp.status_code,
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+        data = resp.json()
+        self.assertTrue(data['healthy'] is False)
+        self.assertEqual(data.get('status'), 'notgood')
+
+
 class TestModelViewSetList(BaseApiTestCase):
 
     @tag('unit')

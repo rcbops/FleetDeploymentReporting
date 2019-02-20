@@ -378,5 +378,26 @@ angular.module("cloudSnitch").factory("cloudSnitchApi", ["$http", "$q", "timeSer
         });
     };
 
+    service.status = function() {
+        var defer = $q.defer();
+        return $http({
+            method: "GET",
+            headers: makeHeaders(),
+            url: "/api/status/"
+        }).then(
+            function(resp) {
+                // Success
+                defer.resolve(resp.data);
+                return defer.promise;
+            },
+            function(resp) {
+                // Error
+                if (resp.status == 503) { defer.resolve(resp.data); }
+                else { defer.reject(resp); }
+                return defer.promise;
+            }
+        );
+    };
+
     return service;
 }]);

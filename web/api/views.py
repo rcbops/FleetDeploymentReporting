@@ -24,10 +24,24 @@ from .serializers import SearchSerializer
 from .serializers import TimesChangedSerializer
 
 from .query import TimesQuery
-
+from .status import combined as combined_status
 from .tasks import objectdiff
 
 logger = logging.getLogger(__name__)
+
+
+class StatusViewSet(viewsets.ViewSet):
+    """Viewset around status."""
+
+    def list(self, request):
+        """Tests cache and database."""
+        healthy, data = combined_status()
+        serializer = GenericSerializer({
+            'healthy': healthy,
+            'status': data
+        })
+        status = 200 if healthy else 503
+        return Response(data=serializer.data, status=status)
 
 
 class ModelViewSet(viewsets.ViewSet):

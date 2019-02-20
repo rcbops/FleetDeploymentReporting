@@ -115,7 +115,7 @@ expandable-table-content:last-child .expandable {
   overflow-x: auto;
 }
 
-.panesContainer, .reportingContainer {
+.panesContainer, .reportingContainer, .statusContainer {
   display: flex;
   overflow: hidden;
   position: relative;
@@ -129,9 +129,13 @@ expandable-table-content:last-child .expandable {
   overflow-x: auto;
 }
 
-.reportingContainer {
+.reportingContainer, .statusContainer {
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.statusContainer table {
+  min-width: 600px;
 }
 
 .report {
@@ -590,4 +594,12 @@ div.diffNodeDetail hx-panel {
 
 .chart-container-sm .chart {
   height: 300px;
+}
+
+.good, .healthy {
+  color: #1B5E20;
+}
+
+.bad, .unhealthy {
+ color: #B71C1C
 }

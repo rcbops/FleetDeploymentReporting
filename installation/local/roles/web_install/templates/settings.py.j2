@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'compressor',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -256,3 +257,11 @@ REST_FRAMEWORK = {
         'rest_framework_csv.renderers.CSVRenderer',
     )
 }
+
+STATICFILES_FINDERS = (
+     'django.contrib.staticfiles.finders.FileSystemFinder',
+     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+     {% if cloud_snitch_web_static_compression_enabled %}'compressor.finders.CompressorFinder',{% endif %}
+)
+
+COMPRESS_OFFLINE = {% if cloud_snitch_web_static_compression_offline %}True{% else %}False{% endif%}

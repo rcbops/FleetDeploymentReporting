@@ -1,14 +1,17 @@
 {% load static %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="en" ng-app="cloudSnitch">
   <head>
     <meta charset="utf-8">
     <title>{% block title %}Cloud Snitch{% endblock %}</title>
     {% block base %}{% endblock %}
+    {% compress css %}
     <link href="{% static 'common/css/helix-ui.css' %}" type="text/css" rel="stylesheet" />
     <link href="{% static 'common/css/cloudsnitch.css' %}" type="text/css" rel="stylesheet" />
     <link href="{% static 'common/css/alert.css' %}" type="text/css" rel="stylesheet" />
     {% block extra_css %}{% endblock %}
+    {% endcompress %}
     <script src="{% static 'common/js/webcomponents-loader.js' %}" type="text/javascript"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
 
@@ -44,11 +47,13 @@
     </div>
     {% endblock %}
 
+    {% compress js %}
     <script src="{% static 'common/js/jquery.min.js' %}" type="text/javascript"></script>
     <script src="{% static 'common/js/moment.min.js' %}" type="text/javascript"></script>
     <script src="{% static 'common/js/custom-elements-es5-adapter.js' %}" type="text/javascript"></script>
     <script src="{% static 'common/js/helix-ui.browser.js' %}" type="text/javascript"></script>
     <script src="{% static 'common/js/d3.v5.min.js' %}" type="text/javascript"></script>
     {% block js %}{% endblock %}
+    {% endcompress %}
   </body>
 </html>

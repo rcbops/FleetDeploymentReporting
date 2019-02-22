@@ -1,0 +1,84 @@
+---
+
+# The `users.yaml` file in `users_repo` should look like this:
+#
+# deleted_users:
+#   - oldusername1
+#
+# users:
+#   - username: username4
+#     name: Firstname Lastname
+#     groups:
+#       - team1
+#       - sudo
+#     ssh_keys:
+#       - "ssh-rsa pubkeydata user@host"
+#
+
+- hosts: fdr_infra
+  vars:
+    users_repo:  git@github.rackspace.com:raxet/users
+  tasks:
+    - block:
+      - name: create temporary directory for user data repo
+        tempfile:
+          state: directory
+        register: tempdir
+        delegate_to: localhost
+        run_once: true
+
+      - name: clone user data repo
+        git:
+          repo: "{{ users_repo }}"
+          accept_hostkey: true
+          dest: "{{ tempdir.path }}"
+        delegate_to: localhost
+        run_once: true
+        become: false
+
+      - name: load user data into vars
+        include_vars:
+          file: "{{ tempdir.path }}/users.yml"
+        delegate_to: localhost
+        run_once: true
+
+      - name: gather groups from all users
+        set_fact:
+          all_groups: "{{ all_groups | default([]) + item.groups }}"
+        with_items: "{{ users }}"
+
+      - name: ensure user groups exists
+        group:
+          name: "{{ item }}"
+          state: present
+        with_items: "{{ all_groups | unique }}"
+
+      - name: ensure users exist and set a random password for each
+        user:
+          name: "{{ item.username }}"
+          comment: "{{ item.name }}"
+          password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,hexdigits,punctuation') | password_hash('sha512') }}"
+          groups: "{{ item.groups }}"
+          shell: /bin/bash
+        with_items: "{{ users }}"
+
+      - name: ensure authorized SSH keys are configured
+        authorized_key:
+          user: "{{ item.username }}"
+          key: "{{  item.ssh_keys | join('\n') }}"
+          exclusive: true
+        with_items: "{{ users }}"
+
+      - name: ensure users in deleted_users are gone
+        user:
+          name: "{{ item }}"
+          state: absent
+        with_items: "{{ deleted_users }}"
+
+      always:
+        - name: remove temporary directory for users repo
+          file:
+            path: "{{ tempdir.path }}"
+            state: absent
+          delegate_to: localhost
+          run_once: true

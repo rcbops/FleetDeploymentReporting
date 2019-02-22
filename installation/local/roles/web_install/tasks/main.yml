@@ -142,6 +142,13 @@
     virtualenv: '{{ cloud_snitch_web_venv }}'
     command: 'collectstatic'
 
+- name: Cloud Snitch Web - Compress Static
+  django_manage:
+    app_path: '{{ cloud_snitch_web_project_dir }}'
+    virtualenv: '{{ cloud_snitch_web_venv }}'
+    command: 'compress'
+  when: cloud_snitch_web_static_compression_offline
+
 - name: Cloud Snitch Web - Check if django superuser exists
   django_manage:
     app_path: '{{ cloud_snitch_web_project_dir }}'

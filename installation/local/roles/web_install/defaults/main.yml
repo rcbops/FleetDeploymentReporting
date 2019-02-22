@@ -14,12 +14,13 @@ cloud_snitch_web_raxauth_auth_url: ''
 
 cloud_snitch_web_log_dir: /var/log/cloud_snitch_web
 
-cloud_snitch_web_repo: https://github.com/rcbops/FleetDeploymentReporting.git
+cloud_snitch_repo: https://github.com/rcbops/FleetDeploymentReporting.git
+cloud_snitch_web_repo: "{{ cloud_snitch_repo }}"
 cloud_snitch_web_repo_dir: /opt/web/cloud_snitch
 cloud_snitch_web_project_dir: "{{ cloud_snitch_web_repo_dir }}/web"
 cloud_snitch_web_app_dir: "{{ cloud_snitch_web_project_dir }}/cloud_snitch_web"
 cloud_snitch_web_venv: /opt/venvs/cloudsnitch
-cloud_snitch_web_version: master
+cloud_snitch_web_version: "{{ cloud_snitch_version }}"
 
 cloud_snitch_web_secret_key: super_secret_key
 
@@ -85,6 +86,7 @@ cloud_snitch_web_pip_pkgs:
   PyYAML: 4.2b1
   django-redis: 4.9.0
   requests: 2.20.0
+  django-compressor: 2.2
 
 cloud_snitch_web_alt_name: "{{ ansible_default_ipv4.address }}"
 cloud_snitch_web_self_signed_subject: "/C=US/ST=Texas/L=San Antonio/O=IT/CN={{ cloud_snitch_web_server_name }}/subjectAltName=IP.1={{ cloud_snitch_web_alt_name }}"
@@ -115,3 +117,6 @@ cloud_snitch_web_default_permission_classes:
   - rest_framework.permissions.IsAuthenticated
 
 cloud_snitch_web_raxauth_rpc_groups: []
+
+cloud_snitch_web_static_compression_enabled: True
+cloud_snitch_web_static_compression_offline: True

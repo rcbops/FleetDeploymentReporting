@@ -1,5 +1,6 @@
 {% extends 'common/base.html' %}
 {% load static %}
+{% load angular %}
 
 {% block title %}Cloud Snitch{% endblock %}
 {% block base %}<base href="/web/" />{% endblock %}
@@ -23,6 +24,7 @@
     <hx-alert class="hxSpan-4" id="master_alert" target="'master_alert'"></hx-alert>
   </main>
 </div>
+{% cached_angular_templates %}
 {% endblock %}
 
 {% block js %}
